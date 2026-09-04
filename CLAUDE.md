@@ -13,11 +13,11 @@ Trước khi viết, sửa, hay review bất kỳ script nào trong project, ph�
 
 ## Project này là gì
 
-**Zombie War** — game bắn súng 3D góc nhìn top-down cho mobile, làm để nộp bài test kỹ thuật, dựng trên một template game casual có sẵn. Toàn bộ asset và code first-party nằm dưới `Assets/_ZombieWar/` (xem Bố cục code first-party); phần còn lại của `Assets/` là third-party. Hiện code mới chỉ có một Editor tool (`Assets/_ZombieWar/Scripts/Editor/`, assembly `ZombieWar.Editor`). Scene duy nhất trong build list, `Assets/Scenes/SampleScene.unity`, là scene **2D** mẫu (camera orthographic, `Global Light 2D`) — tạo scene 3D mới cho gameplay, đừng chuyển đổi scene này. Sau khi renderer mặc định đổi sang 3D (xem Stack chính), scene 2D này render sai là bình thường.
+**Zombie War** — game bắn súng 3D góc nhìn top-down cho mobile, làm để nộp bài test kỹ thuật, dựng trên một template game casual có sẵn. Toàn bộ asset và code first-party nằm dưới `Assets/_ZombieWar/` (xem Bố cục code first-party); phần còn lại của `Assets/` là third-party. Gameplay P0 đã dựng xong khung (xem "Hiện trạng hệ thống"). **Game chạy màn hình dọc 9:16** (quyết định của user ngày 2026-09-05, khác với spec docx viết cho landscape). Build list chỉ có hai scene trong `Assets/_ZombieWar/Scenes/`: `MainMenu` và `Gameplay`; **các level không tách scene** — map mỗi level là prefab `Prefabs/Environment/Map_*.prefab` được `LevelMapLoader` instantiate vào scene `Gameplay`. `Assets/Scenes/SampleScene.unity` là scene **2D** mẫu của template, không thuộc game và không còn trong build list — đừng dựng gì trên nó.
 
 ## Spec (nguồn sự thật cho gameplay)
 
-Đề bài đầy đủ của khách hàng, bảng nghiệm thu, trục chấm điểm và phân rã hệ thống đề xuất nằm ở **`docs/GAME_SPEC.md`**. Theo `CODE-RULE.md` §8, logic gameplay phải bám đúng spec — không sáng tạo thêm cơ chế, mọi số cân bằng là nút vặn trong ScriptableObject. Đọc spec trước khi bắt đầu bất kỳ tính năng gameplay nào.
+Spec/GDD đầy đủ (số cân bằng, state machine, wave timeline, acceptance criteria) là **`docs/Zombie_War_SPEC_GDD_V1.0.docx`** (đã thay thế `docs/GAME_SPEC.md` cũ). File docx không đọc trực tiếp được — trích text bằng Python (`zipfile` + parse `word/document.xml`, xuất heading/paragraph/table ra markdown vào scratchpad) rồi đọc. Theo `CODE-RULE.md` §8, logic gameplay phải bám đúng spec — không sáng tạo thêm cơ chế, mọi số cân bằng là nút vặn trong ScriptableObject. Đọc spec trước khi bắt đầu bất kỳ tính năng gameplay nào.
 
 Bản rút gọn 8 yêu cầu bắt buộc:
 
@@ -48,7 +48,8 @@ Chấm theo Gameplay, Physics, Animation (Blend Trees), Shader/Visual/UI có h�
 - **DOTween / DOTweenPro** (`Assets/Plugins/Demigiant/`), settings tại `Assets/Resources/DOTweenSettings.asset`. Luôn `SetLink(gameObject)`.
 - **Layer Lab GUI Pro-CasualGame** (`Assets/Layer Lab/GUI Pro-CasualGame/Prefabs/`) — bộ prefab UI (button, frame, popup, slider, label) và một script `UIParticleSystem`. Ghép các prefab này cho HUD/menu.
 - **Toony Colors Pro 2** (`Assets/JMO Assets/`) — toon shading, có asmdef riêng `ToonyColorsPro.*`; nền tốt cho dissolve zombie và look toon.
-- **TextMeshPro**, **Timeline**, **Visual Scripting**, **bộ 2D** đã cài nhưng không phải trọng tâm của game này. TMP **Essential Resources chưa import** — 17 material font của Layer Lab đang là `Hidden/InternalErrorShader`; import qua Window → TextMeshPro trước khi dựng HUD.
+- **TextMeshPro**, **Timeline**, **Visual Scripting**, **bộ 2D** đã cài nhưng không phải trọng tâm của game này. TMP Essential Resources **đã import** (`Assets/TextMesh Pro/`); HUD dùng font `LiberationSans SDF`.
+- **DOTween modules có asmdef riêng** (`DOTween.Modules.asmdef`, `DOTweenPro.Scripts.asmdef`, tạo bằng chính ASMDEFManager của DOTween). `ZombieWar.asmdef` reference `DOTween.Modules` để dùng `DOFillAmount`/`DOFade` của uGUI; không xoá các asmdef này.
 
 ## Asset pack — phân vai
 
@@ -119,9 +120,33 @@ Hai assembly definition tách code first-party khỏi `Assembly-CSharp` của c�
 
 `Assets/_Recovery/0.unity` là file recovery sau crash của Unity, không phải scene thật — không dựng gì trên nó; xoá khi tiện.
 
+## Hiện trạng hệ thống (cập nhật 2026-09-05)
+
+Toàn bộ runtime nằm trong một prefab **`Assets/_ZombieWar/Prefabs/GameplayRoot.prefab`** (Systems/Managers, Pools, Map, Player, CameraRig, UI); scene `Gameplay` chỉ chứa một instance của nó. Luồng chọn level: `MainMenuView` → `LevelLoader.LoadLevel(level)` ghi vào `Data/Levels/LevelSelection.asset` (`LevelSelectionSO`, kênh runtime giữa hai scene) rồi load scene `Gameplay`; ở đó `LevelMapLoader` (`DefaultExecutionOrder(-100)`, trên `Systems/Managers`) đọc selection (fallback Level 1 khi mở scene trực tiếp), instantiate `LevelDefinitionSO.MapPrefab` vào `Map/` và đặt player tại `LevelMap.PlayerSpawn`. `GameFlowController`/`WaveDirector` lấy level từ `LevelMapLoader.Level`, không giữ reference level riêng. Retry/Next = reload scene `Gameplay`.
+
+Map prefab (`Prefabs/Environment/Map_FlatOutpost.prefab`, `Map_BurningHills.prefab`) có root `LevelMap` chứa: `Environment` (đất, tường biên, vật cản), `Directional Light`, `PlayerSpawn`, và `NavMeshSurface` (collect **Children**, data bake lưu ở `Prefabs/Environment/NavMesh_Map_*.asset`). Sửa map xong phải bake lại: đặt prefab vào scene, `BuildNavMesh()`, `AssetDatabase.CreateAsset` đè lên file data cũ, save prefab. Thêm level mới = thêm map prefab + `LevelDefinitionSO` + entry trong `MainMenuView`, không đụng code.
+
+Camera portrait: vcam pitch 72°, follow offset (0, 14, −4.5); `CameraAspectAdapter` giữ **FOV ngang** cố định (40°) và suy ra FOV dọc theo aspect (clamp 45–70°), nên 9:16 / 9:19.5 / 3:4 đều thấy cùng bề rộng làn. Spawn ring đã nới lên 14–20 m (min 12) vì màn dọc nhìn xa về phía trước; `_navMeshSampleRadius = 5` ở cả hai level để spawn được khi player đứng trên plateau. UI: Canvas Scaler reference 1080×1920, match 0.5.
+
+| Hệ thống | Script chính | Ghi chú |
+|---|---|---|
+| Flow | `Core/GameFlowController` (Countdown→Playing→Paused/Won/Lost), `LevelTimer`, `ScoreTracker`, `SaveService` (PlayerPrefs) | Entry point duy nhất mỗi scene; UI chỉ subscribe event |
+| Player | `Player/PlayerMotor` (Rigidbody), `PlayerAim` (OverlapSphereNonAlloc + Linecast LOS, hold 0.35 s), `PlayerHealth`, `PlayerAnimationPresenter`, `PlayerHitFlash` (MPB, property `_Color` vì material Autodesk Interactive), `PlayerDeathPresenter` (tween ngã, vì không có clip death) | Input: `PlayerInputReader` đọc action `Player/Move`; joystick là On-Screen Stick `<Gamepad>/leftStick` |
+| Weapons | `Weapons/WeaponController` (FSM Ready/Firing/Cooldown/Reloading/Switching), `Gun`, `ProjectileManager` (SphereCast, pool 180), `BombThrower` + `Bomb` (Rigidbody, fuse, telegraph ring, falloff) | Gun model gắn dưới `hand_r/GunSocket`; hướng nòng = hướng nhân vật |
+| Enemies | `Enemies/ZombieManager` (pool theo `ZombieDefinitionSO`, registry Collider→zombie, tick tập trung), `ZombieController` (FSM Spawning/Chase/Attack/HitStun/Knockback/Dying), `ZombieMaterialFx` (MPB `_HitAmount`/`_DissolveAmount`) | Shader `Art/Shaders/ZombieDissolve.shader` (HLSL URP, có ShadowCaster/DepthOnly) |
+| Level | `Level/LevelMapLoader` + `LevelMap` (map prefab, spawn, NavMesh), `WaveDirector` (phase, cap, weighted pick, scripted Giant @145 s, anti-spike), `SpawnPointResolver`, `FireHazardSpawner` + `FireZone` (P1, Level 2 @75 s/@120 s) | Level 2: plateau 3.5 m + 4 dốc 22° |
+| UI | `UI/*View` (HealthBar, Timer, Score, GunHud, BombButton, Countdown, PauseMenu, ResultPanel, MainMenu), `SafeAreaFitter`, `TimeTextFormatter` (zero-alloc) | 4 Canvas riêng theo tần suất: HUD / Countdown / Pause / Result |
+| Data | `Data/*SO` + instance trong `Assets/_ZombieWar/Data/{Player,Rules,Weapons,Zombies,Waves,Levels}` | Số liệu chép đúng spec §5–§10; chỉnh ở đây, không sửa code |
+
+Editor tool: **Tools ▸ Zombie War ▸ Animation ▸ Create Default Animator Recipe / Build Animators** đọc `Animation/AnimatorBuildRecipe.asset` (clip theo vai) và dựng lại tại chỗ `SoldierAnimator.controller` (4 layer: Base Locomotion blend tree 2D, Upper Combat với `UpperBodyMask`, Hit Reaction additive, Full Body) và `ZombieAnimator.controller`, giữ nguyên GUID. Thiếu clip thì state để trống (log info, không phải lỗi). **Zombie tạm chưa cần animation** (quyết định của user); soldier chưa có clip reload/hit/death trong pack.
+
+Layer vật lý đã thêm: `Player`(8) `Enemy`(9) `Obstacle`(10) `Ground`(11) `Prop`(12) `Bomb`(13); ma trận đã tắt va chạm Player–Bomb. `PlayerSettings.runInBackground = true` để Play mode trong Editor không đứng hình khi cửa sổ mất focus (cần cho test qua MCP).
+
+Còn thiếu / biết trước: nhạc nền (project không có track nào), vignette khi trúng đòn, IK tay trái cầm súng, âm nổ bom đang mượn `AntiMaterialRifle_far_01`, icon súng render từ AssetPreview (`Art/Sprites`). Thư mục `Captures/` (ảnh chụp qua MCP) đã gitignore.
+
 ## Build Android (sản phẩm APK)
 
-Player settings đã có: scripting backend **IL2CPP**, kiến trúc **chỉ ARM64**, min SDK **25**, orientation Auto-rotate. Vẫn còn giá trị template phải đổi trước khi build cuối: `productName: TemplateCasual`, `companyName: DefaultCompany`, và build scene list (chỉ có `SampleScene`). Khoá orientation theo layout joystick đã thiết kế.
+Player settings đã có: scripting backend **IL2CPP**, kiến trúc **chỉ ARM64**, min SDK **25**, `productName: Zombie War`, `companyName: DucHien`, application id `com.duchien.zombiewar`, orientation **Portrait** khoá cứng. Build scene list: `MainMenu`, `Gameplay`.
 
 **Chưa có build script hay CLI**; build trong Editor (File → Build Settings → Android). `*.apk`, `*.aab`, `Builds/` bị gitignore — đưa APK lên **GitHub Release**, đừng cố commit. Nếu thêm method build trong Editor, dạng headless là:
 
