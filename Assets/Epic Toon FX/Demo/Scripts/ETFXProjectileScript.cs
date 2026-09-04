@@ -49,7 +49,7 @@ namespace EpicToonFX
 
             float rad = sphereCollider ? sphereCollider.radius : colliderRadius;
 
-            Vector3 dir = rb.linearVelocity; // Use rb.velocity instead of rb.linearVelocity
+            Vector3 dir = rb.velocity;
             float dist = dir.magnitude * Time.deltaTime;
 
             if (rb.useGravity)
@@ -128,9 +128,9 @@ namespace EpicToonFX
 
         private void RotateTowardsDirection(bool immediate = false)
         {
-            if (rb.linearVelocity != Vector3.zero)
+            if (rb.velocity != Vector3.zero)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(rb.linearVelocity.normalized, Vector3.up);
+                Quaternion targetRotation = Quaternion.LookRotation(rb.velocity.normalized, Vector3.up);
 
                 if (immediate)
                 {
@@ -138,7 +138,7 @@ namespace EpicToonFX
                 }
                 else
                 {
-                    float angle = Vector3.Angle(myTransform.forward, rb.linearVelocity.normalized);
+                    float angle = Vector3.Angle(myTransform.forward, rb.velocity.normalized);
                     float lerpFactor = angle * Time.deltaTime; // Use the angle as the interpolation factor
                     myTransform.rotation = Quaternion.Slerp(myTransform.rotation, targetRotation, lerpFactor);
                 }
