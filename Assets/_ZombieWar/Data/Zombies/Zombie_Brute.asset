@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43d610905e01e2842bda555aa60e3aee, type: 3}
+  m_Name: Zombie_Brute
+  m_EditorClassIdentifier: 
+  _id: brute
+  _displayName: Brute
+  _prefab: {fileID: 3326704796316143143, guid: 0042dc83634158f408a4d74242cbcb72, type: 3}
+  _poolPrewarm: 14
+  _maxHp: 140
+  _moveSpeed: 1.6
+  _scoreReward: 30
+  _attackDamage: 18
+  _attackCooldown: 1.3
+  _attackRange: 1.7
+  _attackWindup: 0.5
+  _attackReachTolerance: 0.4
+  _attackAreaRadius: 0
+  _destinationUpdateHz: 4
+  _spawnDelay: 0.25
+  _repathTimeout: 1
+  _hitStunDuration: 0.14
+  _knockbackForceMultiplier: 1
+  _physicsKnockbackThreshold: 4
+  _knockbackUpwardsFactor: 0.35
+  _knockbackMinDuration: 0.35
+  _knockbackMaxDuration: 0.55
+  _knockbackRestSpeed: 0.4
+  _bulletNudgeDistance: 0.12
+  _deathVfx: {fileID: 1803616269720018331, guid: a0ff922c8add8a34e90c60965aa80abc, type: 3}
+  _attackClips:
+  - {fileID: 8300000, guid: bc2baab908f1b004691a6ecf7044f61c, type: 3}
+  - {fileID: 8300000, guid: 12e7285fa38aaf943a0ed8c7f3c684eb, type: 3}
+  _hitClips:
+  - {fileID: 8300000, guid: b771cd0787c16e64e8e8ba11c3c83734, type: 3}
+  - {fileID: 8300000, guid: 168c9a5ac7025814ea9c89e5098a3cad, type: 3}
+  _deathClips:
+  - {fileID: 8300000, guid: 9df77b70cadc8384ca073a95aebc666f, type: 3}
+  - {fileID: 8300000, guid: 1d92c5ac0e056b045b4461b147f95be5, type: 3}
+  _spawnClip: {fileID: 8300000, guid: ceb2474913e8b5e40b17213af473d784, type: 3}

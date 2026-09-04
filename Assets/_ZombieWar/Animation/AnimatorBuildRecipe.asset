@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d62ef906d95741468dfb1ee22c11733, type: 3}
+  m_Name: AnimatorBuildRecipe
+  m_EditorClassIdentifier: 
+  _soldierControllerPath: Assets/_ZombieWar/Animation/Soldier/SoldierAnimator.controller
+  _upperBodyMaskPath: Assets/_ZombieWar/Animation/Soldier/UpperBodyMask.mask
+  _zombieControllerPath: Assets/_ZombieWar/Animation/Zombie/ZombieAnimator.controller
+  _soldierIdle: {fileID: -3100369314251171874, guid: 12e52e465ed793a4d801955e9f964a82, type: 3}
+  _soldierWalkForward: {fileID: 1657602633327794031, guid: 8269a9f8cf495034c817722ac21f309f, type: 3}
+  _soldierRunForward: {fileID: 6564411413370888346, guid: 16114d403eabb53438de032c6f0d1deb, type: 3}
+  _soldierRunBackward: {fileID: -8704978693243160924, guid: a073c604c44135e438eeeaef77058ac5, type: 3}
+  _soldierCombatIdle: {fileID: 7400000, guid: e9fa0cd70df4a414ea410a82fba042e6, type: 3}
+  _soldierShoot: {fileID: 7400000, guid: f82df825e9d95914186355593096f25e, type: 3}
+  _soldierReload: {fileID: 0}
+  _soldierHit: {fileID: 0}
+  _soldierDeath: {fileID: 0}
+  _zombieIdle: {fileID: -3100369314251171874, guid: 12e52e465ed793a4d801955e9f964a82, type: 3}
+  _zombieWalk: {fileID: 1657602633327794031, guid: 8269a9f8cf495034c817722ac21f309f, type: 3}
+  _zombieAttack: {fileID: 0}
+  _zombieHit: {fileID: 0}
+  _zombieDeath: {fileID: 0}

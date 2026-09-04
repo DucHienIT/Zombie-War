@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b821eeb830af89409c424f930c68366, type: 3}
+  m_Name: L1_Phase3
+  m_EditorClassIdentifier: 
+  _startTime: 65
+  _endTime: 110
+  _spawnInterval: 0.55
+  _aliveCap: 32
+  _weights:
+  - _definition: {fileID: 11400000, guid: 2b53a1328cda368459640a37e4f755af, type: 2}
+    _weight: 72
+  - _definition: {fileID: 11400000, guid: 10ed8f834d389514684b435d848a4f6f, type: 2}
+    _weight: 23
+  - _definition: {fileID: 11400000, guid: c02e777ce552f0f4cb8f9035ee21905e, type: 2}
+    _weight: 5
+  _scriptedSpawns: []
+  _fireHazardTimes: []
