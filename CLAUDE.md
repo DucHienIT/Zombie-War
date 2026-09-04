@@ -2,52 +2,101 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## What this is
+## BẮT BUỘC: đọc `CODE-RULE.md` trước
 
-A **starter template** for casual mobile games in Unity, not a game yet. All C# under `Assets/` is third-party asset packs (Toony Colors Pro 2, DOTween/DOTweenPro, Layer Lab GUI Pro). There is **no first-party game code, no game asmdef, and no gameplay scene** beyond `Assets/Scenes/SampleScene.unity` (the sole scene in the build list). New game code starts from a blank slate — expect to create the scripts, scenes, and ScriptableObject configs yourself.
+Trước khi viết, sửa, hay review bất kỳ script nào trong project, phải đọc toàn bộ **`CODE-RULE.md`** ở root repo. Đó là bộ quy tắc code bắt buộc (cấu trúc thư mục, naming, kiến trúc data-driven, cấm bootstrap runtime, zero-allocation, SOLID, quy trình compile-check). File CLAUDE.md này chỉ chứa những gì riêng của project và không lặp lại các quy tắc đó. Code vi phạm `CODE-RULE.md` coi như chưa xong.
 
-## Unity version (important)
+## Quy tắc ngôn ngữ
 
-- Editor version is **`2022.3.62f3`** (`ProjectSettings/ProjectVersion.txt`, branch `unity_2022`). The project was intentionally downgraded from Unity 6 — see commit `1f3bbff "down version"`. Open with this exact version to avoid a forced upgrade.
-- If `ProjectVersion.txt` and `README.md` ever disagree on the version, `ProjectVersion.txt` is authoritative.
+- **Mọi thứ trong script** viết bằng **tiếng Anh 100%**: tên class/method/field/biến, string log, comment, tên asset/prefab/scene do code tham chiếu. Không để tiếng Việt lọt vào code, kể cả comment.
+- Trả lời người dùng bằng tiếng Việt.
 
-## Key stack
+## Project này là gì
 
-- **URP 14.0** — supports **both 2D and 3D**. The active pipeline `Assets/Settings/UniversalRP.asset` (guid `681886c5...`, referenced by every quality tier) holds two renderers:
-  - index **0 = `Renderer2D.asset`** — the default; 2D lit/sprite scenes render with this out of the box.
-  - index **1 = `UniversalRenderer.asset`** — the standard 3D forward renderer, added for 3D scenes.
-  - Pick per scene/camera: leave a camera on the default for 2D, or set its **Camera → Rendering → Renderer** to `UniversalRenderer (1)` for 3D. `m_DefaultRendererIndex` stays 0, so nothing changes unless a camera opts in. Add renderers by appending to `m_RendererDataList` in `UniversalRP.asset`.
-  - Global settings: `Assets/UniversalRenderPipelineGlobalSettings.asset`.
-- **New Input System 1.18.0** — actions asset wired via `ProjectSettings/EditorBuildSettings.asset` (`com.unity.input.settings.actions`). Do not use the legacy `Input.*` API.
-- **2D tooling**: Animation, Aseprite, PSD Importer, Sprite Shape, Tilemap (+ Extras).
-- **DOTween / DOTweenPro** (`Assets/Plugins/Demigiant/`) — tweening. Settings: `Assets/Resources/DOTweenSettings.asset`.
-- **Layer Lab GUI Pro-CasualGame** (`Assets/Layer Lab/`) — prefab-based casual UI kit (buttons, popups, frames, sliders). Prefer composing these prefabs for UI.
-- **Toony Colors Pro 2** (`Assets/JMO Assets/`) — stylized shading; ships its own asmdefs (`ToonyColorsPro.*`).
+**Zombie War** — game bắn súng 3D góc nhìn top-down cho mobile, làm để nộp bài test kỹ thuật, dựng trên một template game casual có sẵn. Code first-party mới chỉ có một Editor tool (`Assets/Scripts/Editor/`, assembly `ZombieWar.Editor`); toàn bộ phần còn lại của `Assets/` là third-party. Scene duy nhất trong build list, `Assets/Scenes/SampleScene.unity`, là scene **2D** mẫu (camera orthographic, `Global Light 2D`) — tạo scene 3D mới cho gameplay, đừng chuyển đổi scene này. Sau khi renderer mặc định đổi sang 3D (xem Stack chính), scene 2D này render sai là bình thường.
+
+## Spec (nguồn sự thật cho gameplay)
+
+Đề bài đầy đủ của khách hàng, bảng nghiệm thu, trục chấm điểm và phân rã hệ thống đề xuất nằm ở **`docs/GAME_SPEC.md`**. Theo `CODE-RULE.md` §8, logic gameplay phải bám đúng spec — không sáng tạo thêm cơ chế, mọi số cân bằng là nút vặn trong ScriptableObject. Đọc spec trước khi bắt đầu bất kỳ tính năng gameplay nào.
+
+Bản rút gọn 8 yêu cầu bắt buộc:
+
+1. **Camera** — top-down, **Cinemachine** follow soldier; zombie tràn về từ bốn phía.
+2. **Control** — virtual joystick.
+3. **Soldier** — Animator **layer** tách chạy (thân dưới) và bắn (thân trên); hiệu ứng mất máu nhìn thấy được.
+4. **Zombie** — AI tìm soldier; phản hồi khi trúng đạn; chết dissolve bằng **shader**.
+5. **Gun** — ít nhất 2 loại súng, nút switch trên HUD, particle nòng súng/đạn chạm, giật súng.
+6. **Bom** — nổ gây sát thương **và lực vật lý** lên zombie.
+7. **Level** — mỗi level ~3 phút. Level 1: phẳng + vật cản. Level 2 (điểm cộng): dốc + zombie khổng lồ. Nhịp spawn tăng dần.
+8. **Âm thanh + particle** xuyên suốt.
+
+Chấm theo Gameplay, Physics, Animation (Blend Trees), Shader/Visual/UI có hỗ trợ multi-resolution. Nộp: source GitHub, **APK Android**, video gameplay. Deadline 7 ngày (mục tiêu 3–4 ngày).
+
+## Phiên bản Unity (quan trọng)
+
+- Editor là **`2022.3.62f3`** (`ProjectSettings/ProjectVersion.txt`). Project đã chủ động hạ từ Unity 6 xuống; mở đúng phiên bản này để tránh bị ép upgrade. Nếu `README.md` và `ProjectVersion.txt` lệch nhau, `ProjectVersion.txt` là đúng.
+
+## Package cho spec (đã cài)
+
+- **Cinemachine `2.10.7`** — spec bắt buộc, dùng cho camera top-down follow soldier. Không tự viết camera follow.
+- **AI Navigation `1.1.7`** — cung cấp `NavMeshSurface` để bake theo component; cần cho dốc ở Level 2 và né vật cản. Module built-in `com.unity.modules.ai` (`NavMeshAgent`) vẫn dùng song song như bình thường.
+
+## Stack chính
+
+- **URP 14.0** với hai renderer trên `Assets/Settings/UniversalRP.asset`: index 0 = `Renderer2D.asset`, index **1 = `UniversalRenderer.asset`** (3D forward) và **index 1 là mặc định** — camera để `Renderer: Default` là đã đi đúng đường 3D, không cần set tay. `UniversalRP.asset` cũng được gán vào Project Settings → Graphics → Scriptable Render Pipeline Settings, ngoài override sẵn ở cả 6 quality level. Cấu hình đang để: MSAA **4x**, HDR bật, `IntermediateTextureMode: Auto`, SRP Batcher bật, shadow distance 50 / 1 cascade. Global settings: `Assets/UniversalRenderPipelineGlobalSettings.asset`.
+- **Input System mới 1.14.2** duy nhất (`activeInputHandler: 1`; `Input.*` cũ đã tắt). Asset action `Assets/InputSystem_Actions.inputactions` đã đăng ký trong `EditorBuildSettings` và có sẵn map `Player` (`Move`, `Attack`, `Previous`, `Next`, ...) — nối joystick ảo bằng component **On-Screen Stick/Button** của Input System vào các action này, không dựng đường input song song.
+- **DOTween / DOTweenPro** (`Assets/Plugins/Demigiant/`), settings tại `Assets/Resources/DOTweenSettings.asset`. Luôn `SetLink(gameObject)`.
+- **Layer Lab GUI Pro-CasualGame** (`Assets/Layer Lab/GUI Pro-CasualGame/Prefabs/`) — bộ prefab UI (button, frame, popup, slider, label) và một script `UIParticleSystem`. Ghép các prefab này cho HUD/menu.
+- **Toony Colors Pro 2** (`Assets/JMO Assets/`) — toon shading, có asmdef riêng `ToonyColorsPro.*`; nền tốt cho dissolve zombie và look toon.
+- **TextMeshPro**, **Timeline**, **Visual Scripting**, **bộ 2D** đã cài nhưng không phải trọng tâm của game này. TMP **Essential Resources chưa import** — 17 material font của Layer Lab đang là `Hidden/InternalErrorShader`; import qua Window → TextMeshPro trước khi dựng HUD.
+
+## Asset pack model
+
+Bốn pack model của game, tất cả material đã ở URP:
+
+- `Assets/ArtStore3D/Zombie/` — model + anim zombie (`URP/Lit`).
+- `Assets/Survivalist/` — model soldier, nhiều skin. Material dùng `URP/Autodesk Interactive` (pack import từ FBX Autodesk Interactive) — nặng hơn `URP/Lit` nhưng chỉ 1 instance trên màn hình nên chấp nhận được; đổi sang `URP/Lit` nếu profile chỉ ra vấn đề. Thư mục `Materials URP` của pack cũng là shader này, không có lợi thế gì so với `Materials`.
+- `Assets/Low Poly Guns/` — model súng (`URP/Lit`), nguồn cho ít nhất 2 loại súng theo spec.
+- `Assets/ithappy/Military_Free/` — model môi trường/vật cản (`URP/Lit` sẵn từ pack).
+
+Material built-in của pack mới import convert bằng **Tools ▸ Zombie War ▸ Convert Built-in Materials To URP** (`Assets/Scripts/Editor/BuiltInToUrpMaterialConverter.cs`) — nó gom material còn shader built-in rồi gọi converter chính chủ của Unity; skybox và material UI cố ý không đụng tới vì chạy tốt dưới URP.
+
+## Bố cục code first-party
+
+Theo `CODE-RULE.md` §1: script dưới `Assets/Scripts/<Hệ thống>/` (Core, Player, Enemies, Weapons, Level, UI, Data, Audio, Utils, Editor), **instance** ScriptableObject dưới `Assets/Data/`. Assembly definition riêng cho code first-party để không compile chung `Assembly-CSharp` với các asset pack — hiện đã có `ZombieWar.Editor` (`Assets/Scripts/Editor/`, chỉ platform Editor); tạo asmdef runtime tương ứng khi viết script gameplay đầu tiên. Không bao giờ đặt code vào `Assets/JMO Assets`, `Assets/Layer Lab`, `Assets/Plugins`.
+
+`Assets/_Recovery/0.unity` là file recovery sau crash của Unity, không phải scene thật — không dựng gì trên nó; xoá khi tiện.
+
+## Build Android (sản phẩm APK)
+
+Player settings đã có: scripting backend **IL2CPP**, kiến trúc **chỉ ARM64**, min SDK **25**, orientation Auto-rotate. Vẫn còn giá trị template phải đổi trước khi build cuối: `productName: TemplateCasual`, `companyName: DefaultCompany`, và build scene list (chỉ có `SampleScene`). Khoá orientation theo layout joystick đã thiết kế.
+
+**Chưa có build script hay CLI**; build trong Editor (File → Build Settings → Android). `*.apk`, `*.aab`, `Builds/` bị gitignore — đưa APK lên **GitHub Release**, đừng cố commit. Nếu thêm method build trong Editor, dạng headless là:
+
+```bash
+Unity -batchmode -quit -projectPath . -buildTarget Android -executeMethod <Namespace.Class.Method> -logFile build.log
+```
+
+(dùng binary editor 2022.3.62f3). Skill `unity-build-tool` nhắm WebGL; phải chỉnh lại chứ đừng chép nguyên.
+
+## Test
+
+`com.unity.test-framework` đã cài, chưa có test assembly. Khi có asmdef EditMode/PlayMode:
+
+```bash
+Unity -batchmode -runTests -projectPath . -testPlatform EditMode -testResults results.xml
+```
+
+Đổi `EditMode` thành `PlayMode` khi cần. Logic C# thuần (công thức damage, nhịp wave, timer level) nên là class thường để test EditMode không cần scene.
 
 ## Unity MCP
 
-`com.coplaydev.unity-mcp` (MCP for Unity) is a package dependency, so the editor can be driven programmatically over MCP. If `mcp__UnityMCP__*` tools are missing or on the wrong port, use the `unity-mcp-connect` skill — each open editor/project binds its own port. Note: `.mcp.json` is not committed.
-
-## Working in this repo
-
-- **No build/lint/test CLI is set up.** Building and playmode happen inside the Unity Editor. The Test Framework (`com.unity.test-framework`) is installed but there are no test assemblies yet.
-- To run tests headlessly once test asmdefs exist:
-  ```bash
-  Unity -batchmode -runTests -projectPath . -testPlatform EditMode -testResults results.xml
-  ```
-  (swap `EditMode`/`PlayMode`; use the 2022.3.62f3 editor binary).
-- The `Assembly-CSharp*.csproj` and `.sln` at the repo root are Unity-generated and gitignored — never hand-edit them; they regenerate on import.
-- When adding first-party code, create a dedicated assembly definition (e.g. `Assets/_Game/`) rather than dropping scripts into the third-party folders.
-
-## Conventions for new game code
-
-The available skills encode the intended patterns for this template — follow them when the task matches:
-- **`unity-game-clone`** — scene-authored + prefab architecture, tunables/colors in ScriptableObject configs (never hardcoded), procedural sprites/audio, solver-generated levels. Use when building a game from a spec.
-- **`unity-ui-refactor`** — code-first uGUI (UIFactory/SpriteFactory), procedural "candy" UI, no image assets.
-- **`texture-override`** — pick compression format by target device (TV/desktop → DXT, mobile/TikTok → ASTC) when building WebGL.
-- **`tiktok-minigame-sdk`** / **`tv-input-kit`** — TikTok Mini Game (WebGL) and TV-remote input integration.
+`com.coplaydev.unity-mcp` là package dependency, nên điều khiển được Editor qua MCP (dựng scene, `validate_script`, `read_console`). Nếu thiếu tool `mcp__UnityMCP__*` hoặc sai port, dùng skill `unity-mcp-connect` — mỗi editor đang mở bind một port riêng và port đổi giữa các lần mở editor. `.mcp.json` đã nằm trong `.gitignore`. Compile-check sau mỗi lần sửa script (`CODE-RULE.md` §8).
 
 ## Git
 
-- Default branch is `main`; active work is on `unity_2022`.
-- Auto-generated folders (`Library/`, `Temp/`, `Logs/`, `obj/`, IDE/`.sln`/`.csproj` files) are gitignored.
+- **Không tự ý thao tác git.** Không commit, push, tạo/xoá nhánh, merge, reset, stash hay bất kỳ lệnh ghi nào khi người dùng chưa yêu cầu và cho phép rõ ràng. Chỉ được đọc trạng thái (`git status`, `git log`, `git diff`).
+- **Commit message ngắn gọn, bằng tiếng Anh**, một dòng theo dạng mệnh lệnh (ví dụ `Add zombie dissolve shader`). **Không** thêm dòng ghi nguồn hay tác giả (không `Co-Authored-By`, không "Generated with", không tên tool).
+- Nhánh mặc định và release là **`main`**; làm việc hằng ngày trên **`dev`**.
+- `Assembly-CSharp*.csproj` và `.sln` ở root do Unity sinh ra và bị gitignore — không sửa tay.
+- `*.unitypackage` bị gitignore, nên các dòng xoá `.unitypackage.meta` lạc (ví dụ "Cat Demo URP" của Toony Colors) là nhiễu bình thường.
