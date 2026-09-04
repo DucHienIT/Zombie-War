@@ -13,7 +13,7 @@ Trước khi viết, sửa, hay review bất kỳ script nào trong project, ph�
 
 ## Project này là gì
 
-**Zombie War** — game bắn súng 3D góc nhìn top-down cho mobile, làm để nộp bài test kỹ thuật, dựng trên một template game casual có sẵn. Code first-party mới chỉ có một Editor tool (`Assets/Scripts/Editor/`, assembly `ZombieWar.Editor`); toàn bộ phần còn lại của `Assets/` là third-party. Scene duy nhất trong build list, `Assets/Scenes/SampleScene.unity`, là scene **2D** mẫu (camera orthographic, `Global Light 2D`) — tạo scene 3D mới cho gameplay, đừng chuyển đổi scene này. Sau khi renderer mặc định đổi sang 3D (xem Stack chính), scene 2D này render sai là bình thường.
+**Zombie War** — game bắn súng 3D góc nhìn top-down cho mobile, làm để nộp bài test kỹ thuật, dựng trên một template game casual có sẵn. Toàn bộ asset và code first-party nằm dưới `Assets/_ZombieWar/` (xem Bố cục code first-party); phần còn lại của `Assets/` là third-party. Hiện code mới chỉ có một Editor tool (`Assets/_ZombieWar/Scripts/Editor/`, assembly `ZombieWar.Editor`). Scene duy nhất trong build list, `Assets/Scenes/SampleScene.unity`, là scene **2D** mẫu (camera orthographic, `Global Light 2D`) — tạo scene 3D mới cho gameplay, đừng chuyển đổi scene này. Sau khi renderer mặc định đổi sang 3D (xem Stack chính), scene 2D này render sai là bình thường.
 
 ## Spec (nguồn sự thật cho gameplay)
 
@@ -93,13 +93,29 @@ Pack `FREE Shirtless Zombie` (`Assets/NewPunch/`) **đã bị gỡ khỏi projec
 | `Assets/JMO Assets/WarFX/` | VFX súng đạn thực chiến — muzzle flash, bullet impact theo vật liệu, explosion. **Dùng bộ `_Effects (Mobile)`**, không dùng `_Effects` bản desktop |
 | `Assets/Epic Toon FX/` | VFX toon — `Prefabs/Combat`, `Environment`, `Interactive`. Hợp look toon cho nổ bom và dissolve zombie |
 
-Material built-in của pack mới import convert bằng **Tools ▸ Zombie War ▸ Convert Built-in Materials To URP** (`Assets/Scripts/Editor/BuiltInToUrpMaterialConverter.cs`) — nó gom material còn shader built-in rồi gọi converter chính chủ của Unity; skybox và material UI cố ý không đụng tới vì chạy tốt dưới URP. URP **không có** upgrader cho `Mobile/Particles/*` và `Legacy Shaders/Particles/*`. 14 material particle của WarFX đã gán tay sang `URP/Particles/Unlit` (`_BaseColor = 2 × _TintColor` vì shader particle đời cũ nhân đôi tint; additive → `_Blend: 2`, alpha blended → `_Blend: 0`).
+Material built-in của pack mới import convert bằng **Tools ▸ Zombie War ▸ Convert Built-in Materials To URP** (`Assets/_ZombieWar/Scripts/Editor/BuiltInToUrpMaterialConverter.cs`) — nó gom material còn shader built-in rồi gọi converter chính chủ của Unity; skybox và material UI cố ý không đụng tới vì chạy tốt dưới URP. URP **không có** upgrader cho `Mobile/Particles/*` và `Legacy Shaders/Particles/*`. 14 material particle của WarFX đã gán tay sang `URP/Particles/Unlit` (`_BaseColor = 2 × _TintColor` vì shader particle đời cũ nhân đôi tint; additive → `_Blend: 2`, alpha blended → `_Blend: 0`).
 
 **35 material trong `Layer Lab/GUI Pro-CasualGame/ResourcesData/Particle/Materials/` cố ý giữ nguyên `Mobile/Particles/*`** — đó là particle UI chạy qua `UIParticleSystem` trên `CanvasRenderer`, không phải `ParticleSystemRenderer`. Shader particle của URP không hỗ trợ masking/stencil của Canvas, đổi sang là hỏng UI. Chúng render đúng dưới URP như hiện tại.
 
 ## Bố cục code first-party
 
-Theo `CODE-RULE.md` §1: script dưới `Assets/Scripts/<Hệ thống>/` (Core, Player, Enemies, Weapons, Level, UI, Data, Audio, Utils, Editor), **instance** ScriptableObject dưới `Assets/Data/`. Assembly definition riêng cho code first-party để không compile chung `Assembly-CSharp` với các asset pack — hiện đã có `ZombieWar.Editor` (`Assets/Scripts/Editor/`, chỉ platform Editor); tạo asmdef runtime tương ứng khi viết script gameplay đầu tiên. Không bao giờ đặt code vào `Assets/JMO Assets`, `Assets/Layer Lab`, `Assets/Plugins`.
+Khung thư mục đã dựng sẵn theo `CODE-RULE.md` §1 và phân rã hệ thống ở `docs/GAME_SPEC.md` §4:
+
+```
+Assets/_ZombieWar/            # mọi thứ first-party nằm trong đây, tách hẳn khỏi asset pack third-party
+├── Scripts/    Core, Player, Weapons, Enemies, Level, UI, Data, Audio, Utils, Editor
+├── Data/       Weapons, Zombies, Levels     # instance .asset của ScriptableObject
+├── Prefabs/    Player, Enemies, Weapons, VFX, UI, Environment
+├── Animation/  Soldier, Zombie              # Animator controller, Avatar Mask, Blend Tree
+├── Art/        Materials, Shaders           # shader dissolve zombie, material first-party
+└── Scenes/                                  # scene gameplay 3D
+```
+
+`CODE-RULE.md` §1 viết đường dẫn là `Assets/Scripts/`; project này đặt cả cây dưới root `Assets/_ZombieWar/`, cấu trúc con và luật chia hệ thống giữ nguyên. `Assets/Scenes/SampleScene.unity` là scene template 2D, không phải của game — scene gameplay tạo trong `Assets/_ZombieWar/Scenes/`.
+
+Thư mục còn rỗng giữ bằng `.gitkeep` (Unity bỏ qua file bắt đầu bằng dấu chấm, không sinh `.meta`) — xoá khi thư mục có asset thật.
+
+Hai assembly definition tách code first-party khỏi `Assembly-CSharp` của các asset pack: `ZombieWar` (`Assets/_ZombieWar/Scripts/ZombieWar.asmdef`, runtime, reference Unity.InputSystem / Cinemachine / Unity.AI.Navigation / Unity.TextMeshPro / UnityEngine.UI) và `ZombieWar.Editor` (`Assets/_ZombieWar/Scripts/Editor/`, chỉ platform Editor, reference `ZombieWar`). DOTween là DLL trong `Assets/Plugins/` nên auto-reference, không cần khai báo. Thêm package mới cần dùng trong script thì bổ sung vào `references` của `ZombieWar.asmdef`. Không bao giờ đặt code vào `Assets/JMO Assets`, `Assets/Layer Lab`, `Assets/Plugins`.
 
 `Assets/_Recovery/0.unity` là file recovery sau crash của Unity, không phải scene thật — không dựng gì trên nó; xoá khi tiện.
 

@@ -66,7 +66,7 @@ Checklist dùng để tự kiểm tra trước khi nộp. Mỗi dòng phải nh�
 ## 4. Phân rã hệ thống (đề xuất, theo `CODE-RULE.md` §1)
 
 ```
-Assets/Scripts/
+Assets/_ZombieWar/Scripts/
 ├── Core/        # GameManager: state machine (Menu / Playing / Paused / LevelWon / GameOver), level timer
 ├── Player/      # SoldierController (joystick → movement), SoldierAnimator (layers/blend tree), SoldierHealth
 ├── Weapons/     # Gun (base data-driven), GunSwitcher, Projectile/hitscan, Bomb, Explosion
@@ -76,10 +76,10 @@ Assets/Scripts/
 ├── Data/        # ScriptableObject: GunData, ZombieData, LevelData (thời lượng, đường cong spawn), BombData
 ├── Audio/       # AudioManager pool one-shot, nhạc nền
 └── Utils/       # ObjectPool
-Assets/Data/     # Các file .asset instance của Data/ ở trên
+Assets/_ZombieWar/Data/   # Các file .asset instance của Data/ ở trên
 ```
 
-Số liệu cân bằng (damage, tốc độ bắn, HP zombie, bán kính bom, lực nổ, thời lượng level, đường cong spawn) **chỉ** nằm trong `Assets/Data/*.asset`, không hardcode.
+Số liệu cân bằng (damage, tốc độ bắn, HP zombie, bán kính bom, lực nổ, thời lượng level, đường cong spawn) **chỉ** nằm trong `Assets/_ZombieWar/Data/*.asset`, không hardcode.
 
 ## 5. Sản phẩm nộp
 

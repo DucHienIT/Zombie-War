@@ -1,10 +1,14 @@
 {
-    "name": "ZombieWar.Editor",
+    "name": "ZombieWar",
     "rootNamespace": "ZombieWar",
-    "references": [],
-    "includePlatforms": [
-        "Editor"
+    "references": [
+        "Unity.InputSystem",
+        "Cinemachine",
+        "Unity.AI.Navigation",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
     ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
