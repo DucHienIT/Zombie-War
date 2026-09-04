@@ -78,3 +78,6 @@ Thumbs.db
 
 # Unity MCP (port is per-machine, per-editor-session)
 .mcp.json
+
+# Editor screenshots taken via Unity MCP
+Captures/
