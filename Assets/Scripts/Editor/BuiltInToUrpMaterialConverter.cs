@@ -24,7 +24,8 @@ namespace ZombieWar.EditorTools
         {
             "Legacy Shaders/",
             "Mobile/",
-            "Nature/"
+            "Nature/",
+            "Particles/"
         };
 
         [MenuItem("Tools/Zombie War/Convert Built-in Materials To URP")]
