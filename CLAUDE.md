@@ -50,16 +50,50 @@ Chấm theo Gameplay, Physics, Animation (Blend Trees), Shader/Visual/UI có h�
 - **Toony Colors Pro 2** (`Assets/JMO Assets/`) — toon shading, có asmdef riêng `ToonyColorsPro.*`; nền tốt cho dissolve zombie và look toon.
 - **TextMeshPro**, **Timeline**, **Visual Scripting**, **bộ 2D** đã cài nhưng không phải trọng tâm của game này. TMP **Essential Resources chưa import** — 17 material font của Layer Lab đang là `Hidden/InternalErrorShader`; import qua Window → TextMeshPro trước khi dựng HUD.
 
-## Asset pack model
+## Asset pack — phân vai
 
-Bốn pack model của game, tất cả material đã ở URP:
+Mỗi pack chỉ đóng **một** vai. Đừng lấy model của pack animation hay ngược lại.
 
-- `Assets/ArtStore3D/Zombie/` — model + anim zombie (`URP/Lit`).
-- `Assets/Survivalist/` — model soldier, nhiều skin. Material dùng `URP/Autodesk Interactive` (pack import từ FBX Autodesk Interactive) — nặng hơn `URP/Lit` nhưng chỉ 1 instance trên màn hình nên chấp nhận được; đổi sang `URP/Lit` nếu profile chỉ ra vấn đề. Thư mục `Materials URP` của pack cũng là shader này, không có lợi thế gì so với `Materials`.
-- `Assets/Low Poly Guns/` — model súng (`URP/Lit`), nguồn cho ít nhất 2 loại súng theo spec.
-- `Assets/ithappy/Military_Free/` — model môi trường/vật cản (`URP/Lit` sẵn từ pack).
+### Model
 
-Material built-in của pack mới import convert bằng **Tools ▸ Zombie War ▸ Convert Built-in Materials To URP** (`Assets/Scripts/Editor/BuiltInToUrpMaterialConverter.cs`) — nó gom material còn shader built-in rồi gọi converter chính chủ của Unity; skybox và material UI cố ý không đụng tới vì chạy tốt dưới URP.
+| Thư mục | Vai | Ghi chú |
+|---|---|---|
+| `Assets/ArtStore3D/Zombie/` | Zombie chính | Rig **Humanoid**, `URP/Lit`. `Anim/` chỉ chứa animation camera/đèn của demo scene, **không** phải animation nhân vật |
+| `Assets/Survivalist/` | Soldier người chơi | Rig Humanoid, nhiều skin. Material là `URP/Autodesk Interactive` (pack import từ FBX Autodesk Interactive) — nặng hơn `URP/Lit` nhưng chỉ 1 instance trên màn hình; thư mục `Materials URP` của pack cũng đúng shader đó, không hơn gì `Materials` |
+| `Assets/Low Poly Guns/` | Súng | `URP/Lit`. Nguồn cho ≥2 loại súng của spec §5 |
+| `Assets/ithappy/Military_Free/` | Môi trường, vật cản | `URP/Lit` sẵn từ pack |
+| `Assets/ToonSoldiers_WW2_demo/model/` | (không dùng) | Model đi kèm pack animation, giữ để preview clip |
+
+### Animation
+
+Tất cả rig nhân vật đều **Humanoid**, nên clip retarget chéo giữa các model được.
+
+| Nguồn | Clip | Dùng cho |
+|---|---|---|
+| `Assets/ToonSoldiers_WW2_demo/animation/` | `infantry_combat_idle`, `infantry_combat_run`, `infantry_combat_shoot`, `infantry_guard_idle` | Soldier: `combat_run` cho layer thân dưới, `combat_shoot` cho layer thân trên (spec §3) |
+| `Assets/Survivalist/StarterAssets/ThirdPersonController/Character/Animations/` | `Idle`, `Walk_N`, `Run_N`, `Run_S`, `Jump`, `InAir`, 2 clip land | Locomotion + Blend Tree cho soldier. **Giữ thư mục này** dù phần còn lại của StarterAssets bị xoá |
+
+**Zombie chưa có animation nào trong project.** Pack `Zombie 1 Low Poly` chỉ có animation camera/đèn của demo scene; model đã rig Humanoid kèm Avatar nên clip Humanoid từ nguồn ngoài (Mixamo) retarget thẳng được — spec §4 cần chase / hit-reaction / death.
+
+Pack `FREE Shirtless Zombie` (`Assets/NewPunch/`) **đã bị gỡ khỏi project**: đối chiếu tận file `.unitypackage` gốc thì nó chỉ có 2 FBX model, 6 prefab, 3 scene demo, 1 script và material/texture — không có animation nào, trong khi vai trò dự kiến của nó là nguồn animation zombie. Đừng import lại.
+
+`Survivalist/StarterAssets/ThirdPersonController/Character/Animations/` còn kèm `StarterAssetsThirdPerson.controller` — Animator controller có sẵn Blend Tree locomotion, dùng làm điểm khởi đầu cho layer thân dưới của soldier.
+
+### Sound
+
+| Thư mục | Vai |
+|---|---|
+| `Assets/Tybug Studios/Zombie Voice Pack - Free/` | SFX zombie — 10 wav chia sẵn theo hành vi: Aggressive, Chase, Death, Growl, Grunt, Hiss, Moan |
+| `Assets/PostApocalypseGunsDemo/` | SFX súng — 41 wav: AssaultRifles, Pistols, Shotguns, SniperRifles, Miniguns_loop |
+
+### Particle
+
+| Thư mục | Vai |
+|---|---|
+| `Assets/JMO Assets/WarFX/` | VFX súng đạn thực chiến — muzzle flash, bullet impact theo vật liệu, explosion. **Dùng bộ `_Effects (Mobile)`**, không dùng `_Effects` bản desktop |
+| `Assets/Epic Toon FX/` | VFX toon — `Prefabs/Combat`, `Environment`, `Interactive`. Hợp look toon cho nổ bom và dissolve zombie |
+
+Material built-in của pack mới import convert bằng **Tools ▸ Zombie War ▸ Convert Built-in Materials To URP** (`Assets/Scripts/Editor/BuiltInToUrpMaterialConverter.cs`) — nó gom material còn shader built-in rồi gọi converter chính chủ của Unity; skybox và material UI cố ý không đụng tới vì chạy tốt dưới URP. URP **không có** upgrader cho `Mobile/Particles/*` và `Legacy Shaders/Particles/*`, nên các material đó phải gán tay sang `URP/Particles/Unlit` nếu cần soft particle.
 
 ## Bố cục code first-party
 
