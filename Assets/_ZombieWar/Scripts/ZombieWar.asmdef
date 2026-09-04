@@ -6,7 +6,8 @@
         "Cinemachine",
         "Unity.AI.Navigation",
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "DOTween.Modules"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
