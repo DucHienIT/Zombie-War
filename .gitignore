@@ -75,3 +75,6 @@ crashlytics-build.properties
 .idea/
 .DS_Store
 Thumbs.db
+
+# Unity MCP (port is per-machine, per-editor-session)
+.mcp.json
