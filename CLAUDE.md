@@ -93,7 +93,9 @@ Pack `FREE Shirtless Zombie` (`Assets/NewPunch/`) **đã bị gỡ khỏi projec
 | `Assets/JMO Assets/WarFX/` | VFX súng đạn thực chiến — muzzle flash, bullet impact theo vật liệu, explosion. **Dùng bộ `_Effects (Mobile)`**, không dùng `_Effects` bản desktop |
 | `Assets/Epic Toon FX/` | VFX toon — `Prefabs/Combat`, `Environment`, `Interactive`. Hợp look toon cho nổ bom và dissolve zombie |
 
-Material built-in của pack mới import convert bằng **Tools ▸ Zombie War ▸ Convert Built-in Materials To URP** (`Assets/Scripts/Editor/BuiltInToUrpMaterialConverter.cs`) — nó gom material còn shader built-in rồi gọi converter chính chủ của Unity; skybox và material UI cố ý không đụng tới vì chạy tốt dưới URP. URP **không có** upgrader cho `Mobile/Particles/*` và `Legacy Shaders/Particles/*`, nên các material đó phải gán tay sang `URP/Particles/Unlit` nếu cần soft particle.
+Material built-in của pack mới import convert bằng **Tools ▸ Zombie War ▸ Convert Built-in Materials To URP** (`Assets/Scripts/Editor/BuiltInToUrpMaterialConverter.cs`) — nó gom material còn shader built-in rồi gọi converter chính chủ của Unity; skybox và material UI cố ý không đụng tới vì chạy tốt dưới URP. URP **không có** upgrader cho `Mobile/Particles/*` và `Legacy Shaders/Particles/*`. 14 material particle của WarFX đã gán tay sang `URP/Particles/Unlit` (`_BaseColor = 2 × _TintColor` vì shader particle đời cũ nhân đôi tint; additive → `_Blend: 2`, alpha blended → `_Blend: 0`).
+
+**35 material trong `Layer Lab/GUI Pro-CasualGame/ResourcesData/Particle/Materials/` cố ý giữ nguyên `Mobile/Particles/*`** — đó là particle UI chạy qua `UIParticleSystem` trên `CanvasRenderer`, không phải `ParticleSystemRenderer`. Shader particle của URP không hỗ trợ masking/stencil của Canvas, đổi sang là hỏng UI. Chúng render đúng dưới URP như hiện tại.
 
 ## Bố cục code first-party
 
