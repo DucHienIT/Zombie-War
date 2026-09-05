@@ -17,6 +17,7 @@ namespace ZombieWar.Core
         [SerializeField] private PlayerHealth _playerHealth;
         [SerializeField] private ZombieManager _zombies;
         [SerializeField] private LevelLoader _levelLoader;
+        [SerializeField] private ProfileService _profile;
 
         private readonly SaveService _save = new SaveService();
         private LevelDefinitionSO _level;
@@ -41,7 +42,8 @@ namespace ZombieWar.Core
 
         private void Awake()
         {
-            bool missing = _mapLoader == null || _scoringRules == null || _playerHealth == null || _zombies == null || _levelLoader == null;
+            bool missing = _mapLoader == null || _scoringRules == null || _playerHealth == null || _zombies == null || _levelLoader == null
+                           || _profile == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} GameFlowController has an unassigned reference.", this);
@@ -138,6 +140,30 @@ namespace ZombieWar.Core
             SetState(GameState.Playing);
         }
 
+        // A level-up choice stops the run dead until a card is picked. It gets a state of its
+        // own so the HUD never mistakes it for the pause menu.
+        public void PauseForLevelUp()
+        {
+            if (State != GameState.Playing)
+            {
+                return;
+            }
+
+            Time.timeScale = 0f;
+            SetState(GameState.LevelUp);
+        }
+
+        public void ResumeFromLevelUp()
+        {
+            if (State != GameState.LevelUp)
+            {
+                return;
+            }
+
+            Time.timeScale = 1f;
+            SetState(GameState.Playing);
+        }
+
         public void Retry() => _levelLoader.RestartWith(_level);
 
         public void GoToMenu() => _levelLoader.ReturnToMenu();
@@ -218,7 +244,8 @@ namespace ZombieWar.Core
                 }
             }
 
-            var result = new LevelResult(won, _score.Kills, _score.Score, healthBonus, _playerHealth.DamageTaken, isNewBest);
+            _profile.GrantRunRewards(_score.Kills, total, won, out int coinsEarned, out int xpEarned);
+            var result = new LevelResult(won, _score.Kills, _score.Score, healthBonus, _playerHealth.DamageTaken, isNewBest, coinsEarned, xpEarned);
             SetState(won ? GameState.Won : GameState.Lost);
             OnLevelEnded?.Invoke(result);
         }

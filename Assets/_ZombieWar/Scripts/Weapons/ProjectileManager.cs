@@ -34,10 +34,10 @@ namespace ZombieWar.Weapons
             _active = new List<Projectile>(_prewarmCount);
         }
 
-        public void Spawn(Vector3 origin, Vector3 direction, GunDefinitionSO definition)
+        public void Spawn(Vector3 origin, Vector3 direction, GunDefinitionSO definition, in ShotStats shot)
         {
             Projectile projectile = _pool.Get(origin, Quaternion.LookRotation(direction));
-            projectile.Launch(direction, definition);
+            projectile.Launch(direction, definition, shot);
             _active.Add(projectile);
         }
 
@@ -51,9 +51,10 @@ namespace ZombieWar.Weapons
                 bool hitSomething = Physics.SphereCast(projectile.Position, projectile.Radius, projectile.Direction,
                     out RaycastHit hit, step, _hitMask, QueryTriggerInteraction.Ignore);
 
-                if (hitSomething)
+                // A pierced body stays in the bullet's path for a frame or two, so the collider
+                // it just went through is ignored rather than eating another pierce.
+                if (hitSomething && hit.collider != projectile.LastPiercedCollider && ResolveHit(projectile, hit))
                 {
-                    ResolveHit(projectile, hit);
                     Despawn(i);
                     continue;
                 }
@@ -65,17 +66,19 @@ namespace ZombieWar.Weapons
             }
         }
 
-        private void ResolveHit(Projectile projectile, in RaycastHit hit)
+        // True when the bullet is spent. Only flesh can be pierced; a wall always stops it.
+        private bool ResolveHit(Projectile projectile, in RaycastHit hit)
         {
             if (_zombies.TryGetZombie(hit.collider, out ZombieController zombie))
             {
                 var info = new DamageInfo(projectile.Damage, hit.point, projectile.Direction, projectile.Knockback, DamageSource.Bullet);
                 zombie.TakeDamage(info);
                 _vfx.Play(projectile.FleshImpactVfx, hit.point, Quaternion.LookRotation(hit.normal));
-                return;
+                return !projectile.TryPierce(hit.collider);
             }
 
             _vfx.Play(projectile.PropImpactVfx, hit.point, Quaternion.LookRotation(hit.normal));
+            return true;
         }
 
         private void Despawn(int index)

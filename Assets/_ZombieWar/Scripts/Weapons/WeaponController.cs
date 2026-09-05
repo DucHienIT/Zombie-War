@@ -22,6 +22,8 @@ namespace ZombieWar.Weapons
         [SerializeField] private VfxService _vfx;
         [SerializeField] private AudioService _audio;
         [SerializeField] private CinemachineImpulseSource _impulseSource;
+        [SerializeField] private ProfileService _profile;
+        [SerializeField] private PlayerStatSheet _stats;
 
         private int _currentIndex;
         private float _stateTimer;
@@ -41,25 +43,52 @@ namespace ZombieWar.Weapons
         private void Awake()
         {
             bool missing = _guns == null || _guns.Length == 0 || _playerDefinition == null || _aim == null || _health == null
-                           || _flow == null || _projectiles == null || _vfx == null || _audio == null || _impulseSource == null;
+                           || _flow == null || _projectiles == null || _vfx == null || _audio == null || _impulseSource == null
+                           || _profile == null || _stats == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} WeaponController has an unassigned reference.", this);
                 return;
             }
 
+            ApplyUpgrades();
             for (int i = 0; i < _guns.Length; i++)
             {
-                _guns[i].ResetAmmo();
                 _guns[i].SetVisible(i == _currentIndex);
             }
 
             _aim.SetScanRange(CurrentGun.Definition.Range);
         }
 
+        private void OnEnable()
+        {
+            _flow.OnRunStarted += HandleRunStarted;
+        }
+
+        private void OnDisable()
+        {
+            _flow.OnRunStarted -= HandleRunStarted;
+        }
+
         private void Start()
         {
             PublishGunState();
+        }
+
+        // Upgrades bought in the menu land here, so a run always starts with the saved levels.
+        private void HandleRunStarted(LevelDefinitionSO level)
+        {
+            ApplyUpgrades();
+            PublishGunState();
+        }
+
+        private void ApplyUpgrades()
+        {
+            for (int i = 0; i < _guns.Length; i++)
+            {
+                Gun gun = _guns[i];
+                gun.ApplyUpgrade(_profile.GetGunLevel(gun.Definition));
+            }
         }
 
         private void Update()
@@ -135,14 +164,19 @@ namespace ZombieWar.Weapons
             forward.y = 0f;
             forward.Normalize();
 
-            SpawnPellets(definition, origin, forward);
+            // The menu upgrade is baked into gun.Stats; the run's passives scale it from there.
+            var shot = new ShotStats(
+                gun.Stats.Damage * _stats.Multiplier(StatId.WeaponDamage),
+                definition.Knockback * _stats.Multiplier(StatId.Knockback),
+                Mathf.RoundToInt(_stats.Additive(StatId.ProjectilePierce)));
+            SpawnPellets(definition, origin, forward, shot);
             _vfx.Play(definition.MuzzleVfx, origin, Quaternion.LookRotation(forward));
             _audio.PlayWorld(definition.ShotClip, origin);
             _impulseSource.GenerateImpulseWithForce(definition.CameraImpulse);
             gun.Kick();
             gun.ConsumeRound();
 
-            OnAmmoChanged?.Invoke(gun.Ammo, definition.MagazineSize);
+            OnAmmoChanged?.Invoke(gun.Ammo, gun.Stats.MagazineSize);
             OnShotFired?.Invoke(gun);
 
             if (gun.IsEmpty)
@@ -152,10 +186,10 @@ namespace ZombieWar.Weapons
             }
 
             State = WeaponState.Cooldown;
-            _stateTimer = definition.FireInterval;
+            _stateTimer = gun.Stats.FireInterval / _stats.Multiplier(StatId.FireRate);
         }
 
-        private void SpawnPellets(GunDefinitionSO definition, Vector3 origin, Vector3 forward)
+        private void SpawnPellets(GunDefinitionSO definition, Vector3 origin, Vector3 forward, in ShotStats shot)
         {
             int pellets = definition.PelletCount;
             float halfSpread = definition.SpreadAngle * 0.5f;
@@ -165,7 +199,7 @@ namespace ZombieWar.Weapons
                     ? UnityEngine.Random.Range(-halfSpread, halfSpread)
                     : Mathf.Lerp(-halfSpread, halfSpread, (i + 0.5f) / pellets) + UnityEngine.Random.Range(-halfSpread, halfSpread) / pellets;
                 Vector3 direction = Quaternion.AngleAxis(yaw, Vector3.up) * forward;
-                _projectiles.Spawn(origin, direction, definition);
+                _projectiles.Spawn(origin, direction, definition, shot);
             }
         }
 
@@ -189,7 +223,7 @@ namespace ZombieWar.Weapons
         private void BeginReload(Gun gun)
         {
             State = WeaponState.Reloading;
-            _reloadDuration = gun.Definition.ReloadDuration;
+            _reloadDuration = gun.Stats.ReloadDuration / _stats.Multiplier(StatId.ReloadSpeed);
             _stateTimer = _reloadDuration;
             _audio.PlayWorld(gun.Definition.ReloadClip, gun.Muzzle.position);
             OnReloadStarted?.Invoke();
@@ -207,7 +241,7 @@ namespace ZombieWar.Weapons
 
             gun.ResetAmmo();
             State = WeaponState.Ready;
-            OnAmmoChanged?.Invoke(gun.Ammo, gun.Definition.MagazineSize);
+            OnAmmoChanged?.Invoke(gun.Ammo, gun.Stats.MagazineSize);
             OnReloadEnded?.Invoke();
         }
 
@@ -233,7 +267,7 @@ namespace ZombieWar.Weapons
         {
             Gun gun = CurrentGun;
             OnGunChanged?.Invoke(gun);
-            OnAmmoChanged?.Invoke(gun.Ammo, gun.Definition.MagazineSize);
+            OnAmmoChanged?.Invoke(gun.Ammo, gun.Stats.MagazineSize);
         }
     }
 }

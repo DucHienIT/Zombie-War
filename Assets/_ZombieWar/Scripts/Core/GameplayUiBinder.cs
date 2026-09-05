@@ -1,5 +1,8 @@
+using System;
 using UnityEngine;
+using ZombieWar.Data;
 using ZombieWar.Player;
+using ZombieWar.Roguelike;
 using ZombieWar.UI;
 using ZombieWar.Weapons;
 
@@ -18,17 +21,23 @@ namespace ZombieWar.Core
         [SerializeField] private WeaponController _weapons;
         [SerializeField] private BombThrower _bombs;
         [SerializeField] private CameraShakeController _cameraShake;
+        [SerializeField] private RoguelikeDirector _rogue;
+
+        private SkillCardData[] _skillCards;
+        private Action<int> _onSkillPicked;
 
         private void Awake()
         {
             bool missing = _ui == null || _flow == null || _playerHealth == null || _weapons == null || _bombs == null
-                           || _cameraShake == null;
+                           || _cameraShake == null || _rogue == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} GameplayUiBinder has an unassigned reference - the HUD would never update.", this);
                 return;
             }
 
+            // Cached once: turning a method group into a delegate allocates on every level-up.
+            _onSkillPicked = _rogue.ChooseOffer;
             _ui.BindGameplayCommands(_flow.Pause, _weapons.RequestSwitch, _bombs.RequestThrow);
         }
 
@@ -47,6 +56,9 @@ namespace ZombieWar.Core
             _weapons.OnReloadEnded += HandleReloadEnded;
             _bombs.OnChargesChanged += HandleBombChargesChanged;
             _bombs.OnCooldownProgress += HandleBombCooldownProgress;
+            _rogue.OnXpChanged += HandleXpChanged;
+            _rogue.OnChoiceOffered += HandleChoiceOffered;
+            _rogue.OnChoiceClosed += HandleChoiceClosed;
         }
 
         private void OnDisable()
@@ -64,6 +76,9 @@ namespace ZombieWar.Core
             _weapons.OnReloadEnded -= HandleReloadEnded;
             _bombs.OnChargesChanged -= HandleBombChargesChanged;
             _bombs.OnCooldownProgress -= HandleBombCooldownProgress;
+            _rogue.OnXpChanged -= HandleXpChanged;
+            _rogue.OnChoiceOffered -= HandleChoiceOffered;
+            _rogue.OnChoiceClosed -= HandleChoiceClosed;
         }
 
         private void HandleStateChanged(GameState state)
@@ -112,6 +127,35 @@ namespace ZombieWar.Core
 
         private void HandleBombCooldownProgress(float progress) => _ui.SetBombCooldown(progress);
 
+        private void HandleXpChanged(float normalized, int battleLevel) => _ui.SetXp(normalized, battleLevel);
+
+        // The draft hands over gameplay assets; flattening them here is what keeps the popup
+        // ignorant of PassiveSkillSO, the same way the result panel never sees a LevelResult.
+        private void HandleChoiceOffered(PassiveSkillSO[] offers, int count, int battleLevel)
+        {
+            if (_skillCards == null || _skillCards.Length < count)
+            {
+                _skillCards = new SkillCardData[count];
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                PassiveSkillSO skill = offers[i];
+                _skillCards[i] = new SkillCardData(
+                    skill.DisplayName,
+                    skill.Description,
+                    skill.Icon,
+                    skill.AccentColor,
+                    _rogue.StacksOf(skill) + 1,
+                    skill.MaxStacks);
+            }
+
+            _flow.PauseForLevelUp();
+            _ui.ShowSkillChoicePopup(_skillCards, count, battleLevel, _onSkillPicked);
+        }
+
+        private void HandleChoiceClosed() => _flow.ResumeFromLevelUp();
+
         // The flow banks the score before this fires, so the panel only draws what the player owns.
         private void HandleLevelEnded(LevelResult result)
         {
@@ -124,7 +168,9 @@ namespace ZombieWar.Core
                 Mathf.RoundToInt(result.DamageTaken),
                 result.TotalScore,
                 result.IsNewBest,
-                hasNextLevel);
+                hasNextLevel,
+                result.CoinsEarned,
+                result.XpEarned);
             _ui.ShowResultPopup(data, _flow.Retry, _flow.GoToNextLevel, _flow.GoToMenu);
         }
     }

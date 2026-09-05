@@ -7,6 +7,8 @@ namespace ZombieWar.Core
         Countdown,
         Playing,
         Paused,
+        // Modal upgrade draft: the run is frozen but it is not the pause menu.
+        LevelUp,
         Won,
         Lost
     }

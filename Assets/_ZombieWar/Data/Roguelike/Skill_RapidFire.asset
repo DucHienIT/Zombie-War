@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bde9d16ab4ea324e9476544b3561992, type: 3}
+  m_Name: Skill_RapidFire
+  m_EditorClassIdentifier: 
+  _id: rapid_fire
+  _displayName: RAPID FIRE
+  _description: 'Fire rate +15%
+
+    Reload 12% faster'
+  _icon: {fileID: 21300000, guid: d14ff3e2b25b6c84d8d02d9ed8993022, type: 3}
+  _accentColor: {r: 1, g: 0.8352941, b: 0.2901961, a: 1}
+  _maxStacks: 5
+  _draftWeight: 1
+  _modifiers:
+  - _stat: 1
+    _kind: 1
+    _valuePerStack: 1.15
+  - _stat: 2
+    _kind: 1
+    _valuePerStack: 1.135

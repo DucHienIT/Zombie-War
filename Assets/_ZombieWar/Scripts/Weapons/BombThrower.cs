@@ -24,6 +24,7 @@ namespace ZombieWar.Weapons
         [SerializeField] private PlayerAim _aim;
         [SerializeField] private PlayerMotor _motor;
         [SerializeField] private PlayerHealth _health;
+        [SerializeField] private PlayerStatSheet _stats;
         [SerializeField] private GameFlowController _flow;
         [SerializeField] private ZombieManager _zombies;
         [SerializeField] private VfxService _vfx;
@@ -37,6 +38,7 @@ namespace ZombieWar.Weapons
         private List<Bomb> _active;
         private Transform _transform;
         private float _cooldown;
+        private int _appliedChargeBonus;
 
         public event Action<int> OnChargesChanged;
         public event Action<float> OnCooldownProgress;
@@ -47,7 +49,7 @@ namespace ZombieWar.Weapons
         {
             _transform = transform;
             bool missing = _definition == null || _prefab == null || _throwOrigin == null || _aim == null || _motor == null || _health == null
-                           || _flow == null || _zombies == null || _vfx == null || _audio == null || _impulseSource == null;
+                           || _stats == null || _flow == null || _zombies == null || _vfx == null || _audio == null || _impulseSource == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} BombThrower has an unassigned reference.", this);
@@ -59,10 +61,35 @@ namespace ZombieWar.Weapons
             _active = new List<Bomb>(_definition.ChargesPerLevel);
         }
 
+        private void OnEnable()
+        {
+            _stats.OnChanged += HandleStatsChanged;
+        }
+
+        private void OnDisable()
+        {
+            _stats.OnChanged -= HandleStatsChanged;
+        }
+
         private void Start()
         {
             OnChargesChanged?.Invoke(Charges);
             OnCooldownProgress?.Invoke(1f);
+        }
+
+        // An extra charge is handed over the moment the skill is picked, not at the next run.
+        private void HandleStatsChanged()
+        {
+            int bonus = Mathf.RoundToInt(_stats.Additive(StatId.BombCharges));
+            int delta = bonus - _appliedChargeBonus;
+            if (delta == 0)
+            {
+                return;
+            }
+
+            _appliedChargeBonus = bonus;
+            Charges = Mathf.Max(0, Charges + delta);
+            OnChargesChanged?.Invoke(Charges);
         }
 
         private void Update()
@@ -82,7 +109,7 @@ namespace ZombieWar.Weapons
                     continue;
                 }
 
-                Explode(bomb.Position);
+                Explode(bomb.Position, bomb.BlastRadius);
                 int last = _active.Count - 1;
                 _active[i] = _active[last];
                 _active.RemoveAt(last);
@@ -101,9 +128,10 @@ namespace ZombieWar.Weapons
             Vector3 origin = _throwOrigin.position;
             Vector3 target = ResolveTarget();
             Vector3 velocity = ComputeLaunchVelocity(origin, target, _definition.FlightTime);
+            float blastRadius = _definition.BlastRadius * _stats.Multiplier(StatId.BombRadius);
 
             Bomb bomb = _pool.Get(origin, Quaternion.identity);
-            bomb.Launch(velocity, _definition.FuseDuration, _definition.TelegraphLead, _definition.BlastRadius);
+            bomb.Launch(velocity, _definition.FuseDuration, _definition.TelegraphLead, blastRadius);
             _active.Add(bomb);
             _audio.PlayWorld(_definition.ThrowClip, origin);
 
@@ -142,13 +170,13 @@ namespace ZombieWar.Weapons
             return displacement / flightTime - 0.5f * Physics.gravity * flightTime;
         }
 
-        private void Explode(Vector3 center)
+        private void Explode(Vector3 center, float radius)
         {
-            float radius = _definition.BlastRadius;
+            float damageMultiplier = _stats.Multiplier(StatId.BombDamage);
             int count = Physics.OverlapSphereNonAlloc(center, radius, _blastBuffer, _blastMask, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < count; i++)
             {
-                ApplyBlast(center, radius, _blastBuffer[i]);
+                ApplyBlast(center, radius, damageMultiplier, _blastBuffer[i]);
             }
 
             _vfx.Play(_definition.ExplosionVfx, center, Quaternion.identity);
@@ -156,7 +184,7 @@ namespace ZombieWar.Weapons
             _impulseSource.GenerateImpulseWithForce(_definition.CameraImpulse);
         }
 
-        private void ApplyBlast(Vector3 center, float radius, Collider target)
+        private void ApplyBlast(Vector3 center, float radius, float damageMultiplier, Collider target)
         {
             Vector3 point = target.bounds.center;
             bool occluded = Physics.Linecast(center, point, out RaycastHit hit, _obstacleMask, QueryTriggerInteraction.Ignore)
@@ -174,7 +202,7 @@ namespace ZombieWar.Weapons
 
             if (_zombies.TryGetZombie(target, out ZombieController zombie))
             {
-                float damage = Mathf.Lerp(_definition.DamageAtCenter, _definition.DamageAtEdge, falloff);
+                float damage = Mathf.Lerp(_definition.DamageAtCenter, _definition.DamageAtEdge, falloff) * damageMultiplier;
                 zombie.TakeDamage(new DamageInfo(damage, center, direction, force, DamageSource.Bomb));
                 return;
             }

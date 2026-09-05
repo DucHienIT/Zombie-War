@@ -17,6 +17,8 @@ namespace ZombieWar.Data
         [SerializeField] private float _maxHp = 48f;
         [SerializeField] private float _moveSpeed = 2.3f;
         [SerializeField] private int _scoreReward = 10;
+        // Battle experience this kill pays into the in-run roguelike level bar.
+        [SerializeField] private int _xpReward = 10;
 
         [Header("Attack")]
         [SerializeField] private float _attackDamage = 10f;
@@ -58,6 +60,7 @@ namespace ZombieWar.Data
         public float MaxHp => _maxHp;
         public float MoveSpeed => _moveSpeed;
         public int ScoreReward => _scoreReward;
+        public int XpReward => _xpReward;
         public float AttackDamage => _attackDamage;
         public float AttackCooldown => _attackCooldown;
         public float AttackRange => _attackRange;

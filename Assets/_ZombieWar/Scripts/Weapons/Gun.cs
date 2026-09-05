@@ -20,6 +20,9 @@ namespace ZombieWar.Weapons
 
         public GunDefinitionSO Definition => _definition;
         public Transform Muzzle => _muzzle;
+        // Effective numbers at the applied upgrade level; WeaponController applies them before use.
+        public GunStats Stats { get; private set; }
+        public int UpgradeLevel { get; private set; }
         public int Ammo { get; private set; }
         public bool IsEmpty => Ammo <= 0;
 
@@ -32,12 +35,18 @@ namespace ZombieWar.Weapons
             }
 
             _recoilRestPosition = _recoilPivot.localPosition;
-            Ammo = _definition.MagazineSize;
+        }
+
+        public void ApplyUpgrade(int upgradeLevel)
+        {
+            UpgradeLevel = upgradeLevel;
+            Stats = _definition.GetStats(upgradeLevel);
+            Ammo = Stats.MagazineSize;
         }
 
         public void ResetAmmo()
         {
-            Ammo = _definition.MagazineSize;
+            Ammo = Stats.MagazineSize;
         }
 
         public void ConsumeRound()

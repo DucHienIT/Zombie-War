@@ -13,6 +13,9 @@ namespace ZombieWar.Weapons
         private float _telegraphLead;
 
         public Vector3 Position => _rigidbody.position;
+        // Held on the bomb so the blast matches the ring the player was shown, even if a
+        // level-up widens the radius while this one is still in the air.
+        public float BlastRadius { get; private set; }
 
         public void OnSpawned()
         {
@@ -31,6 +34,7 @@ namespace ZombieWar.Weapons
         {
             _fuse = fuseDuration;
             _telegraphLead = telegraphLead;
+            BlastRadius = blastRadius;
             _telegraphRing.localScale = new Vector3(blastRadius * 2f, _telegraphRing.localScale.y, blastRadius * 2f);
             _rigidbody.isKinematic = false;
             _rigidbody.velocity = velocity;
