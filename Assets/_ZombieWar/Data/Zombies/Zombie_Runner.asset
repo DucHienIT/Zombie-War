@@ -16,8 +16,8 @@ MonoBehaviour:
   _displayName: Runner
   _prefab: {fileID: 2500135637788990654, guid: f32cabb5549901e4b872ee8ef22c45d0, type: 3}
   _poolPrewarm: 48
-  _maxHp: 32
-  _moveSpeed: 2.7
+  _maxHp: 14
+  _moveSpeed: 2.3
   _scoreReward: 15
   _xpReward: 14
   _attackDamage: 7
@@ -37,7 +37,8 @@ MonoBehaviour:
   _knockbackMaxDuration: 0.55
   _knockbackRestSpeed: 0.4
   _bulletNudgeDistance: 0.12
-  _deathVfx: {fileID: 1803616269720018331, guid: a0ff922c8add8a34e90c60965aa80abc, type: 3}
+  _deathVfx: {fileID: 2323939475474075167, guid: 608abe7e546b5b146b5643e220ffee60, type: 3}
+  _deathHitStopDuration: 0
   _attackClips:
   - {fileID: 8300000, guid: bc2baab908f1b004691a6ecf7044f61c, type: 3}
   - {fileID: 8300000, guid: 12e7285fa38aaf943a0ed8c7f3c684eb, type: 3}
