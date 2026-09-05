@@ -9,7 +9,6 @@ namespace ZombieWar.Audio
 
         // Voices are authored as child AudioSources; their count is the world voice limit.
         [SerializeField] private AudioSource[] _worldVoices;
-        [SerializeField] private AudioSource _uiVoice;
 
         [Header("Mix")]
         [SerializeField] private float _pitchJitter = 0.03f;
@@ -24,11 +23,6 @@ namespace ZombieWar.Audio
             if (_worldVoices == null || _worldVoices.Length == 0)
             {
                 Debug.LogError($"{LogPrefix} No world voices assigned.", this);
-            }
-
-            if (_uiVoice == null)
-            {
-                Debug.LogError($"{LogPrefix} UI voice is missing.", this);
             }
         }
 
@@ -53,16 +47,6 @@ namespace ZombieWar.Audio
             }
 
             PlayWorld(clips[Random.Range(0, clips.Length)], position);
-        }
-
-        public void PlayUi(AudioClip clip)
-        {
-            if (clip == null)
-            {
-                return;
-            }
-
-            _uiVoice.PlayOneShot(clip);
         }
 
         private bool IsMerged(AudioClip clip)
