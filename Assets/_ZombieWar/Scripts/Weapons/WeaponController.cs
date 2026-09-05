@@ -28,14 +28,9 @@ namespace ZombieWar.Weapons
         private Transform _transform;
         private int _currentIndex;
         private float _stateTimer;
-        private float _reloadDuration;
         private float _pendingCooldownAfterSwitch;
 
         public event Action<Gun> OnGunChanged;
-        public event Action<int, int> OnAmmoChanged;
-        public event Action<float> OnReloadProgress;
-        public event Action OnReloadStarted;
-        public event Action OnReloadEnded;
         public event Action<Gun> OnShotFired;
 
         public Gun CurrentGun => _guns[_currentIndex];
@@ -74,14 +69,14 @@ namespace ZombieWar.Weapons
 
         private void Start()
         {
-            PublishGunState();
+            OnGunChanged?.Invoke(CurrentGun);
         }
 
         // Upgrades bought in the menu land here, so a run always starts with the saved levels.
         private void HandleRunStarted(LevelDefinitionSO level)
         {
             ApplyUpgrades();
-            PublishGunState();
+            OnGunChanged?.Invoke(CurrentGun);
         }
 
         private void ApplyUpgrades()
@@ -93,13 +88,23 @@ namespace ZombieWar.Weapons
             }
         }
 
-        private void Update()
+        // Everything runs after the animator, in this order: the barrel is re-aimed (the run cycle
+        // swings the hand up to 13 degrees off the body facing), the recoil pose is applied, and
+        // only then may a shot fire - so bullets, tracer and flash spawn on the muzzle pose that
+        // this very frame renders, not on the one the previous frame left behind.
+        private void LateUpdate()
         {
+            if (!_health.IsAlive)
+            {
+                return;
+            }
+
             float deltaTime = Time.deltaTime;
             Gun gun = CurrentGun;
+            AlignBarrel();
             gun.TickMotion(deltaTime);
 
-            if (_flow.State != GameState.Playing || !_health.IsAlive)
+            if (_flow.State != GameState.Playing)
             {
                 return;
             }
@@ -110,20 +115,17 @@ namespace ZombieWar.Weapons
                     TryFire(gun);
                     break;
                 case WeaponState.Cooldown:
-                    TickCooldown(gun, deltaTime);
-                    break;
-                case WeaponState.Reloading:
-                    TickReload(gun, deltaTime);
+                    TickCooldown(deltaTime);
                     break;
                 case WeaponState.Switching:
-                    TickSwitch(gun, deltaTime);
+                    TickSwitch(deltaTime);
                     break;
             }
         }
 
-        // After the animator: the run cycle swings the hand up to 13 degrees off the body facing,
-        // so the barrel is re-aimed every frame and bullets leave where the gun visibly points.
-        private void LateUpdate()
+        // Also called from the hand IK pass, which runs before LateUpdate: the hands must reach for
+        // the barrel pose this frame renders. Same inputs both times, so the second call is a no-op.
+        public void AlignBarrel()
         {
             if (!_health.IsAlive)
             {
@@ -149,11 +151,6 @@ namespace ZombieWar.Weapons
             }
 
             float remainingCooldown = State == WeaponState.Cooldown ? _stateTimer : 0f;
-            if (State == WeaponState.Reloading)
-            {
-                OnReloadEnded?.Invoke();
-            }
-
             CurrentGun.SetVisible(false);
             _currentIndex = (_currentIndex + 1) % _guns.Length;
             Gun next = CurrentGun;
@@ -163,7 +160,7 @@ namespace ZombieWar.Weapons
             State = WeaponState.Switching;
             _stateTimer = _playerDefinition.SwitchLockDuration;
             _pendingCooldownAfterSwitch = Mathf.Max(_playerDefinition.MinCooldownAfterSwitch, remainingCooldown);
-            PublishGunState();
+            OnGunChanged?.Invoke(next);
         }
 
         private void TryFire(Gun gun)
@@ -192,20 +189,12 @@ namespace ZombieWar.Weapons
                 definition.Knockback * _stats.Multiplier(StatId.Knockback),
                 Mathf.RoundToInt(_stats.Additive(StatId.ProjectilePierce)));
             SpawnPellets(definition, origin, forward, shot);
-            _vfx.Play(definition.MuzzleVfx, origin, Quaternion.LookRotation(forward));
+            // Attached, not dropped at a world position: the flash rides the muzzle while the soldier runs.
+            _vfx.Play(definition.MuzzleVfx, muzzle);
             _audio.PlayWorld(definition.ShotClip, origin);
             _impulseSource.GenerateImpulseWithForce(definition.CameraImpulse);
             gun.Kick();
-            gun.ConsumeRound();
-
-            OnAmmoChanged?.Invoke(gun.Ammo, gun.Stats.MagazineSize);
             OnShotFired?.Invoke(gun);
-
-            if (gun.IsEmpty)
-            {
-                BeginReload(gun);
-                return;
-            }
 
             State = WeaponState.Cooldown;
             _stateTimer = gun.Stats.FireInterval / _stats.Multiplier(StatId.FireRate);
@@ -225,72 +214,27 @@ namespace ZombieWar.Weapons
             }
         }
 
-        private void TickCooldown(Gun gun, float deltaTime)
+        private void TickCooldown(float deltaTime)
         {
             _stateTimer -= deltaTime;
             if (_stateTimer > 0f)
             {
-                return;
-            }
-
-            if (gun.IsEmpty)
-            {
-                BeginReload(gun);
                 return;
             }
 
             State = WeaponState.Ready;
         }
 
-        private void BeginReload(Gun gun)
-        {
-            State = WeaponState.Reloading;
-            _reloadDuration = gun.Stats.ReloadDuration / _stats.Multiplier(StatId.ReloadSpeed);
-            _stateTimer = _reloadDuration;
-            gun.BeginReloadMotion(_reloadDuration);
-            _audio.PlayWorld(gun.Definition.ReloadClip, gun.Muzzle.position);
-            OnReloadStarted?.Invoke();
-            OnReloadProgress?.Invoke(0f);
-        }
-
-        private void TickReload(Gun gun, float deltaTime)
-        {
-            _stateTimer -= deltaTime;
-            OnReloadProgress?.Invoke(1f - Mathf.Clamp01(_stateTimer / _reloadDuration));
-            if (_stateTimer > 0f)
-            {
-                return;
-            }
-
-            gun.ResetAmmo();
-            State = WeaponState.Ready;
-            OnAmmoChanged?.Invoke(gun.Ammo, gun.Stats.MagazineSize);
-            OnReloadEnded?.Invoke();
-        }
-
-        private void TickSwitch(Gun gun, float deltaTime)
+        private void TickSwitch(float deltaTime)
         {
             _stateTimer -= deltaTime;
             if (_stateTimer > 0f)
             {
-                return;
-            }
-
-            if (gun.IsEmpty)
-            {
-                BeginReload(gun);
                 return;
             }
 
             State = WeaponState.Cooldown;
             _stateTimer = _pendingCooldownAfterSwitch;
-        }
-
-        private void PublishGunState()
-        {
-            Gun gun = CurrentGun;
-            OnGunChanged?.Invoke(gun);
-            OnAmmoChanged?.Invoke(gun.Ammo, gun.Stats.MagazineSize);
         }
     }
 }

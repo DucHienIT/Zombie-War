@@ -8,10 +8,10 @@ namespace ZombieWar.Roguelike
     // has already stacked to its cap.
     public sealed class SkillDraft
     {
-        private readonly PassiveSkillSO[] _pool;
+        private readonly SkillDefinitionSO[] _pool;
         private readonly List<int> _candidates;
 
-        public SkillDraft(PassiveSkillSO[] pool)
+        public SkillDraft(SkillDefinitionSO[] pool)
         {
             _pool = pool;
             _candidates = new List<int>(pool.Length);
@@ -19,12 +19,12 @@ namespace ZombieWar.Roguelike
 
         // Writes into the caller's buffer and returns how many slots it filled, which can be
         // fewer than asked once most of the pool is maxed out.
-        public int Roll(Dictionary<PassiveSkillSO, int> stacks, PassiveSkillSO[] offers, int wanted)
+        public int Roll(Dictionary<SkillDefinitionSO, int> stacks, SkillDefinitionSO[] offers, int wanted)
         {
             _candidates.Clear();
             for (int i = 0; i < _pool.Length; i++)
             {
-                PassiveSkillSO skill = _pool[i];
+                SkillDefinitionSO skill = _pool[i];
                 if (skill == null)
                 {
                     continue;

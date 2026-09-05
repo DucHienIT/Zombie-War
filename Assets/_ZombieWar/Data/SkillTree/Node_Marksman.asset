@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbee22a39cdd524ebfd9ad97e086771, type: 3}
+  m_Name: Node_Marksman
+  m_EditorClassIdentifier: 
+  _id: marksman
+  _displayName: MARKSMAN
+  _description: Every bullet hits harder.
+  _icon: {fileID: 21300000, guid: b5be0c1053ed402793572de71cee8147, type: 3}
+  _accentColor: {r: 1.0, g: 0.60784314, b: 0.23921569, a: 1}
+  _modifiersPerRank:
+  - _stat: 0
+    _kind: 1
+    _valuePerStack: 1.06
+  _effectLabel: WEAPON DAMAGE
+  _valueFormat: '+{0:0}%'
+  _maxRank: 5
+  _baseCost: 120
+  _costGrowth: 1.45
+  _prerequisites:
+  - {fileID: 11400000, guid: 4f761153b3ee4106a3cb06434a8cb92c, type: 2}

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbee22a39cdd524ebfd9ad97e086771, type: 3}
+  m_Name: Node_Toughness
+  m_EditorClassIdentifier: 
+  _id: toughness
+  _displayName: TOUGHNESS
+  _description: More hit points to start every run with.
+  _icon: {fileID: 21300000, guid: f7963dc5a8af4474bbedf183545c3526, type: 3}
+  _accentColor: {r: 0.23921569, g: 0.87843137, b: 0.62745098, a: 1}
+  _modifiersPerRank:
+  - _stat: 5
+    _kind: 0
+    _valuePerStack: 10
+  _effectLabel: MAX HEALTH
+  _valueFormat: '+{0:0}'
+  _maxRank: 5
+  _baseCost: 120
+  _costGrowth: 1.45
+  _prerequisites:
+  - {fileID: 11400000, guid: 4f761153b3ee4106a3cb06434a8cb92c, type: 2}

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbee22a39cdd524ebfd9ad97e086771, type: 3}
+  m_Name: Node_ArmorPiercing
+  m_EditorClassIdentifier: 
+  _id: armor_piercing
+  _displayName: ARMOR PIERCING
+  _description: Bullets pass through one more zombie.
+  _icon: {fileID: 21300000, guid: 7b15fe1bf0d440d691ac95d70487b548, type: 3}
+  _accentColor: {r: 1.0, g: 0.60784314, b: 0.23921569, a: 1}
+  _modifiersPerRank:
+  - _stat: 2
+    _kind: 0
+    _valuePerStack: 1
+  _effectLabel: PIERCE
+  _valueFormat: '+{0:0}'
+  _maxRank: 1
+  _baseCost: 800
+  _costGrowth: 1
+  _prerequisites:
+  - {fileID: 11400000, guid: 61e022e4a4d143d8b9b586d3509ec3f9, type: 2}

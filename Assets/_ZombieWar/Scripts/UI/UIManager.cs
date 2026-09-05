@@ -22,7 +22,6 @@ namespace ZombieWar.UI
         [SerializeField] private TimerView _timer;
         [SerializeField] private ScoreView _score;
         [SerializeField] private GunHudView _gunHud;
-        [SerializeField] private BombButtonView _bombButton;
         [SerializeField] private XpBarView _xpBar;
         [SerializeField] private Button _pauseButton;
 
@@ -37,25 +36,21 @@ namespace ZombieWar.UI
         [SerializeField] private AudioSource _audioSource;
         [SerializeField] private AudioClip _tapClip;
         [SerializeField] private AudioClip _gunSwitchClip;
-        [SerializeField] private AudioClip _bombReadyClip;
         [SerializeField] private AudioClip _winClip;
         [SerializeField] private AudioClip _loseClip;
         [SerializeField] private AudioClip _levelUpClip;
 
         private Action _onPauseRequested;
         private Action _onSwitchGunRequested;
-        private Action _onThrowBombRequested;
         private Action<int> _onUpgradeWeaponRequested;
         private WeaponEntryData[] _menuWeapons;
         private int _openWeapon = -1;
-        private bool _wasBombReady = true;
-        private int _bombCharges;
 
         private void Awake()
         {
             bool missing = _hudCanvas == null || _menuScreen == null || _countdown == null || _popups == null
                            || _healthBar == null || _timer == null || _score == null || _gunHud == null
-                           || _bombButton == null || _xpBar == null || _pauseButton == null || _pausePopup == null
+                           || _xpBar == null || _pauseButton == null || _pausePopup == null
                            || _resultPopup == null || _skillPopup == null || _weaponPopup == null || _settingsPopup == null
                            || _audioSource == null;
             if (missing)
@@ -66,14 +61,12 @@ namespace ZombieWar.UI
 
             _pauseButton.onClick.AddListener(HandlePauseClicked);
             _gunHud.Init(HandleSwitchGunClicked);
-            _bombButton.Init(HandleThrowBombClicked);
         }
 
-        public void BindGameplayCommands(Action onPause, Action onSwitchGun, Action onThrowBomb)
+        public void BindGameplayCommands(Action onPause, Action onSwitchGun)
         {
             _onPauseRequested = onPause;
             _onSwitchGunRequested = onSwitchGun;
-            _onThrowBombRequested = onThrowBomb;
         }
 
         public void ShowGameplayScreen()
@@ -82,8 +75,8 @@ namespace ZombieWar.UI
             _hudCanvas.enabled = true;
         }
 
-        public void ShowMenuScreen(in MenuHeaderData header, LevelCardData[] levels, WeaponEntryData[] weapons,
-            Action<int> onLevelSelected, Action<int> onUpgradeWeapon, Action onSettings)
+        public void ShowMenuScreen(in MenuHeaderData header, LevelCardData[] levels, WeaponEntryData[] weapons, SkillNodeData[] skills,
+            Action<int> onLevelSelected, Action<int> onUpgradeWeapon, Action<int> onUpgradeSkill, Action onSettings)
         {
             _menuWeapons = weapons;
             _onUpgradeWeaponRequested = onUpgradeWeapon;
@@ -91,14 +84,14 @@ namespace ZombieWar.UI
             _hudCanvas.enabled = false;
             _countdown.SetVisible(false);
             _menuScreen.SetVisible(true);
-            _menuScreen.Bind(header, levels, weapons, onLevelSelected, HandleWeaponSelected, Wrap(onSettings), PlayTap);
+            _menuScreen.Bind(header, levels, weapons, skills, onLevelSelected, HandleWeaponSelected, Wrap(onUpgradeSkill), Wrap(onSettings), PlayTap);
         }
 
-        // Re-pushes header and weapon data while the menu is already up (after an upgrade).
-        public void RefreshMenu(in MenuHeaderData header, WeaponEntryData[] weapons)
+        // Re-pushes header, weapon and skill data while the menu is already up (after an upgrade).
+        public void RefreshMenu(in MenuHeaderData header, WeaponEntryData[] weapons, SkillNodeData[] skills)
         {
             _menuWeapons = weapons;
-            _menuScreen.Refresh(header, weapons);
+            _menuScreen.Refresh(header, weapons, skills);
             if (_openWeapon >= 0 && _openWeapon < weapons.Length)
             {
                 _weaponPopup.Refresh(weapons[_openWeapon]);
@@ -142,34 +135,11 @@ namespace ZombieWar.UI
 
         public void SetGun(Sprite icon, string displayName) => _gunHud.SetGun(icon, displayName);
 
-        public void SetAmmo(int ammo, int magazine) => _gunHud.SetAmmo(ammo, magazine);
-
-        public void SetReloadProgress(float progress) => _gunHud.SetReloadProgress(progress);
-
-        public void SetBombCharges(int charges)
-        {
-            _bombCharges = charges;
-            _bombButton.SetCharges(charges);
-        }
-
         public void SetXp(float normalized, int battleLevel) => _xpBar.SetXp(normalized, battleLevel);
 
         public void ShowCountdown(bool visible) => _countdown.SetVisible(visible);
 
         public void SetCountdownSeconds(int seconds) => _countdown.SetSeconds(seconds);
-
-        public void SetBombCooldown(float progress)
-        {
-            _bombButton.SetCooldown(progress);
-            bool ready = progress >= 1f;
-            if (ready && !_wasBombReady && _bombCharges > 0)
-            {
-                Play(_bombReadyClip);
-                _bombButton.PlayReady();
-            }
-
-            _wasBombReady = ready;
-        }
 
         public void ShowPausePopup(Action onResume, Action onRestart, Action onMenu, bool shakeEnabled, Action<bool> onShakeChanged)
         {
@@ -249,8 +219,6 @@ namespace ZombieWar.UI
             Play(_gunSwitchClip);
             _onSwitchGunRequested?.Invoke();
         }
-
-        private void HandleThrowBombClicked() => _onThrowBombRequested?.Invoke();
 
         private void Play(AudioClip clip)
         {

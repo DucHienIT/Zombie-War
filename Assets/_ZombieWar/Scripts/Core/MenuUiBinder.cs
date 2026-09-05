@@ -20,6 +20,7 @@ namespace ZombieWar.Core
         private readonly SaveService _save = new SaveService();
         private LevelCardData[] _cards;
         private WeaponEntryData[] _weapons;
+        private SkillNodeData[] _skills;
         private bool _menuShown;
 
         private void Awake()
@@ -34,6 +35,7 @@ namespace ZombieWar.Core
 
             _cards = new LevelCardData[_levels.Length];
             _weapons = new WeaponEntryData[_profile.Guns.Length];
+            _skills = new SkillNodeData[_profile.Skills.Count];
         }
 
         private void OnEnable()
@@ -58,8 +60,10 @@ namespace ZombieWar.Core
 
             RefreshCards();
             RefreshWeapons();
+            RefreshSkills();
             _menuShown = true;
-            _ui.ShowMenuScreen(BuildHeader(), _cards, _weapons, HandleLevelSelected, HandleUpgradeRequested, HandleSettingsRequested);
+            _ui.ShowMenuScreen(BuildHeader(), _cards, _weapons, _skills, HandleLevelSelected, HandleUpgradeRequested,
+                HandleSkillUpgradeRequested, HandleSettingsRequested);
         }
 
         // Rewards land at the end of a run while the menu is hidden; only a live menu redraws.
@@ -71,7 +75,53 @@ namespace ZombieWar.Core
             }
 
             RefreshWeapons();
-            _ui.RefreshMenu(BuildHeader(), _weapons);
+            RefreshSkills();
+            _ui.RefreshMenu(BuildHeader(), _weapons, _skills);
+        }
+
+        // The page gets a fresh array each time so it can diff ranks against the one it holds.
+        private void RefreshSkills()
+        {
+            SkillTreeProgress skills = _profile.Skills;
+            if (_skills.Length != skills.Count)
+            {
+                _skills = new SkillNodeData[skills.Count];
+            }
+
+            for (int i = 0; i < skills.Count; i++)
+            {
+                SkillTreeNodeSO node = skills.NodeAt(i);
+                if (node == null)
+                {
+                    continue;
+                }
+
+                int rank = skills.RankAt(i);
+                int cost = skills.CostAt(i);
+                SkillTreeNodeSO missing = skills.FirstMissingPrerequisite(i);
+                _skills[i] = new SkillNodeData(
+                    node.DisplayName,
+                    node.Description,
+                    node.EffectLabel,
+                    node.ValueFormat,
+                    node.Icon,
+                    node.AccentColor,
+                    rank,
+                    node.MaxRank,
+                    missing == null,
+                    missing != null ? missing.DisplayName : string.Empty,
+                    cost,
+                    _profile.Coins >= cost,
+                    Mathf.Max(0, cost - _profile.Coins),
+                    node.EffectValueAt(rank),
+                    node.EffectValueAt(Mathf.Min(rank + 1, node.MaxRank)));
+            }
+        }
+
+        private void HandleSkillUpgradeRequested(int index)
+        {
+            // A refused purchase (locked, maxed, short on coins) is already reflected by the disabled button.
+            _profile.TryUpgradeSkill(index);
         }
 
         private MenuHeaderData BuildHeader()
@@ -111,7 +161,7 @@ namespace ZombieWar.Core
 
         private static WeaponStatsData ToStatsData(in GunStats stats)
         {
-            return new WeaponStatsData(stats.Damage, stats.ShotsPerSecond, stats.MagazineSize, stats.ReloadDuration);
+            return new WeaponStatsData(stats.Damage, stats.ShotsPerSecond);
         }
 
         private void HandleUpgradeRequested(int slot)

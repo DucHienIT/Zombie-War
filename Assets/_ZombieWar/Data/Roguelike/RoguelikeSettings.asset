@@ -19,6 +19,25 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d6e57b3077dbea749b076f8fe4138c51, type: 2}
   - {fileID: 11400000, guid: 27cf3372927407145a6e477dccabe720, type: 2}
   - {fileID: 11400000, guid: f897594469e3392489c94eb0e820cc7b, type: 2}
+  - {fileID: 11400000, guid: e480db97d566308468348ffdf2535d8b, type: 2}
+  - {fileID: 11400000, guid: a3119090e2004026b3d962799e0a94c1, type: 2}
+  - {fileID: 11400000, guid: a7928b78d6061364c82729fc2f32e302, type: 2}
+  - {fileID: 11400000, guid: 06ea9aec4c5c9364596a6cd7649ceafe, type: 2}
+  - {fileID: 11400000, guid: d127a4e1e7d17e04baefc396fdffcaf8, type: 2}
+  - {fileID: 11400000, guid: 33daea3e055229e4eab2073e14043809, type: 2}
+  - {fileID: 11400000, guid: cdc651f5ae71ac74787bdaf7d6d24d35, type: 2}
+  - {fileID: 11400000, guid: 5bfa80ada4bfd1e43ba2d298a01c8e8f, type: 2}
+  - {fileID: 11400000, guid: b715d63bc7f5eda49b92d0dfde596456, type: 2}
+  - {fileID: 11400000, guid: de15b64974bf18c449229bd854c6b153, type: 2}
+  - {fileID: 11400000, guid: c55c0e8bd6cc055429f9cb4bb3c2cb1b, type: 2}
+  _startingAbility: {fileID: 0}
+  _firstLevelPool:
+  - {fileID: 11400000, guid: e480db97d566308468348ffdf2535d8b, type: 2}
+  - {fileID: 11400000, guid: a3119090e2004026b3d962799e0a94c1, type: 2}
+  - {fileID: 11400000, guid: a7928b78d6061364c82729fc2f32e302, type: 2}
+  - {fileID: 11400000, guid: 06ea9aec4c5c9364596a6cd7649ceafe, type: 2}
+  - {fileID: 11400000, guid: d127a4e1e7d17e04baefc396fdffcaf8, type: 2}
+  - {fileID: 11400000, guid: 33daea3e055229e4eab2073e14043809, type: 2}
   _offersPerLevelUp: 3
   _baseXpToLevel: 80
   _xpGrowthPerLevel: 1.35

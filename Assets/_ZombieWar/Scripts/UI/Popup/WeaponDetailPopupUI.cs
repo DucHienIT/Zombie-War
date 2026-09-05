@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace ZombieWar.UI
 {
-    // Detail sheet for one gun: description, six-cell stat grid with upgrade preview,
+    // Detail sheet for one gun: description, four-cell stat grid with upgrade preview,
     // cost and the upgrade button. Stays open across an upgrade and redraws with new data.
     public sealed class WeaponDetailPopupUI : PopupBase
     {
@@ -21,8 +21,6 @@ namespace ZombieWar.UI
         [Header("Stats")]
         [SerializeField] private WeaponStatCellView _attackCell;
         [SerializeField] private WeaponStatCellView _rateCell;
-        [SerializeField] private WeaponStatCellView _magazineCell;
-        [SerializeField] private WeaponStatCellView _reloadCell;
         [SerializeField] private WeaponStatCellView _shotsCell;
         [SerializeField] private WeaponStatCellView _typeCell;
 
@@ -37,8 +35,6 @@ namespace ZombieWar.UI
         [Header("Formats")]
         [SerializeField] private string _damageFormat = "{0:1}";
         [SerializeField] private string _fireRateFormat = "{0:1}/s";
-        [SerializeField] private string _magazineFormat = "{0:0}";
-        [SerializeField] private string _reloadFormat = "{0:2}s";
         [SerializeField] private string _singleShotLabel = "SINGLE";
         [SerializeField] private string _spreadShotLabel = "SPREAD";
         [SerializeField] private string _lockedHint = "LOCKED";
@@ -53,8 +49,7 @@ namespace ZombieWar.UI
         {
             base.Awake();
             bool missing = _closeButton == null || _icon == null || _nameText == null || _levelText == null || _descriptionText == null
-                           || _attackCell == null || _rateCell == null || _magazineCell == null || _reloadCell == null
-                           || _shotsCell == null || _typeCell == null || _upgradeButton == null || _costGroup == null
+                           || _attackCell == null || _rateCell == null || _shotsCell == null || _typeCell == null || _upgradeButton == null || _costGroup == null
                            || _costText == null || _hintText == null;
             if (missing)
             {
@@ -114,8 +109,6 @@ namespace ZombieWar.UI
             bool showNext = _entry.Unlocked && !_entry.IsMaxLevel;
             _attackCell.Set(_damageFormat, _entry.Current.Damage, _entry.Next.Damage, showNext);
             _rateCell.Set(_fireRateFormat, _entry.Current.ShotsPerSecond, _entry.Next.ShotsPerSecond, showNext);
-            _magazineCell.Set(_magazineFormat, _entry.Current.Magazine, _entry.Next.Magazine, showNext);
-            _reloadCell.Set(_reloadFormat, _entry.Current.Reload, _entry.Next.Reload, showNext);
             _shotsCell.SetCount(_entry.Pellets);
             _typeCell.SetLabel(_entry.IsSpread ? _spreadShotLabel : _singleShotLabel);
 

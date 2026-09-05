@@ -19,7 +19,6 @@ namespace ZombieWar.Core
         [SerializeField] private GameFlowController _flow;
         [SerializeField] private PlayerHealth _playerHealth;
         [SerializeField] private WeaponController _weapons;
-        [SerializeField] private BombThrower _bombs;
         [SerializeField] private CameraShakeController _cameraShake;
         [SerializeField] private RoguelikeDirector _rogue;
 
@@ -28,7 +27,7 @@ namespace ZombieWar.Core
 
         private void Awake()
         {
-            bool missing = _ui == null || _flow == null || _playerHealth == null || _weapons == null || _bombs == null
+            bool missing = _ui == null || _flow == null || _playerHealth == null || _weapons == null
                            || _cameraShake == null || _rogue == null;
             if (missing)
             {
@@ -38,7 +37,7 @@ namespace ZombieWar.Core
 
             // Cached once: turning a method group into a delegate allocates on every level-up.
             _onSkillPicked = _rogue.ChooseOffer;
-            _ui.BindGameplayCommands(_flow.Pause, _weapons.RequestSwitch, _bombs.RequestThrow);
+            _ui.BindGameplayCommands(_flow.Pause, _weapons.RequestSwitch);
         }
 
         private void OnEnable()
@@ -50,12 +49,6 @@ namespace ZombieWar.Core
             _flow.OnLevelEnded += HandleLevelEnded;
             _playerHealth.OnHealthChanged += HandleHealthChanged;
             _weapons.OnGunChanged += HandleGunChanged;
-            _weapons.OnAmmoChanged += HandleAmmoChanged;
-            _weapons.OnReloadStarted += HandleReloadStarted;
-            _weapons.OnReloadProgress += HandleReloadProgress;
-            _weapons.OnReloadEnded += HandleReloadEnded;
-            _bombs.OnChargesChanged += HandleBombChargesChanged;
-            _bombs.OnCooldownProgress += HandleBombCooldownProgress;
             _rogue.OnXpChanged += HandleXpChanged;
             _rogue.OnChoiceOffered += HandleChoiceOffered;
             _rogue.OnChoiceClosed += HandleChoiceClosed;
@@ -70,12 +63,6 @@ namespace ZombieWar.Core
             _flow.OnLevelEnded -= HandleLevelEnded;
             _playerHealth.OnHealthChanged -= HandleHealthChanged;
             _weapons.OnGunChanged -= HandleGunChanged;
-            _weapons.OnAmmoChanged -= HandleAmmoChanged;
-            _weapons.OnReloadStarted -= HandleReloadStarted;
-            _weapons.OnReloadProgress -= HandleReloadProgress;
-            _weapons.OnReloadEnded -= HandleReloadEnded;
-            _bombs.OnChargesChanged -= HandleBombChargesChanged;
-            _bombs.OnCooldownProgress -= HandleBombCooldownProgress;
             _rogue.OnXpChanged -= HandleXpChanged;
             _rogue.OnChoiceOffered -= HandleChoiceOffered;
             _rogue.OnChoiceClosed -= HandleChoiceClosed;
@@ -115,23 +102,11 @@ namespace ZombieWar.Core
 
         private void HandleGunChanged(Gun gun) => _ui.SetGun(gun.Definition.Icon, gun.Definition.DisplayName);
 
-        private void HandleAmmoChanged(int ammo, int magazine) => _ui.SetAmmo(ammo, magazine);
-
-        private void HandleReloadStarted() => _ui.SetReloadProgress(0f);
-
-        private void HandleReloadProgress(float progress) => _ui.SetReloadProgress(progress);
-
-        private void HandleReloadEnded() => _ui.SetReloadProgress(0f);
-
-        private void HandleBombChargesChanged(int charges) => _ui.SetBombCharges(charges);
-
-        private void HandleBombCooldownProgress(float progress) => _ui.SetBombCooldown(progress);
-
         private void HandleXpChanged(float normalized, int battleLevel) => _ui.SetXp(normalized, battleLevel);
 
         // The draft hands over gameplay assets; flattening them here is what keeps the popup
         // ignorant of PassiveSkillSO, the same way the result panel never sees a LevelResult.
-        private void HandleChoiceOffered(PassiveSkillSO[] offers, int count, int battleLevel)
+        private void HandleChoiceOffered(SkillDefinitionSO[] offers, int count, int battleLevel)
         {
             if (_skillCards == null || _skillCards.Length < count)
             {
@@ -140,14 +115,15 @@ namespace ZombieWar.Core
 
             for (int i = 0; i < count; i++)
             {
-                PassiveSkillSO skill = offers[i];
+                SkillDefinitionSO skill = offers[i];
                 _skillCards[i] = new SkillCardData(
                     skill.DisplayName,
                     skill.Description,
                     skill.Icon,
                     skill.AccentColor,
                     _rogue.StacksOf(skill) + 1,
-                    skill.MaxStacks);
+                    skill.MaxStacks,
+                    skill.Kind == SkillKind.Active);
             }
 
             _flow.PauseForLevelUp();

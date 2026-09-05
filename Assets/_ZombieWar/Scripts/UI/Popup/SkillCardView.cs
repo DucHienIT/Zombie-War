@@ -10,10 +10,24 @@ namespace ZombieWar.UI
         private const string LogPrefix = "[UI]";
 
         [SerializeField] private Button _button;
+        [SerializeField] private Image _iconPlate;
         [SerializeField] private Image _icon;
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _descriptionText;
         [SerializeField] private GameObject _newBadge;
+
+        [Header("Kind")]
+        // The pack's tags are pre-coloured art, so each kind gets its own sprite rather than a tint.
+        [SerializeField] private Image _kindChip;
+        [SerializeField] private TMP_Text _kindText;
+        [SerializeField] private string _passiveLabel = "PASSIVE";
+        [SerializeField] private string _activeLabel = "ACTIVE";
+        [SerializeField] private Sprite _passiveKindSprite;
+        [SerializeField] private Sprite _activeKindSprite;
+        [SerializeField] private Color _passiveKindTextColor;
+        [SerializeField] private Color _activeKindTextColor;
+        [SerializeField] private Color _passivePlateColor;
+        [SerializeField] private Color _activePlateColor;
 
         [Header("Stars")]
         // One authored slot per stack a skill can ever have; a skill with a lower cap hides
@@ -29,8 +43,10 @@ namespace ZombieWar.UI
 
         private void Awake()
         {
-            bool missing = _button == null || _icon == null || _nameText == null || _descriptionText == null
-                           || _newBadge == null || _stars == null || _stars.Length == 0 || _starRow == null;
+            bool missing = _button == null || _iconPlate == null || _icon == null || _nameText == null || _descriptionText == null
+                           || _newBadge == null || _kindChip == null || _kindText == null
+                           || _passiveKindSprite == null || _activeKindSprite == null
+                           || _stars == null || _stars.Length == 0 || _starRow == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} SkillCardView has an unassigned reference.", this);
@@ -51,6 +67,10 @@ namespace ZombieWar.UI
             _nameText.text = data.DisplayName;
             _descriptionText.text = data.Description;
             _newBadge.SetActive(data.IsNew);
+            _kindText.text = data.IsActive ? _activeLabel : _passiveLabel;
+            _kindText.color = data.IsActive ? _activeKindTextColor : _passiveKindTextColor;
+            _kindChip.sprite = data.IsActive ? _activeKindSprite : _passiveKindSprite;
+            _iconPlate.color = data.IsActive ? _activePlateColor : _passivePlateColor;
             DrawStars(data.NextStack, data.MaxStacks);
         }
 

@@ -14,17 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: blood_pact
   _displayName: BLOOD PACT
-  _description: 'Max health +15
-
-    Heal 2 per kill'
+  _description: Heal 2 per kill
   _icon: {fileID: 21300000, guid: 7f5721dc5748f8548aa63ce1eec4a337, type: 3}
   _accentColor: {r: 1, g: 0.35686275, b: 0.2901961, a: 1}
   _maxStacks: 4
   _draftWeight: 1
   _modifiers:
   - _stat: 6
-    _kind: 0
-    _valuePerStack: 15
-  - _stat: 7
     _kind: 0
     _valuePerStack: 2

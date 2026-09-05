@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbee22a39cdd524ebfd9ad97e086771, type: 3}
+  m_Name: Node_TriggerFinger
+  m_EditorClassIdentifier: 
+  _id: trigger_finger
+  _displayName: TRIGGER FINGER
+  _description: A faster fire rate on every gun.
+  _icon: {fileID: 21300000, guid: bdda6db7b26d4f719d96e124aa4f953c, type: 3}
+  _accentColor: {r: 1.0, g: 0.60784314, b: 0.23921569, a: 1}
+  _modifiersPerRank:
+  - _stat: 1
+    _kind: 1
+    _valuePerStack: 1.05
+  _effectLabel: FIRE RATE
+  _valueFormat: '+{0:0}%'
+  _maxRank: 5
+  _baseCost: 200
+  _costGrowth: 1.45
+  _prerequisites:
+  - {fileID: 11400000, guid: 745db444f54544e1922fcca1722cce45, type: 2}

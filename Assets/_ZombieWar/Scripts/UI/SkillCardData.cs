@@ -13,8 +13,10 @@ namespace ZombieWar.UI
         // The level this pick would reach, so the star row previews the reward before the tap.
         public readonly int NextStack;
         public readonly int MaxStacks;
+        // Drawn as a label and a plate tint: an ability that fires itself must not read like a stat bump.
+        public readonly bool IsActive;
 
-        public SkillCardData(string displayName, string description, Sprite icon, Color accentColor, int nextStack, int maxStacks)
+        public SkillCardData(string displayName, string description, Sprite icon, Color accentColor, int nextStack, int maxStacks, bool isActive)
         {
             DisplayName = displayName;
             Description = description;
@@ -22,6 +24,7 @@ namespace ZombieWar.UI
             AccentColor = accentColor;
             NextStack = nextStack;
             MaxStacks = maxStacks;
+            IsActive = isActive;
         }
 
         public bool IsNew => NextStack <= 1;

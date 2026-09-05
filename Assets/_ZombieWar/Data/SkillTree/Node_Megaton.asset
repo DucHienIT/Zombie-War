@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbee22a39cdd524ebfd9ad97e086771, type: 3}
+  m_Name: Node_Megaton
+  m_EditorClassIdentifier: 
+  _id: megaton
+  _displayName: MEGATON
+  _description: A massive jump in bomb damage.
+  _icon: {fileID: 21300000, guid: f6b9b4dbb6204db3a3fc10dcbf7ace95, type: 3}
+  _accentColor: {r: 0.70588235, g: 0.48627451, b: 1.0, a: 1}
+  _modifiersPerRank:
+  - _stat: 9
+    _kind: 1
+    _valuePerStack: 1.3
+  _effectLabel: BOMB DAMAGE
+  _valueFormat: '+{0:0}%'
+  _maxRank: 1
+  _baseCost: 800
+  _costGrowth: 1
+  _prerequisites:
+  - {fileID: 11400000, guid: b86d55ba1a5e49b387422271c1df97ae, type: 2}

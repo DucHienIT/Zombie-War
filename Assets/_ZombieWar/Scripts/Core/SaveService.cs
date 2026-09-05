@@ -15,6 +15,7 @@ namespace ZombieWar.Core
         private const string CoinsKey = "zw_coins";
         private const string GunLevelKeyPrefix = "zw_gun_level_";
         private const string GunUnlockedKeyPrefix = "zw_gun_unlocked_";
+        private const string SkillRankKeyPrefix = "zw_skill_rank_";
         private const int FirstLevelIndex = 1;
         private const int FirstPlayerLevel = 1;
 
@@ -23,6 +24,7 @@ namespace ZombieWar.Core
         public int GetCoins(int startingCoins) => PlayerPrefs.GetInt(CoinsKey, startingCoins);
         public int GetGunLevel(string gunId) => PlayerPrefs.GetInt(GunLevelKeyPrefix + gunId, 0);
         public bool IsGunUnlocked(string gunId, bool unlockedByDefault) => PlayerPrefs.GetInt(GunUnlockedKeyPrefix + gunId, unlockedByDefault ? 1 : 0) == 1;
+        public int GetSkillRank(string nodeId) => PlayerPrefs.GetInt(SkillRankKeyPrefix + nodeId, 0);
 
         public int UnlockedLevel => PlayerPrefs.GetInt(UnlockedLevelKey, FirstLevelIndex);
         public float MusicVolume => PlayerPrefs.GetFloat(MusicVolumeKey, 1f);
@@ -88,6 +90,12 @@ namespace ZombieWar.Core
         public void SetGunUnlocked(string gunId, bool unlocked)
         {
             PlayerPrefs.SetInt(GunUnlockedKeyPrefix + gunId, unlocked ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        public void SetSkillRank(string nodeId, int rank)
+        {
+            PlayerPrefs.SetInt(SkillRankKeyPrefix + nodeId, rank);
             PlayerPrefs.Save();
         }
     }

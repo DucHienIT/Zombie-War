@@ -6,7 +6,7 @@ namespace ZombieWar.UI
         Shop,
         Weapon,
         Battle,
-        Talent,
+        SkillTree,
         Gacha
     }
 }

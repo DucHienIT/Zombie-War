@@ -6,15 +6,11 @@ namespace ZombieWar.UI
     {
         public readonly float Damage;
         public readonly float ShotsPerSecond;
-        public readonly int Magazine;
-        public readonly float Reload;
 
-        public WeaponStatsData(float damage, float shotsPerSecond, int magazine, float reload)
+        public WeaponStatsData(float damage, float shotsPerSecond)
         {
             Damage = damage;
             ShotsPerSecond = shotsPerSecond;
-            Magazine = magazine;
-            Reload = reload;
         }
     }
 

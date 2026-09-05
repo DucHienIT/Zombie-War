@@ -47,6 +47,24 @@ namespace ZombieWar.VFX
                 return;
             }
 
+            Acquire(prefab, position, rotation);
+        }
+
+        // Spawns the effect on the anchor and keeps it there: a muzzle flash left at a world
+        // position trails half a metre behind a running soldier before it has even faded.
+        public void Play(PooledVfx prefab, Transform anchor)
+        {
+            if (prefab == null || anchor == null)
+            {
+                return;
+            }
+
+            PooledVfx instance = Acquire(prefab, anchor.position, anchor.rotation);
+            instance.AttachTo(anchor);
+        }
+
+        private PooledVfx Acquire(PooledVfx prefab, Vector3 position, Quaternion rotation)
+        {
             if (!_pools.TryGetValue(prefab, out ComponentPool<PooledVfx> pool))
             {
                 Debug.LogWarning($"{LogPrefix} No prewarmed pool for {prefab.name}; creating one at runtime. Add it to VfxService entries.", this);
@@ -57,6 +75,7 @@ namespace ZombieWar.VFX
             PooledVfx instance = pool.Get(position, rotation);
             _prefabOfInstance[instance] = prefab;
             _active.Add(instance);
+            return instance;
         }
 
         private void Update()
@@ -68,6 +87,11 @@ namespace ZombieWar.VFX
                 if (instance.Tick(deltaTime))
                 {
                     continue;
+                }
+
+                if (instance.IsAttached)
+                {
+                    instance.Detach(_poolParent);
                 }
 
                 _pools[_prefabOfInstance[instance]].Release(instance);

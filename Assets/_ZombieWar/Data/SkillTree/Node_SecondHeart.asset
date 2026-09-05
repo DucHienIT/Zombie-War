@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afbee22a39cdd524ebfd9ad97e086771, type: 3}
+  m_Name: Node_SecondHeart
+  m_EditorClassIdentifier: 
+  _id: second_heart
+  _displayName: SECOND HEART
+  _description: A big reserve of hit points.
+  _icon: {fileID: 21300000, guid: 7b7fdbe2e9314ccbbfaf22a70fb32cdd, type: 3}
+  _accentColor: {r: 0.23921569, g: 0.87843137, b: 0.62745098, a: 1}
+  _modifiersPerRank:
+  - _stat: 5
+    _kind: 0
+    _valuePerStack: 40
+  _effectLabel: MAX HEALTH
+  _valueFormat: '+{0:0}'
+  _maxRank: 1
+  _baseCost: 800
+  _costGrowth: 1
+  _prerequisites:
+  - {fileID: 11400000, guid: b85924106a8a45699e8206b4861fb48f, type: 2}

@@ -178,7 +178,6 @@ namespace ZombieWar.Enemies
 
         private void Release(ZombieController zombie)
         {
-            _vfx.Play(zombie.Definition.DeathVfx, zombie.Position, Quaternion.identity);
             _pools[zombie.Definition].Release(zombie);
         }
 
@@ -190,8 +189,10 @@ namespace ZombieWar.Enemies
             _byCollider[zombie.Collider] = zombie;
         }
 
+        // The burst belongs to the killing blow, not to the despawn a second later.
         private void HandleDied(ZombieController zombie)
         {
+            _vfx.Play(zombie.Definition.DeathVfx, zombie.Position, Quaternion.identity);
             OnZombieKilled?.Invoke(zombie);
         }
 

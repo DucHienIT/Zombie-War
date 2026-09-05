@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9841b20cad037d84ebf415c0a4554251, type: 3}
   m_Name: BombDefinition
   m_EditorClassIdentifier: 
-  _chargesPerLevel: 3
-  _cooldown: 2
+  _poolSize: 8
   _throwRange: 6
   _flightTime: 0.55
   _fuseDuration: 1.2
   _telegraphLead: 0.45
+  _volleyScatter: 1.6
   _blastRadius: 4.5
   _damageAtCenter: 160
   _damageAtEdge: 60

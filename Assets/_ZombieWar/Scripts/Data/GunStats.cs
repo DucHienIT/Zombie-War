@@ -5,15 +5,11 @@ namespace ZombieWar.Data
     {
         public readonly float Damage;
         public readonly float FireInterval;
-        public readonly int MagazineSize;
-        public readonly float ReloadDuration;
 
-        public GunStats(float damage, float fireInterval, int magazineSize, float reloadDuration)
+        public GunStats(float damage, float fireInterval)
         {
             Damage = damage;
             FireInterval = fireInterval;
-            MagazineSize = magazineSize;
-            ReloadDuration = reloadDuration;
         }
 
         public float ShotsPerSecond => FireInterval > 0f ? 1f / FireInterval : 0f;

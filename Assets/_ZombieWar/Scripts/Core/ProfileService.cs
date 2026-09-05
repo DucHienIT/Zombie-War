@@ -4,8 +4,8 @@ using ZombieWar.Data;
 
 namespace ZombieWar.Core
 {
-    // Runtime copy of the player's persistent progress: level, XP, coins and per-gun upgrades.
-    // Static numbers stay in ProgressionRulesSO and GunDefinitionSO; this only holds state.
+    // Runtime copy of the player's persistent progress: level, XP, coins, per-gun upgrades and
+    // skill tree ranks. Static numbers stay in the definition assets; this only holds state.
     public sealed class ProfileService : MonoBehaviour
     {
         private const string LogPrefix = "[Profile]";
@@ -13,10 +13,12 @@ namespace ZombieWar.Core
         [SerializeField] private ProgressionRulesSO _rules;
         // Every gun the menu can show, in display order.
         [SerializeField] private GunDefinitionSO[] _guns;
+        [SerializeField] private SkillTreeSO _skillTree;
 
         private readonly SaveService _save = new SaveService();
         private int[] _gunLevels;
         private bool[] _gunUnlocked;
+        private SkillTreeProgress _skills;
         private bool _loaded;
 
         public event Action OnChanged;
@@ -28,9 +30,18 @@ namespace ZombieWar.Core
         public int XpToNextLevel => _rules.XpToLevelUp(Level);
         public bool IsMaxLevel => Level >= _rules.MaxLevel;
 
+        public SkillTreeProgress Skills
+        {
+            get
+            {
+                EnsureLoaded();
+                return _skills;
+            }
+        }
+
         private void Awake()
         {
-            if (_rules == null || _guns == null || _guns.Length == 0)
+            if (_rules == null || _guns == null || _guns.Length == 0 || _skillTree == null)
             {
                 Debug.LogError($"{LogPrefix} ProfileService has an unassigned reference.", this);
                 return;
@@ -78,6 +89,27 @@ namespace ZombieWar.Core
             return true;
         }
 
+        public bool CanUpgradeSkill(int index)
+        {
+            EnsureLoaded();
+            bool inTree = index >= 0 && index < _skills.Count;
+            return inTree && _skills.IsUnlocked(index) && !_skills.IsMaxed(index) && Coins >= _skills.CostAt(index);
+        }
+
+        public bool TryUpgradeSkill(int index)
+        {
+            if (!CanUpgradeSkill(index))
+            {
+                return false;
+            }
+
+            Coins -= _skills.CostAt(index);
+            _skills.Advance(index);
+            _save.SetProgress(Level, Xp, Coins);
+            OnChanged?.Invoke();
+            return true;
+        }
+
         // Banks a finished run and reports what it paid so the result panel can show it.
         public void GrantRunRewards(int kills, int totalScore, bool won, out int coinsEarned, out int xpEarned)
         {
@@ -114,6 +146,7 @@ namespace ZombieWar.Core
             Level = Mathf.Clamp(_save.PlayerLevel, 1, _rules.MaxLevel);
             Xp = _save.PlayerXp;
             Coins = _save.GetCoins(_rules.StartingCoins);
+            _skills = new SkillTreeProgress(_skillTree, _save);
             _gunLevels = new int[_guns.Length];
             _gunUnlocked = new bool[_guns.Length];
             for (int i = 0; i < _guns.Length; i++)

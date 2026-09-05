@@ -11,16 +11,14 @@ namespace ZombieWar.Weapons
         [SerializeField] private GunDefinitionSO _definition;
         [SerializeField] private Transform _muzzle;
         [SerializeField] private Transform _recoilPivot;
+        // Where the hand bones land while the gun is held; their rotation is the hand bone rotation.
+        [SerializeField] private Transform _rightHandGrip;
+        [SerializeField] private Transform _leftHandGrip;
 
         [Header("Recoil")]
         [SerializeField] private float _recoilDistance = 0.06f;
         [SerializeField] private float _recoilReturnDuration = 0.08f;
         [SerializeField] private float _recoilKickDegrees = 5f;
-
-        [Header("Reload")]
-        // No reload clip ships with the soldier: the gun dips and tilts over the reload instead.
-        [SerializeField] private float _reloadTiltDegrees = 35f;
-        [SerializeField] private float _reloadDipDistance = 0.05f;
 
         [Header("Switch")]
         [SerializeField] private float _switchPopScale = 0.7f;
@@ -37,22 +35,22 @@ namespace ZombieWar.Weapons
         private Vector3 _restScale;
         private bool _restCached;
         private float _recoilOffset;
-        private float _reloadDuration;
-        private float _reloadRemaining;
         private bool _pivotDirty;
 
         public GunDefinitionSO Definition => _definition;
         public Transform Muzzle => _muzzle;
+        public Transform RightHandGrip => _rightHandGrip;
+        public Transform LeftHandGrip => _leftHandGrip;
         // Effective numbers at the applied upgrade level; WeaponController applies them before use.
         public GunStats Stats { get; private set; }
         public int UpgradeLevel { get; private set; }
-        public int Ammo { get; private set; }
-        public bool IsEmpty => Ammo <= 0;
 
         private void Awake()
         {
             _transform = transform;
-            if (_definition == null || _muzzle == null || _recoilPivot == null)
+            bool missing = _definition == null || _muzzle == null || _recoilPivot == null
+                           || _rightHandGrip == null || _leftHandGrip == null;
+            if (missing)
             {
                 Debug.LogError($"{LogPrefix} Gun {name} has an unassigned reference.", this);
                 return;
@@ -68,29 +66,11 @@ namespace ZombieWar.Weapons
         {
             UpgradeLevel = upgradeLevel;
             Stats = _definition.GetStats(upgradeLevel);
-            Ammo = Stats.MagazineSize;
-        }
-
-        public void ResetAmmo()
-        {
-            Ammo = Stats.MagazineSize;
-        }
-
-        public void ConsumeRound()
-        {
-            Ammo = Mathf.Max(0, Ammo - 1);
         }
 
         public void Kick()
         {
             _recoilOffset = _recoilDistance;
-            _pivotDirty = true;
-        }
-
-        public void BeginReloadMotion(float duration)
-        {
-            _reloadDuration = duration;
-            _reloadRemaining = duration;
             _pivotDirty = true;
         }
 
@@ -101,27 +81,14 @@ namespace ZombieWar.Weapons
                 return;
             }
 
-            if (_recoilOffset > 0f)
-            {
-                float returnSpeed = _recoilDistance / _recoilReturnDuration;
-                _recoilOffset = Mathf.MoveTowards(_recoilOffset, 0f, returnSpeed * deltaTime);
-            }
-
-            float reload = 0f;
-            if (_reloadRemaining > 0f)
-            {
-                _reloadRemaining -= deltaTime;
-                float progress = 1f - Mathf.Clamp01(_reloadRemaining / _reloadDuration);
-                // One sine arc: the gun swings out and settles back exactly as the magazine lands.
-                reload = Mathf.Sin(progress * Mathf.PI);
-            }
-
+            float returnSpeed = _recoilDistance / _recoilReturnDuration;
+            _recoilOffset = Mathf.MoveTowards(_recoilOffset, 0f, returnSpeed * deltaTime);
             float recoil = _recoilDistance > 0f ? _recoilOffset / _recoilDistance : 0f;
-            Vector3 position = _restPosition + Vector3.back * _recoilOffset + Vector3.down * (_reloadDipDistance * reload);
-            // Negative pitch raises the muzzle, so the kick and the reload tilt pull in opposite directions.
-            Quaternion rotation = _restRotation * Quaternion.Euler(_reloadTiltDegrees * reload - _recoilKickDegrees * recoil, 0f, 0f);
+            Vector3 position = _restPosition + Vector3.back * _recoilOffset;
+            // Negative pitch raises the muzzle, so the kick lifts the barrel as it pushes back.
+            Quaternion rotation = _restRotation * Quaternion.Euler(-_recoilKickDegrees * recoil, 0f, 0f);
             _recoilPivot.SetLocalPositionAndRotation(position, rotation);
-            _pivotDirty = _recoilOffset > 0f || _reloadRemaining > 0f;
+            _pivotDirty = _recoilOffset > 0f;
         }
 
         // Levels the barrel along the body facing, whatever pose the hand is in. Called after the
@@ -182,7 +149,6 @@ namespace ZombieWar.Weapons
         private void ResetMotion()
         {
             _recoilOffset = 0f;
-            _reloadRemaining = 0f;
             _pivotDirty = false;
             // Hidden before its first activation: nothing has moved yet, and no rest pose exists to restore.
             if (!_restCached)

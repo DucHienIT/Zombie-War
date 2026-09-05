@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79c25acb1b731d4e895b31b4a51276d, type: 3}
+  m_Name: MolotovDefinition
+  m_EditorClassIdentifier: 
+  _bottlePoolSize: 4
+  _firePoolSize: 6
+  _throwRange: 6
+  _flightTime: 0.6
+  _firePrefab: {fileID: 7135708135450928788, guid: 95093a5930faadc4e833bd414cc99362, type: 3}
+  _throwClip: {fileID: 8300000, guid: 406c929b7299afb469c82778f8d15d5b, type: 3}
+  _igniteClip: {fileID: 8300000, guid: 79ee7751ab191f548b7f3232381afa0a, type: 3}

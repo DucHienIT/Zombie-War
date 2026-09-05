@@ -20,22 +20,26 @@ namespace ZombieWar.Roguelike
         [SerializeField] private ZombieManager _zombies;
         [SerializeField] private PlayerStatSheet _stats;
         [SerializeField] private PlayerHealth _playerHealth;
+        [SerializeField] private AbilityRunner _abilities;
 
-        private readonly Dictionary<PassiveSkillSO, int> _stacks = new Dictionary<PassiveSkillSO, int>(8);
+        private readonly Dictionary<SkillDefinitionSO, int> _stacks = new Dictionary<SkillDefinitionSO, int>(8);
         private BattleXpTracker _xp;
         private SkillDraft _draft;
-        private PassiveSkillSO[] _offers;
+        private SkillDraft _firstLevelDraft;
+        private SkillDefinitionSO[] _offers;
+        private bool _firstChoiceDone;
         private int _offerCount;
         private int _pendingLevelUps;
         private bool _choiceOpen;
 
         public event Action<float, int> OnXpChanged;
-        public event Action<PassiveSkillSO[], int, int> OnChoiceOffered;
+        public event Action<SkillDefinitionSO[], int, int> OnChoiceOffered;
         public event Action OnChoiceClosed;
 
         private void Awake()
         {
-            bool missing = _settings == null || _flow == null || _zombies == null || _stats == null || _playerHealth == null;
+            bool missing = _settings == null || _flow == null || _zombies == null || _stats == null || _playerHealth == null
+                           || _abilities == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} RoguelikeDirector has an unassigned reference.", this);
@@ -49,7 +53,9 @@ namespace ZombieWar.Roguelike
             }
 
             _draft = new SkillDraft(_settings.SkillPool);
-            _offers = new PassiveSkillSO[_settings.OffersPerLevelUp];
+            ActiveSkillSO[] firstLevelPool = _settings.FirstLevelPool;
+            _firstLevelDraft = firstLevelPool != null && firstLevelPool.Length > 0 ? new SkillDraft(firstLevelPool) : null;
+            _offers = new SkillDefinitionSO[_settings.OffersPerLevelUp];
             _xp = NewTracker();
         }
 
@@ -96,6 +102,7 @@ namespace ZombieWar.Roguelike
 
             _pendingLevelUps = Mathf.Max(0, _pendingLevelUps - 1);
             _choiceOpen = false;
+            _firstChoiceDone = true;
 
             // A double level-up hands over the next card set straight away rather than letting
             // the run breathe for a frame in between.
@@ -107,7 +114,7 @@ namespace ZombieWar.Roguelike
             OnChoiceClosed?.Invoke();
         }
 
-        public int StacksOf(PassiveSkillSO skill)
+        public int StacksOf(SkillDefinitionSO skill)
         {
             _stacks.TryGetValue(skill, out int owned);
             return owned;
@@ -120,7 +127,15 @@ namespace ZombieWar.Roguelike
             _pendingLevelUps = 0;
             _offerCount = 0;
             _choiceOpen = false;
-            RebuildStats();
+            _firstChoiceDone = false;
+            // The bomb is a spec feature, so it is owned from the start rather than drafted.
+            // Seeding it here keeps the rebuild loop uniform and the card levels honest.
+            if (_settings.StartingAbility != null)
+            {
+                _stacks[_settings.StartingAbility] = 1;
+            }
+
+            RebuildLoadout();
             OnXpChanged?.Invoke(_xp.Normalized, _xp.Level);
         }
 
@@ -149,7 +164,16 @@ namespace ZombieWar.Roguelike
 
         private bool TryOpenChoice()
         {
-            _offerCount = _draft.Roll(_stacks, _offers, _settings.OffersPerLevelUp);
+            // The very first pick is drawn from the ability pool so no run goes the whole way
+            // without one; after that both kinds share a pool.
+            bool useFirstLevelPool = !_firstChoiceDone && _firstLevelDraft != null;
+            SkillDraft draft = useFirstLevelPool ? _firstLevelDraft : _draft;
+            _offerCount = draft.Roll(_stacks, _offers, _settings.OffersPerLevelUp);
+            if (_offerCount == 0 && useFirstLevelPool)
+            {
+                _offerCount = _draft.Roll(_stacks, _offers, _settings.OffersPerLevelUp);
+            }
+
             if (_offerCount == 0)
             {
                 // Every skill sits at its cap: stop banking picks nobody can spend.
@@ -162,22 +186,28 @@ namespace ZombieWar.Roguelike
             return true;
         }
 
-        private void Grant(PassiveSkillSO skill)
+        private void Grant(SkillDefinitionSO skill)
         {
             _stacks.TryGetValue(skill, out int owned);
             _stacks[skill] = owned + 1;
-            RebuildStats();
+            RebuildLoadout();
         }
 
-        private void RebuildStats()
+        // One pass over everything owned. Each skill writes itself into the sheet or the runner,
+        // so a new kind of skill needs no branch here.
+        private void RebuildLoadout()
         {
             _stats.BeginRebuild();
-            foreach (KeyValuePair<PassiveSkillSO, int> owned in _stacks)
+            _abilities.BeginRebuild();
+
+            var context = new SkillApplyContext(_stats, _abilities);
+            foreach (KeyValuePair<SkillDefinitionSO, int> owned in _stacks)
             {
-                _stats.Apply(owned.Key.Modifiers, owned.Value);
+                owned.Key.Apply(context, owned.Value);
             }
 
             _stats.EndRebuild();
+            _abilities.EndRebuild();
         }
 
         private BattleXpTracker NewTracker()

@@ -16,6 +16,7 @@ namespace ZombieWar.UI
         [SerializeField] private GameObject[] _pages;
         [SerializeField] private BattlePageView _battlePage;
         [SerializeField] private WeaponPageView _weaponPage;
+        [SerializeField] private SkillTreePageView _skillTreePage;
         [SerializeField] private int _defaultTab = (int)MenuTab.Battle;
 
         private Action _onTap;
@@ -24,7 +25,7 @@ namespace ZombieWar.UI
         private void Awake()
         {
             bool missing = _canvas == null || _header == null || _tabBar == null || _pages == null || _pages.Length == 0
-                           || _battlePage == null || _weaponPage == null;
+                           || _battlePage == null || _weaponPage == null || _skillTreePage == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} MenuScreenView has an unassigned reference.", this);
@@ -37,22 +38,24 @@ namespace ZombieWar.UI
 
         public void SetVisible(bool visible) => _canvas.enabled = visible;
 
-        public void Bind(in MenuHeaderData header, LevelCardData[] levels, WeaponEntryData[] weapons,
-            Action<int> onLevelSelected, Action<int> onWeaponSelected, Action onSettings, Action onTap)
+        public void Bind(in MenuHeaderData header, LevelCardData[] levels, WeaponEntryData[] weapons, SkillNodeData[] skills,
+            Action<int> onLevelSelected, Action<int> onWeaponSelected, Action<int> onSkillUpgrade, Action onSettings, Action onTap)
         {
             _onTap = onTap;
             _onSettings = onSettings;
             _header.Set(header);
             _battlePage.Bind(levels, onLevelSelected, onTap);
             _weaponPage.Bind(weapons, onWeaponSelected, onTap);
+            _skillTreePage.Bind(skills, onSkillUpgrade, onTap);
             ShowPage(_defaultTab);
             _tabBar.Select(_defaultTab);
         }
 
-        public void Refresh(in MenuHeaderData header, WeaponEntryData[] weapons)
+        public void Refresh(in MenuHeaderData header, WeaponEntryData[] weapons, SkillNodeData[] skills)
         {
             _header.Set(header);
             _weaponPage.Refresh(weapons);
+            _skillTreePage.Refresh(skills);
         }
 
         private void HandleTabSelected(int tab)

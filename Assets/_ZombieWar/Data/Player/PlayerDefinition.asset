@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerDefinition
   m_EditorClassIdentifier: 
   _maxHp: 100
-  _moveSpeed: 4.6
+  _moveSpeed: 4
   _acceleration: 24
   _turnSpeedDegrees: 720
   _hitInvulnerability: 0.4

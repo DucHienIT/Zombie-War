@@ -5,7 +5,6 @@ namespace ZombieWar.Weapons
         Ready,
         Firing,
         Cooldown,
-        Reloading,
         Switching
     }
 }

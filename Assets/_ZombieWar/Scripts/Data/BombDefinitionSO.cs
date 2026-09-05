@@ -6,15 +6,18 @@ namespace ZombieWar.Data
     [CreateAssetMenu(menuName = "Zombie War/Bomb Definition", fileName = "BombDefinition")]
     public sealed class BombDefinitionSO : ScriptableObject
     {
-        [Header("Supply")]
-        [SerializeField] private int _chargesPerLevel = 3;
-        [SerializeField] private float _cooldown = 2f;
+        [Header("Pool")]
+        // Bombs that can be in the air at once. Pacing lives in the Auto Bomb skill, so this
+        // only has to cover the largest volley twice over.
+        [SerializeField] private int _poolSize = 8;
 
         [Header("Throw")]
         [SerializeField] private float _throwRange = 6f;
         [SerializeField] private float _flightTime = 0.55f;
         [SerializeField] private float _fuseDuration = 1.2f;
         [SerializeField] private float _telegraphLead = 0.45f;
+        // Extra bombs in a volley land up to this far from the first, so they never stack on one spot.
+        [SerializeField] private float _volleyScatter = 1.6f;
 
         [Header("Blast")]
         [SerializeField] private float _blastRadius = 4.5f;
@@ -31,12 +34,12 @@ namespace ZombieWar.Data
         [SerializeField] private AudioClip _throwClip;
         [SerializeField] private float _cameraImpulse = 0.55f;
 
-        public int ChargesPerLevel => _chargesPerLevel;
-        public float Cooldown => _cooldown;
+        public int PoolSize => _poolSize;
         public float ThrowRange => _throwRange;
         public float FlightTime => _flightTime;
         public float FuseDuration => _fuseDuration;
         public float TelegraphLead => _telegraphLead;
+        public float VolleyScatter => _volleyScatter;
         public float BlastRadius => _blastRadius;
         public float DamageAtCenter => _damageAtCenter;
         public float DamageAtEdge => _damageAtEdge;

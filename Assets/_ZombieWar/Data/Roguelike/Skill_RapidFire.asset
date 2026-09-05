@@ -14,9 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: rapid_fire
   _displayName: RAPID FIRE
-  _description: 'Fire rate +15%
-
-    Reload 12% faster'
+  _description: Fire rate +15%
   _icon: {fileID: 21300000, guid: ccf73dc4210d6c14caeed3633463475c, type: 3}
   _accentColor: {r: 1, g: 0.8352941, b: 0.2901961, a: 1}
   _maxStacks: 5
@@ -25,6 +23,3 @@ MonoBehaviour:
   - _stat: 1
     _kind: 1
     _valuePerStack: 1.15
-  - _stat: 2
-    _kind: 1
-    _valuePerStack: 1.135

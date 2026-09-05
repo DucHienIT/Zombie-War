@@ -12,6 +12,8 @@ using ZombieWar.VFX;
 
 namespace ZombieWar.Weapons
 {
+    // Throws and detonates bombs. It has no pacing of its own any more: the Auto Bomb skill
+    // decides when a volley goes out, this only decides where it lands and what it does.
     public sealed class BombThrower : MonoBehaviour
     {
         private const string LogPrefix = "[Bomb]";
@@ -37,15 +39,9 @@ namespace ZombieWar.Weapons
         private ComponentPool<Bomb> _pool;
         private List<Bomb> _active;
         private Transform _transform;
-        private float _cooldown;
-        private int _appliedChargeBonus;
 
-        public event Action<int> OnChargesChanged;
-        public event Action<float> OnCooldownProgress;
         // Blast centre and how many zombies it reached; feel systems key off the count.
         public event Action<Vector3, int> OnExploded;
-
-        public int Charges { get; private set; }
 
         private void Awake()
         {
@@ -58,51 +54,13 @@ namespace ZombieWar.Weapons
                 return;
             }
 
-            Charges = _definition.ChargesPerLevel;
-            _pool = new ComponentPool<Bomb>(_prefab, _poolParent, _definition.ChargesPerLevel);
-            _active = new List<Bomb>(_definition.ChargesPerLevel);
-        }
-
-        private void OnEnable()
-        {
-            _stats.OnChanged += HandleStatsChanged;
-        }
-
-        private void OnDisable()
-        {
-            _stats.OnChanged -= HandleStatsChanged;
-        }
-
-        private void Start()
-        {
-            OnChargesChanged?.Invoke(Charges);
-            OnCooldownProgress?.Invoke(1f);
-        }
-
-        // An extra charge is handed over the moment the skill is picked, not at the next run.
-        private void HandleStatsChanged()
-        {
-            int bonus = Mathf.RoundToInt(_stats.Additive(StatId.BombCharges));
-            int delta = bonus - _appliedChargeBonus;
-            if (delta == 0)
-            {
-                return;
-            }
-
-            _appliedChargeBonus = bonus;
-            Charges = Mathf.Max(0, Charges + delta);
-            OnChargesChanged?.Invoke(Charges);
+            _pool = new ComponentPool<Bomb>(_prefab, _poolParent, _definition.PoolSize);
+            _active = new List<Bomb>(_definition.PoolSize);
         }
 
         private void Update()
         {
             float deltaTime = Time.deltaTime;
-            if (_cooldown > 0f)
-            {
-                _cooldown -= deltaTime;
-                OnCooldownProgress?.Invoke(1f - Mathf.Clamp01(_cooldown / _definition.Cooldown));
-            }
-
             for (int i = _active.Count - 1; i >= 0; i--)
             {
                 Bomb bomb = _active[i];
@@ -119,57 +77,40 @@ namespace ZombieWar.Weapons
             }
         }
 
-        public void RequestThrow()
+        // One volley per ability trigger. The only refusal is the run not being playable;
+        // how often this is called is the skill's business.
+        public void ThrowVolley()
         {
-            bool blocked = _flow.State != GameState.Playing || !_health.IsAlive || Charges <= 0 || _cooldown > 0f;
-            if (blocked)
+            if (_flow.State != GameState.Playing || !_health.IsAlive)
             {
                 return;
             }
 
             Vector3 origin = _throwOrigin.position;
-            Vector3 target = ResolveTarget();
-            Vector3 velocity = ComputeLaunchVelocity(origin, target, _definition.FlightTime);
+            Vector3 target = ThrowSolver.GroundTarget(_transform.position, _aim, _motor, _definition.ThrowRange);
             float blastRadius = _definition.BlastRadius * _stats.Multiplier(StatId.BombRadius);
+            int count = 1 + Mathf.RoundToInt(_stats.Additive(StatId.ExtraBombsPerVolley));
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 landing = i == 0 ? target : target + Scatter(_definition.VolleyScatter);
+                Launch(origin, landing, blastRadius);
+            }
 
+            _audio.PlayWorld(_definition.ThrowClip, origin);
+        }
+
+        private void Launch(Vector3 origin, Vector3 target, float blastRadius)
+        {
+            Vector3 velocity = ThrowSolver.LaunchVelocity(origin, target, _definition.FlightTime);
             Bomb bomb = _pool.Get(origin, Quaternion.identity);
             bomb.Launch(velocity, _definition.FuseDuration, _definition.TelegraphLead, blastRadius);
             _active.Add(bomb);
-            _audio.PlayWorld(_definition.ThrowClip, origin);
-
-            Charges--;
-            _cooldown = _definition.Cooldown;
-            OnChargesChanged?.Invoke(Charges);
-            OnCooldownProgress?.Invoke(0f);
         }
 
-        private Vector3 ResolveTarget()
+        private static Vector3 Scatter(float radius)
         {
-            Vector3 feet = _transform.position;
-            Vector3 offset;
-            if (_aim.HasTarget)
-            {
-                offset = _aim.TargetPosition - feet;
-                offset.y = 0f;
-                if (offset.sqrMagnitude > _definition.ThrowRange * _definition.ThrowRange)
-                {
-                    offset = offset.normalized * _definition.ThrowRange;
-                }
-            }
-            else
-            {
-                Vector3 heading = _motor.NormalizedSpeed > 0f ? _motor.WorldMoveDirection : _motor.Forward;
-                heading.y = 0f;
-                offset = heading.normalized * _definition.ThrowRange;
-            }
-
-            return feet + offset;
-        }
-
-        private static Vector3 ComputeLaunchVelocity(Vector3 origin, Vector3 target, float flightTime)
-        {
-            Vector3 displacement = target - origin;
-            return displacement / flightTime - 0.5f * Physics.gravity * flightTime;
+            Vector2 offset = UnityEngine.Random.insideUnitCircle * radius;
+            return new Vector3(offset.x, 0f, offset.y);
         }
 
         private void Explode(Vector3 center, float radius)

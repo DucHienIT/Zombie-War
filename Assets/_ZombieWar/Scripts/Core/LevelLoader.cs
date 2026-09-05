@@ -4,14 +4,15 @@ using ZombieWar.Data;
 
 namespace ZombieWar.Core
 {
-    // The game ships as one scene. Starting a level from the menu happens in place; retry,
-    // next level and "back to menu" reload that same scene, which is the cheapest way to
-    // guarantee pools, physics and the map start from a clean slate.
+    // Starting a level from the menu happens in place; retry, next level and "back to menu"
+    // go through the Loading scene, which loads a fresh Gameplay scene behind a progress bar.
+    // A fresh scene is the cheapest way to guarantee pools, physics and the map start clean.
     public sealed class LevelLoader : MonoBehaviour
     {
         private const string LogPrefix = "[Level]";
 
         [SerializeField] private LevelSelectionSO _selection;
+        [SerializeField] private string _loadingSceneName = "Loading";
 
         public LevelDefinitionSO PendingLevel => _selection.Selected;
 
@@ -42,7 +43,7 @@ namespace ZombieWar.Core
         private void Reload()
         {
             Time.timeScale = 1f;
-            SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
+            SceneManager.LoadSceneAsync(_loadingSceneName, LoadSceneMode.Single);
         }
     }
 }

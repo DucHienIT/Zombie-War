@@ -22,6 +22,6 @@ MonoBehaviour:
   _maxStacks: 3
   _draftWeight: 1
   _modifiers:
-  - _stat: 3
+  - _stat: 2
     _kind: 0
     _valuePerStack: 1

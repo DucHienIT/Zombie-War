@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a47ccb955c433094399aa7db2d8d17f9, type: 3}
+  m_Name: Skill_ChainLightning
+  m_EditorClassIdentifier: 
+  _id: chain_lightning
+  _displayName: CHAIN LIGHTNING
+  _description: 'Bolt jumps between zombies
+
+    +1 jump per level'
+  _icon: {fileID: 21300000, guid: 36235ecd514ae3b41ad780e064076bf9, type: 3}
+  _accentColor: {r: 0.44, g: 0.83, b: 1, a: 1}
+  _maxStacks: 5
+  _draftWeight: 1
+  _baseInterval: 5
+  _intervalPerStack: 0.88
+  _minInterval: 2.5
+  _baseDamage: 40
+  _damageFalloffPerJump: 0.8
+  _baseJumps: 3
+  _jumpsPerStack: 1
+  _jumpRadius: 4
+  _knockback: 1

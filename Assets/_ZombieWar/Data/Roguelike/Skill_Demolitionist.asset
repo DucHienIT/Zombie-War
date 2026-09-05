@@ -14,22 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: demolitionist
   _displayName: DEMOLITIONIST
-  _description: 'Bombs +1
-
-    Blast damage +20%
-
-    Blast radius +12%'
-  _icon: {fileID: 21300000, guid: 55c09588b3f5b71488269de611ea4644, type: 3}
+  _description: Blast damage +20%
+  _icon: {fileID: 21300000, guid: 80882f9b9123b6b4f843be9c30d14765, type: 3}
   _accentColor: {r: 0.7058824, g: 0.4862745, b: 1, a: 1}
   _maxStacks: 3
   _draftWeight: 1
   _modifiers:
-  - _stat: 8
-    _kind: 0
-    _valuePerStack: 1
   - _stat: 9
-    _kind: 1
-    _valuePerStack: 1.12
-  - _stat: 10
     _kind: 1
     _valuePerStack: 1.2

@@ -12,7 +12,6 @@ namespace ZombieWar.Player
         private static readonly int MoveYHash = Animator.StringToHash("MoveY");
         private static readonly int SpeedHash = Animator.StringToHash("Speed");
         private static readonly int ShootHash = Animator.StringToHash("Shoot");
-        private static readonly int ReloadHash = Animator.StringToHash("Reload");
         private static readonly int WeaponTypeHash = Animator.StringToHash("WeaponType");
         private static readonly int HitHash = Animator.StringToHash("Hit");
         private static readonly int DeathHash = Animator.StringToHash("Death");
@@ -36,8 +35,6 @@ namespace ZombieWar.Player
         private void OnEnable()
         {
             _weapons.OnShotFired += HandleShotFired;
-            _weapons.OnReloadStarted += HandleReloadStarted;
-            _weapons.OnReloadEnded += HandleReloadEnded;
             _weapons.OnGunChanged += HandleGunChanged;
             _health.OnDamaged += HandleDamaged;
             _health.OnDied += HandleDied;
@@ -46,8 +43,6 @@ namespace ZombieWar.Player
         private void OnDisable()
         {
             _weapons.OnShotFired -= HandleShotFired;
-            _weapons.OnReloadStarted -= HandleReloadStarted;
-            _weapons.OnReloadEnded -= HandleReloadEnded;
             _weapons.OnGunChanged -= HandleGunChanged;
             _health.OnDamaged -= HandleDamaged;
             _health.OnDied -= HandleDied;
@@ -63,8 +58,6 @@ namespace ZombieWar.Player
         }
 
         private void HandleShotFired(Gun gun) => _animator.SetTrigger(ShootHash);
-        private void HandleReloadStarted() => _animator.SetBool(ReloadHash, true);
-        private void HandleReloadEnded() => _animator.SetBool(ReloadHash, false);
         private void HandleGunChanged(Gun gun) => _animator.SetInteger(WeaponTypeHash, gun.Definition.AnimatorWeaponType);
         private void HandleDamaged(DamageInfo info) => _animator.SetTrigger(HitHash);
         private void HandleDied() => _animator.SetTrigger(DeathHash);

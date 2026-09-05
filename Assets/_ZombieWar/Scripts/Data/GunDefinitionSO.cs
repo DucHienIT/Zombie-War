@@ -18,8 +18,6 @@ namespace ZombieWar.Data
         [Header("Ballistics")]
         [SerializeField] private float _damage = 16f;
         [SerializeField] private float _fireInterval = 0.1333f;
-        [SerializeField] private int _magazineSize = 30;
-        [SerializeField] private float _reloadDuration = 1.25f;
         [SerializeField] private float _range = 16f;
         [SerializeField] private float _projectileSpeed = 32f;
         [SerializeField] private float _projectileRadius = 0.06f;
@@ -33,17 +31,14 @@ namespace ZombieWar.Data
         [SerializeField] private PooledVfx _fleshImpactVfx;
         [SerializeField] private PooledVfx _propImpactVfx;
         [SerializeField] private AudioClip _shotClip;
-        [SerializeField] private AudioClip _reloadClip;
         [SerializeField] private float _cameraImpulse = 0.08f;
 
         [Header("Upgrade")]
         [SerializeField] private bool _unlockedByDefault = true;
         [SerializeField] private int _maxUpgradeLevel = 5;
-        // Fractions of the base value gained (damage) or shaved (fire interval, reload) per level.
+        // Fractions of the base value gained (damage) or shaved (fire interval) per level.
         [SerializeField] private float _damageGainPerLevel = 0.12f;
-        [SerializeField] private int _magazineGainPerLevel = 2;
         [SerializeField] private float _fireIntervalCutPerLevel = 0.03f;
-        [SerializeField] private float _reloadCutPerLevel = 0.05f;
         [SerializeField] private int _baseUpgradeCost = 150;
         [SerializeField] private float _upgradeCostGrowth = 1.6f;
 
@@ -55,8 +50,6 @@ namespace ZombieWar.Data
         public bool IsSpread => _pelletCount > 1;
         public float Damage => _damage;
         public float FireInterval => _fireInterval;
-        public int MagazineSize => _magazineSize;
-        public float ReloadDuration => _reloadDuration;
         public float Range => _range;
         public float ProjectileSpeed => _projectileSpeed;
         public float ProjectileRadius => _projectileRadius;
@@ -67,7 +60,6 @@ namespace ZombieWar.Data
         public PooledVfx FleshImpactVfx => _fleshImpactVfx;
         public PooledVfx PropImpactVfx => _propImpactVfx;
         public AudioClip ShotClip => _shotClip;
-        public AudioClip ReloadClip => _reloadClip;
         public float CameraImpulse => _cameraImpulse;
         public bool UnlockedByDefault => _unlockedByDefault;
         public int MaxUpgradeLevel => _maxUpgradeLevel;
@@ -77,9 +69,7 @@ namespace ZombieWar.Data
             int level = Mathf.Clamp(upgradeLevel, 0, _maxUpgradeLevel);
             float damage = _damage * (1f + _damageGainPerLevel * level);
             float fireInterval = _fireInterval * (1f - _fireIntervalCutPerLevel * level);
-            int magazine = _magazineSize + _magazineGainPerLevel * level;
-            float reload = _reloadDuration * (1f - _reloadCutPerLevel * level);
-            return new GunStats(damage, fireInterval, magazine, reload);
+            return new GunStats(damage, fireInterval);
         }
 
         // Cost of the step from currentLevel to currentLevel + 1.

@@ -5,6 +5,7 @@ namespace ZombieWar.Core
         Bullet,
         Bomb,
         Fire,
-        Melee
+        Melee,
+        Shock
     }
 }
