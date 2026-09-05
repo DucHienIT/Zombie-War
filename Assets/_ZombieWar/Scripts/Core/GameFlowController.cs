@@ -26,6 +26,7 @@ namespace ZombieWar.Core
         private int _lastCountdownShown = -1;
 
         public event Action<GameState> OnStateChanged;
+        public event Action<LevelDefinitionSO> OnRunStarted;
         public event Action<int> OnCountdownChanged;
         public event Action<float> OnRemainingTimeChanged;
         public event Action<int, int> OnScoreChanged;
@@ -47,14 +48,9 @@ namespace ZombieWar.Core
                 return;
             }
 
-            // LevelMapLoader runs first (DefaultExecutionOrder) so the level is already resolved here.
-            _level = _mapLoader.Level;
             Application.targetFrameRate = TargetFrameRate;
             Time.timeScale = 1f;
-            _timer = new LevelTimer(_level.Duration);
-            _score = new ScoreTracker(_scoringRules.MultiKillWindow, _scoringRules.MultiKillBonus, _scoringRules.HealthBonusPerPercent);
-            _countdownRemaining = _level.CountdownDuration;
-            State = GameState.Countdown;
+            State = GameState.Menu;
         }
 
         private void OnEnable()
@@ -71,10 +67,15 @@ namespace ZombieWar.Core
 
         private void Start()
         {
-            OnStateChanged?.Invoke(State);
-            OnRemainingTimeChanged?.Invoke(_timer.Remaining);
-            OnScoreChanged?.Invoke(0, 0);
-            PublishCountdown();
+            // Retry and "next level" reload the scene with the level already chosen; every
+            // other entry into the scene lands on the menu.
+            if (_levelLoader.ConsumeAutoStart() && _levelLoader.PendingLevel != null)
+            {
+                StartRun(_levelLoader.PendingLevel);
+                return;
+            }
+
+            SetState(GameState.Menu);
         }
 
         private void Update()
@@ -89,6 +90,30 @@ namespace ZombieWar.Core
                     TickPlaying(deltaTime);
                     break;
             }
+        }
+
+        public void StartRun(LevelDefinitionSO level)
+        {
+            if (level == null)
+            {
+                Debug.LogError($"{LogPrefix} StartRun called with no level.", this);
+                return;
+            }
+
+            _level = level;
+            _levelLoader.Remember(level);
+            _mapLoader.Load(level);
+            _timer = new LevelTimer(level.Duration);
+            _score = new ScoreTracker(_scoringRules.MultiKillWindow, _scoringRules.MultiKillBonus, _scoringRules.HealthBonusPerPercent);
+            _countdownRemaining = level.CountdownDuration;
+            _lastCountdownShown = -1;
+            Time.timeScale = 1f;
+
+            OnRunStarted?.Invoke(level);
+            SetState(GameState.Countdown);
+            OnRemainingTimeChanged?.Invoke(_timer.Remaining);
+            OnScoreChanged?.Invoke(0, 0);
+            PublishCountdown();
         }
 
         public void Pause()
@@ -113,19 +138,19 @@ namespace ZombieWar.Core
             SetState(GameState.Playing);
         }
 
-        public void Retry() => _levelLoader.ReloadCurrent();
+        public void Retry() => _levelLoader.RestartWith(_level);
 
-        public void GoToMenu() => _levelLoader.LoadMenu();
+        public void GoToMenu() => _levelLoader.ReturnToMenu();
 
         public void GoToNextLevel()
         {
             if (_level.NextLevel == null)
             {
-                _levelLoader.LoadMenu();
+                _levelLoader.ReturnToMenu();
                 return;
             }
 
-            _levelLoader.LoadLevel(_level.NextLevel);
+            _levelLoader.RestartWith(_level.NextLevel);
         }
 
         private void TickCountdown(float deltaTime)

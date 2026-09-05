@@ -1,43 +1,60 @@
+using Cinemachine;
 using UnityEngine;
 using ZombieWar.Data;
 
 namespace ZombieWar.Level
 {
-    // Runs before every other gameplay Awake so the map, NavMesh and player spawn exist when systems initialise.
-    [DefaultExecutionOrder(-100)]
+    // Builds the world for one run. Nothing happens until the flow starts a run, so the
+    // menu overlay sits in an empty scene with the player switched off.
     public sealed class LevelMapLoader : MonoBehaviour
     {
         private const string LogPrefix = "[Level]";
 
-        [SerializeField] private LevelSelectionSO _selection;
-        // Used when the gameplay scene is opened directly without passing through the menu.
-        [SerializeField] private LevelDefinitionSO _fallbackLevel;
         [SerializeField] private Transform _mapParent;
         [SerializeField] private Rigidbody _playerBody;
+        [SerializeField] private CinemachineVirtualCamera _virtualCamera;
 
         public LevelDefinitionSO Level { get; private set; }
         public LevelMap Map { get; private set; }
 
         private void Awake()
         {
-            if (_selection == null || _fallbackLevel == null || _mapParent == null || _playerBody == null)
+            if (_mapParent == null || _playerBody == null || _virtualCamera == null)
             {
                 Debug.LogError($"{LogPrefix} LevelMapLoader has an unassigned reference.", this);
                 return;
             }
 
-            Level = _selection.Selected != null ? _selection.Selected : _fallbackLevel;
-            if (Level.MapPrefab == null)
+            _playerBody.gameObject.SetActive(false);
+        }
+
+        public void Load(LevelDefinitionSO level)
+        {
+            if (level.MapPrefab == null)
             {
-                Debug.LogError($"{LogPrefix} {Level.name} has no map prefab assigned.", this);
+                Debug.LogError($"{LogPrefix} {level.name} has no map prefab assigned.", this);
                 return;
             }
 
-            Map = Instantiate(Level.MapPrefab, _mapParent);
+            if (Map != null)
+            {
+                Destroy(Map.gameObject);
+            }
+
+            Level = level;
+            Map = Instantiate(level.MapPrefab, _mapParent);
+
             Transform spawn = Map.PlayerSpawn;
+            _playerBody.gameObject.SetActive(true);
+            _playerBody.transform.SetPositionAndRotation(spawn.position, spawn.rotation);
             _playerBody.position = spawn.position;
             _playerBody.rotation = spawn.rotation;
-            _playerBody.transform.SetPositionAndRotation(spawn.position, spawn.rotation);
+            _playerBody.velocity = Vector3.zero;
+            _playerBody.angularVelocity = Vector3.zero;
+
+            // The follow target just teleported across the map; without this the camera
+            // would glide in from wherever it idled during the menu.
+            _virtualCamera.PreviousStateIsValid = false;
         }
     }
 }

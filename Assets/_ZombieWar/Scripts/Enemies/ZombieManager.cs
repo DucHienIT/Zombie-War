@@ -56,6 +56,26 @@ namespace ZombieWar.Enemies
             _onCreated = HandleCreated;
             _onDied = HandleDied;
             _onDespawnReady = HandleDespawnReady;
+        }
+
+        private void OnEnable()
+        {
+            _flow.OnRunStarted += HandleRunStarted;
+        }
+
+        private void OnDisable()
+        {
+            _flow.OnRunStarted -= HandleRunStarted;
+        }
+
+        // Pools are filled once the map exists: a NavMeshAgent that wakes up with no NavMesh
+        // under it logs an error and never attaches, and the map carries the baked data.
+        private void HandleRunStarted(LevelDefinitionSO level)
+        {
+            if (_pools.Count > 0)
+            {
+                return;
+            }
 
             for (int i = 0; i < _definitions.Length; i++)
             {

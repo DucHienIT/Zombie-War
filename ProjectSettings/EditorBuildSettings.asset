@@ -6,9 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_ZombieWar/Scenes/MainMenu.unity
-    guid: 8ecbb6b81ab6c8248b062d5379c407a3
-  - enabled: 1
     path: Assets/_ZombieWar/Scenes/Gameplay.unity
     guid: 39c35b9dca8229d4893744d1fd1dc925
   m_configObjects:

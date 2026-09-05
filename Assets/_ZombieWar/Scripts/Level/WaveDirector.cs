@@ -10,7 +10,6 @@ namespace ZombieWar.Level
     {
         private const string LogPrefix = "[Wave]";
 
-        [SerializeField] private LevelMapLoader _mapLoader;
         [SerializeField] private GameFlowController _flow;
         [SerializeField] private ZombieManager _zombies;
         [SerializeField] private Camera _camera;
@@ -36,27 +35,45 @@ namespace ZombieWar.Level
 
         private void Awake()
         {
-            bool missing = _mapLoader == null || _flow == null || _zombies == null || _camera == null || _player == null;
+            bool missing = _flow == null || _zombies == null || _camera == null || _player == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} WaveDirector has an unassigned reference.", this);
-                return;
             }
+        }
 
-            _level = _mapLoader.Level;
-            if (_level == null || _level.Phases == null || _level.Phases.Length == 0)
+        private void OnEnable()
+        {
+            _flow.OnRunStarted += HandleRunStarted;
+        }
+
+        private void OnDisable()
+        {
+            _flow.OnRunStarted -= HandleRunStarted;
+        }
+
+        // The level is only known once the player picks one, so the schedule is armed here
+        // rather than in Awake.
+        private void HandleRunStarted(LevelDefinitionSO level)
+        {
+            if (level.Phases == null || level.Phases.Length == 0)
             {
-                Debug.LogError($"{LogPrefix} {_level.name} has no wave phases.", this);
+                Debug.LogError($"{LogPrefix} {level.name} has no wave phases.", this);
                 return;
             }
 
-            _resolver = new SpawnPointResolver(_level, _camera);
+            _level = level;
+            _resolver = new SpawnPointResolver(level, _camera);
+            _phaseIndex = 0;
+            _scriptedCursor = 0;
+            _hazardCursor = 0;
+            _spawnTimer = 0f;
             _smoothedDeltaTime = Time.fixedDeltaTime;
         }
 
         private void Update()
         {
-            if (_flow.State != GameState.Playing)
+            if (_level == null || _flow.State != GameState.Playing)
             {
                 return;
             }
