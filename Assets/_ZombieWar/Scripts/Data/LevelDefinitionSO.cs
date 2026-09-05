@@ -9,6 +9,8 @@ namespace ZombieWar.Data
         [Header("Identity")]
         [SerializeField] private int _levelIndex = 1;
         [SerializeField] private string _displayName;
+        // Chapter picture on the battle page; the menu keeps its placeholder when this is empty.
+        [SerializeField] private Sprite _artwork;
         [SerializeField] private LevelMap _mapPrefab;
         [SerializeField] private LevelDefinitionSO _nextLevel;
 
@@ -27,6 +29,7 @@ namespace ZombieWar.Data
 
         public int LevelIndex => _levelIndex;
         public string DisplayName => _displayName;
+        public Sprite Artwork => _artwork;
         public LevelMap MapPrefab => _mapPrefab;
         public LevelDefinitionSO NextLevel => _nextLevel;
         public float Duration => _duration;

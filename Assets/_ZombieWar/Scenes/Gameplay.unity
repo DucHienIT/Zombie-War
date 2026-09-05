@@ -134,6 +134,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameplayRoot
       objectReference: {fileID: 0}
+    - target: {fileID: 825491425852113598, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 873971757925487232, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 917335860924773540, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 1382579833902833896, guid: 94e1958cf77af544994da37060b7156a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -173,6 +185,102 @@ PrefabInstance:
     - target: {fileID: 1382579833902833896, guid: 94e1958cf77af544994da37060b7156a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1729454862255537445, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299281521129645913, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2404818103301419025, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3611338825383138440, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4276591624057945292, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 4373403398704146096, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5674368611593791749, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5999831307783424192, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6041682791757278948, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6092273841241652954, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6773067381138836892, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7154484690524052180, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7251120579555967144, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7757932674355257076, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: field of view
+      value: 55
+      objectReference: {fileID: 0}
+    - target: {fileID: 7757932674355257076, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: orthographic size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7919205376004647148, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8077889475499297065, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8106933538952720141, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8635047154709086003, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 9126271420960246901, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 9184478437554950952, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 9184478437554950952, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9184478437554950952, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.809017
+      objectReference: {fileID: 0}
+    - target: {fileID: 9184478437554950952, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.58778524
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

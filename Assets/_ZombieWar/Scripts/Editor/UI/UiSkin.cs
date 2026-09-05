@@ -32,14 +32,20 @@ namespace ZombieWar.EditorTools.UI
             "Btn_MainButton_Blue",
             "Btn_OtherButton_Circle01_n",
             "Btn_OtherButton_Circle02",
+            "Btn_OtherButton_Square02",
+            "Btn_OtherButton_Square03_Blue",
         };
 
         public static readonly string[] FrameSprites =
         {
             "Frame_BarFrame_Top01_Navy",
+            "Frame_BarFrame_Bottom01_Navy",
             "Frame_BasicFrame_Square05",
             "Frame_ItemFrame03_Navy",
             "Frame_StageFrame_n_Blue",
+            "Frame_ListFrame02",
+            "Frame_ListFrame02_s",
+            "Frame_ItemFrame01_Color_Blue",
         };
 
         public static readonly string[] PopupSprites =
@@ -54,6 +60,8 @@ namespace ZombieWar.EditorTools.UI
             "Slider10_Frame",
             "Slider10_Fill_Red",
             "Slider10_Fill_Green",
+            "Slider11_Frame",
+            "Slider11_Fill_Blue",
         };
 
         public static readonly string[] LabelSprites =
@@ -61,7 +69,9 @@ namespace ZombieWar.EditorTools.UI
             "Label_TitleFlag01_Red",
             "Label_TitleFlag01_Green",
             "Label_TitleFlag01_Blue",
+            "Label_TitleFlag01_Purple",
             "Label_TitleRibbon_Yellow",
+            "Label_BasicLabel01_White",
         };
 
         public static readonly string[] IconSprites =
@@ -81,7 +91,21 @@ namespace ZombieWar.EditorTools.UI
             "Pictoicon_Reload",
             "Pictoicon_Damage",
             "Pictoicon_Gun",
+            "Pictoicon_Shop_0",
+            "Pictoicon_Battle",
+            "Pictoicon_Buff",
+            "Pictoicon_Gacha_Ball",
+            "Pictoicon_Arrow_Prev",
+            "Pictoicon_Speed",
+            "Pictoicon_Stack",
+            "Pictoicon_Setting",
+            "Pictoicon_Crown",
+            "Pictoicon_Close",
+            "Pictoicon_Castle",
+            "Pictoicon_Target",
+            "Pictoicon_Missile",
             "Icon_Bomb_Bomb",
+            "Icon_Gold",
         };
 
         public static readonly string[] ToggleSprites =
@@ -98,6 +122,7 @@ namespace ZombieWar.EditorTools.UI
         public static readonly Color Danger = new Color32(0xFF, 0x5B, 0x4A, 0xFF);
         public static readonly Color Warning = new Color32(0xFF, 0xC5, 0x3D, 0xFF);
         public static readonly Color Good = new Color32(0x5C, 0xE0, 0x8B, 0xFF);
+        public static readonly Color XpAccent = new Color32(0x4E, 0xCD, 0xE0, 0xFF);
         public static readonly Color IconOnDark = new Color32(0xE8, 0xEF, 0xF8, 0xFF);
         public static readonly Color IconMuted = new Color32(0x6E, 0x7A, 0x8C, 0xFF);
         public static readonly Color Backdrop = new Color32(0x06, 0x09, 0x0F, 0xC7);

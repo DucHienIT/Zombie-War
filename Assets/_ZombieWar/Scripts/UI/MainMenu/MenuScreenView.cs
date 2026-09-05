@@ -3,59 +3,74 @@ using UnityEngine;
 
 namespace ZombieWar.UI
 {
+    // The whole main menu: shared header, one page per tab, tab bar. It only knows
+    // presentation structs and the callbacks the binder hands over.
     public sealed class MenuScreenView : MonoBehaviour
     {
         private const string LogPrefix = "[UI]";
 
         [SerializeField] private Canvas _canvas;
-        // One authored slot per level; extra data is an error, not a silent truncation.
-        [SerializeField] private LevelCardView[] _cards;
+        [SerializeField] private MenuHeaderView _header;
+        [SerializeField] private MenuTabBarView _tabBar;
+        // Index matches MenuTab.
+        [SerializeField] private GameObject[] _pages;
+        [SerializeField] private BattlePageView _battlePage;
+        [SerializeField] private WeaponPageView _weaponPage;
+        [SerializeField] private int _defaultTab = (int)MenuTab.Battle;
+
+        private Action _onTap;
+        private Action _onSettings;
 
         private void Awake()
         {
-            if (_canvas == null || _cards == null || _cards.Length == 0)
+            bool missing = _canvas == null || _header == null || _tabBar == null || _pages == null || _pages.Length == 0
+                           || _battlePage == null || _weaponPage == null;
+            if (missing)
             {
                 Debug.LogError($"{LogPrefix} MenuScreenView has an unassigned reference.", this);
+                return;
             }
+
+            _tabBar.Init(HandleTabSelected);
+            _header.Init(HandleSettingsClicked);
         }
 
         public void SetVisible(bool visible) => _canvas.enabled = visible;
 
-        public void Bind(LevelCardData[] cards, Action<int> onSelected, Action onTap)
+        public void Bind(in MenuHeaderData header, LevelCardData[] levels, WeaponEntryData[] weapons,
+            Action<int> onLevelSelected, Action<int> onWeaponSelected, Action onSettings, Action onTap)
         {
-            if (cards == null)
-            {
-                Debug.LogError($"{LogPrefix} MenuScreenView received no level data.", this);
-                return;
-            }
+            _onTap = onTap;
+            _onSettings = onSettings;
+            _header.Set(header);
+            _battlePage.Bind(levels, onLevelSelected, onTap);
+            _weaponPage.Bind(weapons, onWeaponSelected, onTap);
+            ShowPage(_defaultTab);
+            _tabBar.Select(_defaultTab);
+        }
 
-            if (cards.Length > _cards.Length)
-            {
-                Debug.LogError($"{LogPrefix} {cards.Length} levels but only {_cards.Length} authored cards - rebuild the UI root.", this);
-            }
+        public void Refresh(in MenuHeaderData header, WeaponEntryData[] weapons)
+        {
+            _header.Set(header);
+            _weaponPage.Refresh(weapons);
+        }
 
-            for (int i = 0; i < _cards.Length; i++)
+        private void HandleTabSelected(int tab)
+        {
+            _onTap?.Invoke();
+            ShowPage(tab);
+        }
+
+        private void HandleSettingsClicked() => _onSettings?.Invoke();
+
+        private void ShowPage(int tab)
+        {
+            for (int i = 0; i < _pages.Length; i++)
             {
-                LevelCardView card = _cards[i];
-                if (card == null)
+                if (_pages[i] != null)
                 {
-                    Debug.LogError($"{LogPrefix} Empty level card slot {i}.", this);
-                    continue;
+                    _pages[i].SetActive(i == tab);
                 }
-
-                if (i >= cards.Length)
-                {
-                    card.gameObject.SetActive(false);
-                    continue;
-                }
-
-                int slot = i;
-                card.gameObject.SetActive(true);
-                card.Bind(cards[i], () =>
-                {
-                    onTap?.Invoke();
-                    onSelected?.Invoke(slot);
-                });
             }
         }
     }

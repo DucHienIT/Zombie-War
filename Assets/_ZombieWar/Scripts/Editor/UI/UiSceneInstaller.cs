@@ -6,6 +6,7 @@ using ZombieWar.Core;
 using ZombieWar.Data;
 using ZombieWar.Level;
 using ZombieWar.Player;
+using ZombieWar.Roguelike;
 using ZombieWar.UI;
 using ZombieWar.Weapons;
 
@@ -18,6 +19,7 @@ namespace ZombieWar.EditorTools.UI
         private const string LogPrefix = "[UI Build]";
         private const string GameplayPrefabPath = "Assets/_ZombieWar/Prefabs/GameplayRoot.prefab";
         private const string UiInstanceName = "UIRoot";
+        private const string ProgressionRulesPath = "Assets/_ZombieWar/Data/Rules/ProgressionRules.asset";
 
         [MenuItem("Tools/Zombie War/UI/3. Install UI Into Gameplay Root", false, 102)]
         public static void Install()
@@ -79,9 +81,12 @@ namespace ZombieWar.EditorTools.UI
                 }
 
                 var flow = managers.GetComponent<GameFlowController>();
-                BindGameplayBinder(managers, ui, flow, player, cameraShake);
-                BindMenuBinder(managers, ui, flow);
+                ProfileService profile = BindProfileService(managers);
+                BindGameplayBinder(managers, ui, flow, player, cameraShake, managers.GetComponent<RoguelikeDirector>());
+                BindMenuBinder(managers, ui, flow, profile, cameraShake);
                 UiBuildUtility.Bind(managers.GetComponent<LevelMapLoader>(), "_virtualCamera", virtualCamera);
+                UiBuildUtility.Bind(flow, "_profile", profile);
+                UiBuildUtility.Bind(player.GetComponent<WeaponController>(), "_profile", profile);
 
                 // The world only exists during a run; the menu overlay sits in an empty scene.
                 player.gameObject.SetActive(false);
@@ -96,7 +101,10 @@ namespace ZombieWar.EditorTools.UI
             }
         }
 
-        private static void BindGameplayBinder(Transform managers, UIManager ui, GameFlowController flow, Transform player, CameraShakeController cameraShake)
+        // The director is null until the roguelike step has run; installing in either order
+        // ends up with the same wiring because that step binds this field as well.
+        private static void BindGameplayBinder(Transform managers, UIManager ui, GameFlowController flow, Transform player,
+            CameraShakeController cameraShake, RoguelikeDirector rogue)
         {
             var binder = managers.GetComponent<GameplayUiBinder>();
             if (binder == null)
@@ -110,10 +118,12 @@ namespace ZombieWar.EditorTools.UI
                 "_playerHealth", player.GetComponent<PlayerHealth>(),
                 "_weapons", player.GetComponent<WeaponController>(),
                 "_bombs", player.GetComponent<BombThrower>(),
-                "_cameraShake", cameraShake);
+                "_cameraShake", cameraShake,
+                "_rogue", rogue);
         }
 
-        private static void BindMenuBinder(Transform managers, UIManager ui, GameFlowController flow)
+        private static void BindMenuBinder(Transform managers, UIManager ui, GameFlowController flow, ProfileService profile,
+            CameraShakeController cameraShake)
         {
             var binder = managers.GetComponent<MenuUiBinder>();
             if (binder == null)
@@ -124,7 +134,54 @@ namespace ZombieWar.EditorTools.UI
             UiBuildUtility.Bind(binder,
                 "_ui", ui,
                 "_flow", flow,
+                "_profile", profile,
+                "_cameraShake", cameraShake,
                 "_levels", LoadLevels());
+        }
+
+        // The profile is gameplay-side state the menu reads; it lives with the other managers.
+        private static ProfileService BindProfileService(Transform managers)
+        {
+            var profile = managers.GetComponent<ProfileService>();
+            if (profile == null)
+            {
+                profile = managers.gameObject.AddComponent<ProfileService>();
+            }
+
+            var rules = AssetDatabase.LoadAssetAtPath<ProgressionRulesSO>(ProgressionRulesPath);
+            if (rules == null)
+            {
+                rules = ScriptableObject.CreateInstance<ProgressionRulesSO>();
+                AssetDatabase.CreateAsset(rules, ProgressionRulesPath);
+                Debug.Log($"{LogPrefix} created {ProgressionRulesPath} with default values.");
+            }
+
+            UiBuildUtility.Bind(profile, "_rules", rules, "_guns", LoadGuns());
+            return profile;
+        }
+
+        // Display order of the weapon page: by asset name, which puts the rifle before the shotgun.
+        private static List<Object> LoadGuns()
+        {
+            string[] guids = AssetDatabase.FindAssets("t:GunDefinitionSO", new[] { "Assets/_ZombieWar/Data/Weapons" });
+            var paths = new List<string>(guids.Length);
+            for (int i = 0; i < guids.Length; i++)
+            {
+                paths.Add(AssetDatabase.GUIDToAssetPath(guids[i]));
+            }
+
+            paths.Sort(string.CompareOrdinal);
+            var result = new List<Object>(paths.Count);
+            for (int i = 0; i < paths.Count; i++)
+            {
+                var gun = AssetDatabase.LoadAssetAtPath<GunDefinitionSO>(paths[i]);
+                if (gun != null)
+                {
+                    result.Add(gun);
+                }
+            }
+
+            return result;
         }
 
         private static void DestroyChild(Transform parent, string name)

@@ -56,6 +56,28 @@ namespace ZombieWar.EditorTools.UI
             Debug.Log($"{LogPrefix} copied {copied}, already present {skipped}, failed {failed}. Destination: {UiSkin.Root}");
         }
 
+        // Lets another authoring tool pull the few pack sprites it owns without widening the
+        // shared UiSkin lists that the HUD and popups are built from.
+        public static void ImportSprites(string[] fileNames, string destinationFolder)
+        {
+            int copied = 0;
+            int skipped = 0;
+            int failed = 0;
+
+            AssetDatabase.StartAssetEditing();
+            try
+            {
+                CopyGroup(fileNames, destinationFolder, ref copied, ref skipped, ref failed);
+            }
+            finally
+            {
+                AssetDatabase.StopAssetEditing();
+                AssetDatabase.Refresh();
+            }
+
+            Debug.Log($"{LogPrefix} copied {copied}, already present {skipped}, failed {failed} into {destinationFolder}.");
+        }
+
         private static void CopyGroup(string[] fileNames, string destinationFolder, ref int copied, ref int skipped, ref int failed)
         {
             EnsureFolder(destinationFolder);
