@@ -10,36 +10,54 @@ namespace ZombieWar.EditorTools
         private const string LogPrefix = "[Animator]";
         private const string RecipePath = "Assets/_ZombieWar/Animation/AnimatorBuildRecipe.asset";
 
-        private const string SurvivalistClipFolder = "Assets/Survivalist/StarterAssets/ThirdPersonController/Character/Animations/";
-        private const string ToonSoldierClipFolder = "Assets/ToonSoldiers_WW2_demo/animation/";
+        private const string SurvivalistClipFolder = "Assets/ThirdParty/Survivalist/StarterAssets/ThirdPersonController/Character/Animations/";
+        private const string ToonSoldierClipFolder = "Assets/ThirdParty/ToonSoldiers_WW2_demo/animation/";
+        private const string ZombiePackClipFolder = "Assets/ThirdParty/Zombie_Animations/Animations/";
 
         private const float InstantTransition = 0.02f;
         private const float ShortTransition = 0.1f;
         private const float WalkBlendDistance = 0.5f;
 
-        [MenuItem("Tools/Zombie War/Animation/Create Default Animator Recipe")]
+        [MenuItem("Tools/Zombie War/Animation/1. Create Default Animator Recipe")]
         private static void CreateDefaultRecipe()
         {
-            var recipe = AssetDatabase.LoadAssetAtPath<AnimatorBuildRecipeSO>(RecipePath);
-            if (recipe == null)
-            {
-                recipe = ScriptableObject.CreateInstance<AnimatorBuildRecipeSO>();
-                AssetDatabase.CreateAsset(recipe, RecipePath);
-            }
-
-            recipe.AssignDefaults(
-                LoadClip(SurvivalistClipFolder + "Stand--Idle.anim.fbx", "Idle"),
-                LoadClip(SurvivalistClipFolder + "Locomotion--Walk_N.anim.fbx", "Walk_N"),
-                LoadClip(SurvivalistClipFolder + "Locomotion--Run_N.anim.fbx", "Run_N"),
-                LoadClip(SurvivalistClipFolder + "Locomotion--Run_S.anim.fbx", "Run_S"),
-                LoadClip(ToonSoldierClipFolder + "infantry_combat_idle.FBX", "infantry_combat_idle"),
-                LoadClip(ToonSoldierClipFolder + "infantry_combat_shoot.FBX", "infantry_combat_shoot"));
+            AnimatorBuildRecipeSO recipe = LoadOrCreateRecipe();
+            recipe.AssignSoldierDefaults(
+                LoadClip(SurvivalistClipFolder + "Stand--Idle.anim.fbx"),
+                LoadClip(SurvivalistClipFolder + "Locomotion--Walk_N.anim.fbx"),
+                LoadClip(SurvivalistClipFolder + "Locomotion--Run_N.anim.fbx"),
+                LoadClip(SurvivalistClipFolder + "Locomotion--Run_S.anim.fbx"),
+                LoadClip(ToonSoldierClipFolder + "infantry_combat_idle.FBX"),
+                LoadClip(ToonSoldierClipFolder + "infantry_combat_shoot.FBX"));
             EditorUtility.SetDirty(recipe);
             AssetDatabase.SaveAssets();
-            Debug.Log($"{LogPrefix} Recipe written to {RecipePath}.", recipe);
+            Debug.Log($"{LogPrefix} Soldier clips written to {RecipePath}.", recipe);
         }
 
-        [MenuItem("Tools/Zombie War/Animation/Build Animators")]
+        [MenuItem("Tools/Zombie War/Animation/2. Assign Zombie Animation Pack")]
+        private static void AssignZombiePack()
+        {
+            AnimatorBuildRecipeSO recipe = LoadOrCreateRecipe();
+            // One-shot actions must not loop; the pack imports everything as looping.
+            SetLooping(ZombiePackClipFolder + "Zombie_Attack01.FBX", false);
+            SetLooping(ZombiePackClipFolder + "Zombie_HitReact_Head.fbx", false);
+            SetLooping(ZombiePackClipFolder + "Zombie_Idle_Death.fbx", false);
+
+            recipe.AssignZombieClips(
+                LoadClip(ZombiePackClipFolder + "Zombie_Idle_01.FBX"),
+                LoadClip(ZombiePackClipFolder + "Zombie_Walk_01_Forward_InPlace.fbx"),
+                LoadClip(ZombiePackClipFolder + "Zombie_Walk_Fast01_Forward_InPlace.fbx"),
+                LoadClip(ZombiePackClipFolder + "Zombie_Run_01_Forward_InPlace.fbx"),
+                LoadClip(ZombiePackClipFolder + "Zombie_Attack01.FBX"),
+                LoadClip(ZombiePackClipFolder + "Zombie_HitReact_Head.fbx"),
+                LoadClip(ZombiePackClipFolder + "Zombie_HitReact_Head.fbx"),
+                LoadClip(ZombiePackClipFolder + "Zombie_Idle_Death.fbx"));
+            EditorUtility.SetDirty(recipe);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"{LogPrefix} Zombie clips written to {RecipePath}.", recipe);
+        }
+
+        [MenuItem("Tools/Zombie War/Animation/3. Build Animators")]
         private static void BuildAnimators()
         {
             var recipe = AssetDatabase.LoadAssetAtPath<AnimatorBuildRecipeSO>(RecipePath);
@@ -56,6 +74,19 @@ namespace ZombieWar.EditorTools
             Debug.Log($"{LogPrefix} Built {recipe.SoldierControllerPath} and {recipe.ZombieControllerPath}.");
         }
 
+        private static AnimatorBuildRecipeSO LoadOrCreateRecipe()
+        {
+            var recipe = AssetDatabase.LoadAssetAtPath<AnimatorBuildRecipeSO>(RecipePath);
+            if (recipe != null)
+            {
+                return recipe;
+            }
+
+            recipe = ScriptableObject.CreateInstance<AnimatorBuildRecipeSO>();
+            AssetDatabase.CreateAsset(recipe, RecipePath);
+            return recipe;
+        }
+
         private static void BuildSoldier(AnimatorBuildRecipeSO recipe, AvatarMask upperBodyMask)
         {
             AnimatorController controller = PrepareController(recipe.SoldierControllerPath);
@@ -70,7 +101,7 @@ namespace ZombieWar.EditorTools
 
             BuildSoldierLocomotionLayer(controller, recipe);
             BuildSoldierCombatLayer(controller, recipe, upperBodyMask);
-            BuildHitReactionLayer(controller, recipe.SoldierHit, upperBodyMask);
+            BuildHitReactionLayer(controller, recipe.SoldierHit, upperBodyMask, 1f);
             BuildFullBodyLayer(controller, recipe.SoldierDeath);
         }
 
@@ -94,9 +125,9 @@ namespace ZombieWar.EditorTools
         private static void BuildSoldierCombatLayer(AnimatorController controller, AnimatorBuildRecipeSO recipe, AvatarMask mask)
         {
             AnimatorStateMachine machine = AddLayer(controller, "Upper Combat", mask, AnimatorLayerBlendingMode.Override);
-            AnimatorState combatIdle = AddState(machine, "CombatIdle", recipe.SoldierCombatIdle);
-            AnimatorState shoot = AddState(machine, "Shoot", recipe.SoldierShoot);
-            AnimatorState reload = AddState(machine, "Reload", recipe.SoldierReload);
+            AnimatorState combatIdle = AddState(machine, "CombatIdle", recipe.SoldierCombatIdle, 1f);
+            AnimatorState shoot = AddState(machine, "Shoot", recipe.SoldierShoot, 1f);
+            AnimatorState reload = AddState(machine, "Reload", recipe.SoldierReload, 1f);
             machine.defaultState = combatIdle;
 
             AddTriggerTransition(combatIdle, shoot, "Shoot", InstantTransition);
@@ -107,11 +138,12 @@ namespace ZombieWar.EditorTools
             AddBoolTransition(reload, combatIdle, "Reload", false, ShortTransition);
         }
 
-        private static void BuildHitReactionLayer(AnimatorController controller, AnimationClip hitClip, AvatarMask mask)
+        private static void BuildHitReactionLayer(AnimatorController controller, AnimationClip hitClip, AvatarMask mask, float playbackSpeed)
         {
-            AnimatorStateMachine machine = AddLayer(controller, "Hit Reaction", mask, AnimatorLayerBlendingMode.Additive);
-            AnimatorState empty = AddState(machine, "Empty", null);
-            AnimatorState hit = AddState(machine, "Hit", hitClip);
+            // Override rather than additive: the packs ship full-pose flinches, not additive deltas.
+            AnimatorStateMachine machine = AddLayer(controller, "Hit Reaction", mask, AnimatorLayerBlendingMode.Override);
+            AnimatorState empty = AddState(machine, "Empty", null, 1f);
+            AnimatorState hit = AddState(machine, "Hit", hitClip, playbackSpeed);
             machine.defaultState = empty;
             AddTriggerTransition(empty, hit, "Hit", InstantTransition);
             AddExitTimeTransition(hit, empty, ShortTransition);
@@ -120,8 +152,8 @@ namespace ZombieWar.EditorTools
         private static void BuildFullBodyLayer(AnimatorController controller, AnimationClip deathClip)
         {
             AnimatorStateMachine machine = AddLayer(controller, "Full Body", null, AnimatorLayerBlendingMode.Override);
-            AnimatorState empty = AddState(machine, "Empty", null);
-            AnimatorState death = AddState(machine, "Death", deathClip);
+            AnimatorState empty = AddState(machine, "Empty", null, 1f);
+            AnimatorState death = AddState(machine, "Death", deathClip, 1f);
             machine.defaultState = empty;
             AddTriggerTransition(empty, death, "Death", ShortTransition);
         }
@@ -141,14 +173,17 @@ namespace ZombieWar.EditorTools
             tree.blendParameter = "Speed";
             tree.useAutomaticThresholds = false;
             tree.AddChild(recipe.ZombieIdle, 0f);
-            tree.AddChild(recipe.ZombieWalk, 1f);
+            tree.AddChild(recipe.ZombieWalk, recipe.ZombieWalkSpeed);
+            tree.AddChild(recipe.ZombieWalkFast, recipe.ZombieWalkFastSpeed);
+            tree.AddChild(recipe.ZombieRun, recipe.ZombieRunSpeed);
 
-            AnimatorState attack = AddState(machine, "Attack", recipe.ZombieAttack);
-            AnimatorState knockback = AddState(machine, "Knockback", recipe.ZombieHit);
-            AnimatorState death = AddState(machine, "Death", recipe.ZombieDeath);
+            AnimatorState attack = AddState(machine, "Attack", recipe.ZombieAttack, recipe.ZombieAttackPlaybackSpeed);
+            AnimatorState knockback = AddState(machine, "Knockback", recipe.ZombieKnockback, recipe.ZombieHitPlaybackSpeed);
+            AnimatorState death = AddState(machine, "Death", recipe.ZombieDeath, 1f);
             machine.defaultState = locomotion;
 
             AddTriggerTransition(locomotion, attack, "Attack", ShortTransition);
+            AddTriggerTransition(attack, attack, "Attack", ShortTransition);
             AddExitTimeTransition(attack, locomotion, ShortTransition);
             AddBoolTransition(locomotion, knockback, "Knockback", true, ShortTransition);
             AddBoolTransition(attack, knockback, "Knockback", true, ShortTransition);
@@ -160,7 +195,7 @@ namespace ZombieWar.EditorTools
             toDeath.duration = ShortTransition;
             toDeath.AddCondition(AnimatorConditionMode.If, 0f, "Death");
 
-            BuildHitReactionLayer(controller, recipe.ZombieHit, upperBodyMask);
+            BuildHitReactionLayer(controller, recipe.ZombieHit, upperBodyMask, recipe.ZombieHitPlaybackSpeed);
         }
 
         private static AnimatorController PrepareController(string path)
@@ -205,10 +240,11 @@ namespace ZombieWar.EditorTools
             return machine;
         }
 
-        private static AnimatorState AddState(AnimatorStateMachine machine, string name, AnimationClip clip)
+        private static AnimatorState AddState(AnimatorStateMachine machine, string name, AnimationClip clip, float playbackSpeed)
         {
             AnimatorState state = machine.AddState(name);
             state.motion = clip;
+            state.speed = playbackSpeed;
             if (clip == null)
             {
                 Debug.Log($"{LogPrefix} State {name} in {machine.name} has no clip in the recipe; it stays empty until one is assigned.");
@@ -266,18 +302,39 @@ namespace ZombieWar.EditorTools
             return mask;
         }
 
-        private static AnimationClip LoadClip(string fbxPath, string clipName)
+        private static void SetLooping(string fbxPath, bool looping)
+        {
+            var importer = AssetImporter.GetAtPath(fbxPath) as ModelImporter;
+            if (importer == null)
+            {
+                Debug.LogError($"{LogPrefix} No model importer at {fbxPath}.");
+                return;
+            }
+
+            ModelImporterClipAnimation[] clips = importer.clipAnimations.Length > 0 ? importer.clipAnimations : importer.defaultClipAnimations;
+            for (int i = 0; i < clips.Length; i++)
+            {
+                clips[i].loopTime = looping;
+                clips[i].loopPose = false;
+            }
+
+            importer.clipAnimations = clips;
+            importer.SaveAndReimport();
+        }
+
+        // Every source FBX in the packs carries exactly one clip, so the first representation is the clip.
+        private static AnimationClip LoadClip(string fbxPath)
         {
             Object[] representations = AssetDatabase.LoadAllAssetRepresentationsAtPath(fbxPath);
             for (int i = 0; i < representations.Length; i++)
             {
-                if (representations[i] is AnimationClip clip && clip.name == clipName)
+                if (representations[i] is AnimationClip clip)
                 {
                     return clip;
                 }
             }
 
-            Debug.LogError($"{LogPrefix} Clip {clipName} not found in {fbxPath}.");
+            Debug.LogError($"{LogPrefix} No animation clip found in {fbxPath}.");
             return null;
         }
     }

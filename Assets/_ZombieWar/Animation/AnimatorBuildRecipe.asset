@@ -24,8 +24,16 @@ MonoBehaviour:
   _soldierReload: {fileID: 0}
   _soldierHit: {fileID: 0}
   _soldierDeath: {fileID: 0}
-  _zombieIdle: {fileID: -3100369314251171874, guid: 12e52e465ed793a4d801955e9f964a82, type: 3}
-  _zombieWalk: {fileID: 1657602633327794031, guid: 8269a9f8cf495034c817722ac21f309f, type: 3}
-  _zombieAttack: {fileID: 0}
-  _zombieHit: {fileID: 0}
-  _zombieDeath: {fileID: 0}
+  _zombieIdle: {fileID: 1827226128182048838, guid: 954860183fbf15b48afe83f409ecea4d, type: 3}
+  _zombieWalk: {fileID: 1827226128182048838, guid: 0da2fc682221e9a41b1b73f9ee210b9f, type: 3}
+  _zombieWalkFast: {fileID: 1827226128182048838, guid: 91df17f132fe1a14a9908c3c573e0a43, type: 3}
+  _zombieRun: {fileID: 1827226128182048838, guid: 1de2c99e2956ea74d851788edfbc2d25, type: 3}
+  _zombieWalkSpeed: 1.4
+  _zombieWalkFastSpeed: 2.3
+  _zombieRunSpeed: 3.6
+  _zombieAttack: {fileID: 1827226128182048838, guid: bf1adccc1c27da3438014864836cfc84, type: 3}
+  _zombieHit: {fileID: 1827226128182048838, guid: 845f60fc7c8fdb747af36ef1ed6db16d, type: 3}
+  _zombieKnockback: {fileID: 1827226128182048838, guid: 845f60fc7c8fdb747af36ef1ed6db16d, type: 3}
+  _zombieDeath: {fileID: 1827226128182048838, guid: f4883a8b97670374a8cd9e4f1f0a54b7, type: 3}
+  _zombieAttackPlaybackSpeed: 2
+  _zombieHitPlaybackSpeed: 3

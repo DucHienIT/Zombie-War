@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: FeedbackProfile
   m_EditorClassIdentifier: 
   _zombieHitFlashDuration: 0.1
-  _deathPoseDuration: 0.15
+  _deathPoseDuration: 0.6
   _dissolveDuration: 0.65
   _playerHitFlashDuration: 0.1
   _playerVignetteDuration: 0.18

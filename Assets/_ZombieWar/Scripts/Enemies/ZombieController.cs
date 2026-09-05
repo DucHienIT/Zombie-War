@@ -182,7 +182,8 @@ namespace ZombieWar.Enemies
             }
 
             TrackPathFailure(deltaTime);
-            _animation.SetSpeed(_agent.velocity.magnitude / _definition.MoveSpeed, deltaTime);
+            // The locomotion blend tree is keyed in m/s so every archetype picks the clip that matches its real pace.
+            _animation.SetSpeed(_agent.velocity.magnitude, deltaTime);
 
             if (IsWithin(playerPosition, _definition.AttackRange))
             {

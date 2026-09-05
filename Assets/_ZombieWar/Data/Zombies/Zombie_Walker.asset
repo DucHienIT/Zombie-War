@@ -22,7 +22,7 @@ MonoBehaviour:
   _attackDamage: 10
   _attackCooldown: 1
   _attackRange: 1.4
-  _attackWindup: 0.35
+  _attackWindup: 0.45
   _attackReachTolerance: 0.4
   _attackAreaRadius: 0
   _destinationUpdateHz: 4
