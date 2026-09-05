@@ -13,7 +13,7 @@ Trước khi viết, sửa, hay review bất kỳ script nào trong project, ph�
 
 ## Project này là gì
 
-**Zombie War** — game bắn súng 3D góc nhìn top-down cho mobile, làm để nộp bài test kỹ thuật, dựng trên một template game casual có sẵn. Toàn bộ asset và code first-party nằm dưới `Assets/_ZombieWar/` (xem Bố cục code first-party); mọi asset pack third-party gom trong `Assets/ThirdParty/`. Gameplay P0 đã dựng xong khung (xem "Hiện trạng hệ thống"). **Game chạy màn hình dọc 9:16** (quyết định của user ngày 2026-09-05, khác với spec docx viết cho landscape). Build list chỉ có hai scene trong `Assets/_ZombieWar/Scenes/`: `MainMenu` và `Gameplay`; **các level không tách scene** — map mỗi level là prefab `Prefabs/Environment/Map_*.prefab` được `LevelMapLoader` instantiate vào scene `Gameplay`.
+**Zombie War** — game bắn súng 3D góc nhìn top-down cho mobile, làm để nộp bài test kỹ thuật, dựng trên một template game casual có sẵn. Toàn bộ asset và code first-party nằm dưới `Assets/_ZombieWar/` (xem Bố cục code first-party); mọi asset pack third-party gom trong `Assets/ThirdParty/`. Gameplay P0 đã dựng xong khung (xem "Hiện trạng hệ thống"). **Game chạy màn hình dọc 9:16** (quyết định của user ngày 2026-09-05, khác với spec docx viết cho landscape). **Game chỉ có đúng MỘT scene**: `Assets/_ZombieWar/Scenes/Gameplay.unity` (build list cũng chỉ có nó). Main menu là overlay trong chính scene đó, **các level không tách scene** — map mỗi level là prefab `Prefabs/Environment/Map_*.prefab` được `LevelMapLoader` instantiate khi bắt đầu một lượt chơi.
 
 ## Spec (nguồn sự thật cho gameplay)
 
@@ -48,14 +48,18 @@ Chấm theo Gameplay, Physics, Animation (Blend Trees), Shader/Visual/UI có h�
 - **DOTween / DOTweenPro** (`Assets/Plugins/Demigiant/`), settings tại `Assets/Resources/DOTweenSettings.asset`. Luôn `SetLink(gameObject)`.
 - **Layer Lab GUI Pro-CasualGame** (`Assets/ThirdParty/Layer Lab/GUI Pro-CasualGame/Prefabs/`) — bộ prefab UI (button, frame, popup, slider, label) và một script `UIParticleSystem`. **Hiện HUD/menu chưa tham chiếu file nào của pack này** (rà reference 2026-09-05: 0/3626 file được dùng, 180 MB); dùng làm nguồn sprite/prefab khi cần polish UI, hoặc gỡ hẳn pack nếu quyết định giữ UI thuần code.
 - **Toony Colors Pro 2** (`Assets/ThirdParty/JMO Assets/`) — toon shading, có asmdef riêng `ToonyColorsPro.*`; nền tốt cho dissolve zombie và look toon.
-- **TextMeshPro**, **Timeline**, **Visual Scripting**, **bộ 2D** đã cài nhưng không phải trọng tâm của game này. TMP Essential Resources **đã import** (`Assets/TextMesh Pro/`); HUD dùng font `LiberationSans SDF`.
+- **TextMeshPro**, **Timeline**, **Visual Scripting**, **bộ 2D** đã cài nhưng không phải trọng tâm của game này. TMP Essential Resources **đã import** (`Assets/TextMesh Pro/`); font UI của game là **LilitaOne** copy từ Layer Lab sang `Art/UI/Fonts/` (xem "Kiến trúc UI"), `LiberationSans SDF` chỉ còn là fallback mặc định của TMP.
 - **DOTween modules có asmdef riêng** (`DOTween.Modules.asmdef`, `DOTweenPro.Scripts.asmdef`, tạo bằng chính ASMDEFManager của DOTween). `ZombieWar.asmdef` reference `DOTween.Modules` để dùng `DOFillAmount`/`DOFade` của uGUI; không xoá các asmdef này.
 
 ## Bố cục `Assets/` và asset third-party
 
-Root `Assets/` chỉ còn: `_ZombieWar/` (first-party), `ThirdParty/` (mọi asset pack ngoài), `Plugins/` (DOTween DLL — special folder của Unity, không được move), `Resources/` (DOTweenSettings), `Settings/` (URP), `TextMesh Pro/`, cùng 3 asset lẻ (`DefaultVolumeProfile.asset`, `UniversalRenderPipelineGlobalSettings.asset`, `InputSystem_Actions.inputactions`).
+Root `Assets/` chỉ còn: `_ZombieWar/` (first-party), `ThirdParty/` (kho asset pack ngoài), `Plugins/` (DOTween DLL — special folder của Unity, không được move), `Resources/` (DOTweenSettings), `Settings/` (URP), `TextMesh Pro/`, cùng 3 asset lẻ (`DefaultVolumeProfile.asset`, `UniversalRenderPipelineGlobalSettings.asset`, `InputSystem_Actions.inputactions`).
 
-**Pack mới import phải move ngay vào `Assets/ThirdParty/`** — move bằng Unity (`AssetDatabase.MoveAsset` / kéo trong Project window) để giữ GUID, đừng move bằng file system khi Editor đang mở.
+**Luật vàng: asset nào game thật sự dùng thì nằm trong `Assets/_ZombieWar/`, phân theo loại** (`Models/`, `Animation/`, `Audio/`, `Art/Materials`, `Art/Textures`, `Art/Shaders`, `Prefabs/`) — không tham chiếu xuyên qua `ThirdParty/`. Đợt gom 2026-09-05 đã kéo 183 file (~200 MB) từ 11 pack vào `_ZombieWar`, nên **`ThirdParty/` hiện là kho dự phòng thuần: 0 file trong đó được scene/prefab nào tham chiếu**.
+
+Quy trình khi cần thêm asset từ pack: import pack vào `Assets/ThirdParty/<tên pack>/`, lấy đúng file cần dùng move sang thư mục loại tương ứng trong `_ZombieWar/`, phần còn lại để nguyên trong `ThirdParty/`. Move bằng Unity (`AssetDatabase.MoveAsset` / kéo trong Project window) để giữ GUID, đừng move bằng file system khi Editor đang mở.
+
+Kiểm tra lại bất cứ lúc nào bằng cách rà GUID: quét chuỗi `guid:` trong mọi asset dưới `_ZombieWar/` + `Settings/` + `ProjectSettings/`, lấy bao đóng bắc cầu (transitive closure) rồi đối chiếu với `.meta` toàn project — file nào ngoài tập đó là không dùng.
 
 Đợt dọn 2026-09-05 đã xoá vĩnh viễn (khôi phục được qua git nếu cần): demo scene + demo folder của Epic Toon FX / WarFX / Toony Colors Pro / Low Poly Guns / ToonSoldiers / Survivalist, `Epic Toon FX/Prefabs 2D` + `Upgrade`, `WarFX/_Effects` + `Desktop` (bản desktop), `Survivalist/Materials HDRP`, phần không dùng của `Survivalist/StarterAssets`, `ithappy/Military_Free/Render_Pipeline_Convert` (3 unitypackage convert pipeline), `Low Poly Guns/Scripts` (script demo Assembly-CSharp) và `Assets/Scenes/SampleScene.unity`.
 
@@ -65,43 +69,51 @@ Mỗi pack chỉ đóng **một** vai. Đừng lấy model của pack animation 
 
 ### Model
 
-| Thư mục | Vai | Ghi chú |
-|---|---|---|
-| `Assets/ThirdParty/ArtStore3D/Zombie/` | Zombie chính | Rig **Humanoid**, `URP/Lit`. `Anim/` chỉ chứa animation camera/đèn của demo scene, **không** phải animation nhân vật |
-| `Assets/ThirdParty/Survivalist/` | Soldier người chơi | Rig Humanoid, nhiều skin. Material là `URP/Autodesk Interactive` (pack import từ FBX Autodesk Interactive) — nặng hơn `URP/Lit` nhưng chỉ 1 instance trên màn hình; thư mục `Materials URP` của pack cũng đúng shader đó, không hơn gì `Materials` |
-| `Assets/ThirdParty/Low Poly Guns/` | Súng | `URP/Lit`. Nguồn cho ≥2 loại súng của spec §5 |
-| `Assets/ThirdParty/ithappy/Military_Free/` | Môi trường, vật cản | `URP/Lit` sẵn từ pack |
-| `Assets/ThirdParty/ToonSoldiers_WW2_demo/model/` | (không dùng) | Model đi kèm pack animation, giữ để preview clip |
+Model đang dùng nằm trong `Assets/_ZombieWar/Models/`; cột "Pack gốc" chỉ để biết lấy thêm ở đâu và ghi công.
+
+| File trong `_ZombieWar/Models/` | Vai | Pack gốc | Ghi chú |
+|---|---|---|---|
+| `Characters/Zombie.fbx` | Zombie chính | ArtStore3D | Rig **Humanoid**, `URP/Lit`. Material `Art/Materials/Characters/Zombie_Mat.mat` |
+| `Characters/SK_Military_Survivalist.fbx` + `Armature.fbx` | Soldier người chơi | Survivalist | Rig Humanoid. 13 material ở `Art/Materials/Characters/` dùng `URP/Autodesk Interactive` (pack import từ FBX Autodesk Interactive) — nặng hơn `URP/Lit` nhưng chỉ 1 instance trên màn hình |
+| `Weapons/assault1.fbx`, `Weapons/shotgun1.fbx` | 2 loại súng của spec §5 | Low Poly Guns | `URP/Lit` |
+| `Environment/*.fbx` (14 mesh) | Môi trường, vật cản | ithappy Military_Free | Prefab tương ứng ở `Prefabs/Environment/Props/`, dùng chung `Art/Materials/Environment/Military_base.mat` |
+| `Characters/ToonSoldier_WW2_demo.FBX` | Model preview clip | ToonSoldiers_WW2_demo | Đi kèm pack animation, giữ để preview |
+| `VFX/Plane1x1.FBX` | Mesh phẳng cho particle | WarFX | |
 
 ### Animation
 
 Tất cả rig nhân vật đều **Humanoid**, nên clip retarget chéo giữa các model được.
 
-| Nguồn | Clip | Dùng cho |
+| File trong `_ZombieWar/Animation/` | Clip | Pack gốc |
 |---|---|---|
-| `Assets/ThirdParty/ToonSoldiers_WW2_demo/animation/` | `infantry_combat_idle`, `infantry_combat_run`, `infantry_combat_shoot`, `infantry_guard_idle` | Soldier: `combat_run` cho layer thân dưới, `combat_shoot` cho layer thân trên (spec §3) |
-| `Assets/ThirdParty/Zombie_Animations/Animations/` | Bộ clip zombie (idle/walk/attack/death/paired) | Zombie: nguồn animation chính, đã nối vào `ZombieAnimator` |
-| `Assets/ThirdParty/Survivalist/StarterAssets/ThirdPersonController/Character/Animations/` | `Idle`, `Walk_N`, `Run_N`, `Run_S`, `Jump`, `InAir`, 2 clip land | Locomotion + Blend Tree cho soldier. **Giữ thư mục này** — phần còn lại của StarterAssets (`Editor`, `Environment`, `InputSystem`, `ThirdPersonController/Scripts`) đã xoá |
+| `Soldier/infantry_combat_idle.FBX`, `infantry_combat_shoot.FBX` | Idle + bắn cho layer thân trên (spec §3) | ToonSoldiers_WW2_demo |
+| `Soldier/Locomotion--Run_N/Run_S/Walk_N.anim.fbx`, `Stand--Idle.anim.fbx` | Locomotion + Blend Tree thân dưới | Survivalist StarterAssets |
+| `Zombie/Zombie_Idle_01`, `Walk_01`, `Walk_Fast01`, `Run_01`, `Attack01`, `HitReact_Head`, `Idle_Death`, `T_pose` | Chase / attack / hit-reaction / death (spec §4) | Zombie_Animations |
 
-Animation zombie đến từ pack `Assets/ThirdParty/Zombie_Animations/` (import 2026-09-05). Pack `Zombie 1 Low Poly` chỉ có animation camera/đèn của demo scene; model đã rig Humanoid kèm Avatar nên clip Humanoid retarget thẳng được — spec §4 cần chase / hit-reaction / death.
+Animation zombie đến từ pack `Zombie_Animations` (import 2026-09-05); 8 clip đang dùng đã nằm trong `_ZombieWar/Animation/Zombie/`, 245 clip còn lại vẫn ở `ThirdParty/Zombie_Animations/` nếu cần lấy thêm. Pack `Zombie 1 Low Poly` chỉ có animation camera/đèn của demo scene; model đã rig Humanoid kèm Avatar nên clip Humanoid retarget thẳng được — spec §4 cần chase / hit-reaction / death.
 
 Pack `FREE Shirtless Zombie` (`Assets/NewPunch/`) **đã bị gỡ khỏi project**: đối chiếu tận file `.unitypackage` gốc thì nó chỉ có 2 FBX model, 6 prefab, 3 scene demo, 1 script và material/texture — không có animation nào, trong khi vai trò dự kiến của nó là nguồn animation zombie. Đừng import lại.
 
-`Survivalist/StarterAssets/ThirdPersonController/Character/Animations/` còn kèm `StarterAssetsThirdPerson.controller` — Animator controller có sẵn Blend Tree locomotion, dùng làm điểm khởi đầu cho layer thân dưới của soldier.
+`ThirdParty/Survivalist/StarterAssets/ThirdPersonController/Character/Animations/` còn kèm `StarterAssetsThirdPerson.controller` — Animator controller có sẵn Blend Tree locomotion, để lại đó làm tham khảo cho layer thân dưới của soldier.
 
 ### Sound
 
-| Thư mục | Vai |
-|---|---|
-| `Assets/ThirdParty/Tybug Studios/Zombie Voice Pack - Free/` | SFX zombie — 10 wav chia sẵn theo hành vi: Aggressive, Chase, Death, Growl, Grunt, Hiss, Moan |
-| `Assets/ThirdParty/PostApocalypseGunsDemo/` | SFX súng — 41 wav: AssaultRifles, Pistols, Shotguns, SniperRifles, Miniguns_loop |
+| Thư mục | Vai | Pack gốc |
+|---|---|---|
+| `_ZombieWar/Audio/Zombies/` | 8 wav zombie đang dùng (aggressive, death, growl, grunt, hiss, moan) | Tybug Studios Zombie Voice Pack |
+| `_ZombieWar/Audio/Weapons/` | 6 wav súng đang dùng (rifle, shotgun, reload; nổ bom đang mượn `AntiMaterialRifle_far_01`) | PostApocalypseGunsDemo |
+
+Muốn thêm tiếng: 2 wav zombie còn lại ở `ThirdParty/Tybug Studios/`, 35 wav súng còn lại ở `ThirdParty/PostApocalypseGunsDemo/`. Project vẫn **chưa có nhạc nền** — không pack nào có track.
 
 ### Particle
 
-| Thư mục | Vai |
+Prefab particle của game là first-party trong `_ZombieWar/Prefabs/VFX/`, ăn 18 material ở `Art/Materials/VFX/` + 16 texture ở `Art/Textures/VFX/` + 2 shader `Art/Shaders/WFX_S Particle *.shader`.
+
+| Kho dự phòng | Vai |
 |---|---|
-| `Assets/ThirdParty/JMO Assets/WarFX/` | VFX súng đạn thực chiến — muzzle flash, bullet impact theo vật liệu, explosion. Chỉ còn bộ **`_Effects (Mobile)`** + `Mobile/`; bản desktop (`_Effects`, `Desktop/`) và scene demo đã xoá |
-| `Assets/ThirdParty/Epic Toon FX/` | VFX toon — `Prefabs/Combat`, `Environment`, `Interactive`. Hợp look toon cho nổ bom và dissolve zombie. **Nặng 534 MB nhưng mới dùng đúng 4 file** (`Materials/Basics/circle_AB.mat`, `cloud_2x2_default_AB.mat` + 2 texture) |
+| `ThirdParty/JMO Assets/WarFX/` | VFX súng đạn thực chiến. Chỉ còn bộ **`_Effects (Mobile)`** + `Mobile/`; bản desktop (`_Effects`, `Desktop/`) và scene demo đã xoá |
+| `ThirdParty/Epic Toon FX/` | VFX toon — `Prefabs/Combat`, `Environment`, `Interactive`. **534 MB mà game mới lấy đúng 4 file** (2 material + 2 texture, đã chuyển sang `_ZombieWar/Art/`) |
+| `ThirdParty/Layer Lab/GUI Pro-CasualGame/` | Prefab/sprite UI casual — **180 MB, game chưa dùng file nào**; HUD/menu đang thuần code |
 
 Material built-in của pack mới import convert bằng **Tools ▸ Zombie War ▸ Convert Built-in Materials To URP** (`Assets/_ZombieWar/Scripts/Editor/BuiltInToUrpMaterialConverter.cs`) — nó gom material còn shader built-in rồi gọi converter chính chủ của Unity; skybox và material UI cố ý không đụng tới vì chạy tốt dưới URP. URP **không có** upgrader cho `Mobile/Particles/*` và `Legacy Shaders/Particles/*`. 14 material particle của WarFX đã gán tay sang `URP/Particles/Unlit` (`_BaseColor = 2 × _TintColor` vì shader particle đời cũ nhân đôi tint; additive → `_Blend: 2`, alpha blended → `_Blend: 0`).
 
@@ -116,8 +128,10 @@ Assets/_ZombieWar/            # mọi thứ first-party nằm trong đây, tách
 ├── Scripts/    Core, Player, Weapons, Enemies, Level, UI, Data, Audio, Utils, Editor
 ├── Data/       Weapons, Zombies, Levels     # instance .asset của ScriptableObject
 ├── Prefabs/    Player, Enemies, Weapons, VFX, UI, Environment
-├── Animation/  Soldier, Zombie              # Animator controller, Avatar Mask, Blend Tree
-├── Art/        Materials, Shaders           # shader dissolve zombie, material first-party
+├── Animation/  Soldier, Zombie              # Animator controller, Avatar Mask, Blend Tree, clip FBX
+├── Models/     Characters, Weapons, Environment, VFX   # FBX đang dùng, kéo từ pack về
+├── Audio/      Weapons, Zombies             # wav đang dùng
+├── Art/        Materials, Textures, Shaders, Sprites   # material/texture/shader đang dùng
 └── Scenes/                                  # scene gameplay 3D
 ```
 
@@ -131,11 +145,23 @@ Hai assembly definition tách code first-party khỏi `Assembly-CSharp` của c�
 
 ## Hiện trạng hệ thống (cập nhật 2026-09-05)
 
-Toàn bộ runtime nằm trong một prefab **`Assets/_ZombieWar/Prefabs/GameplayRoot.prefab`** (Systems/Managers, Pools, Map, Player, CameraRig, UI); scene `Gameplay` chỉ chứa một instance của nó. Luồng chọn level: `MainMenuView` → `LevelLoader.LoadLevel(level)` ghi vào `Data/Levels/LevelSelection.asset` (`LevelSelectionSO`, kênh runtime giữa hai scene) rồi load scene `Gameplay`; ở đó `LevelMapLoader` (`DefaultExecutionOrder(-100)`, trên `Systems/Managers`) đọc selection (fallback Level 1 khi mở scene trực tiếp), instantiate `LevelDefinitionSO.MapPrefab` vào `Map/` và đặt player tại `LevelMap.PlayerSpawn`. `GameFlowController`/`WaveDirector` lấy level từ `LevelMapLoader.Level`, không giữ reference level riêng. Retry/Next = reload scene `Gameplay`.
+Toàn bộ runtime nằm trong một prefab **`Assets/_ZombieWar/Prefabs/GameplayRoot.prefab`** (Systems/Managers, Pools, Map, Player, CameraRig, và một instance `UIRoot.prefab`); scene `Gameplay` chỉ chứa một instance của nó.
 
-Map prefab (`Prefabs/Environment/Map_FlatOutpost.prefab`, `Map_BurningHills.prefab`) có root `LevelMap` chứa: `Environment` (đất, tường biên, vật cản), `Directional Light`, `PlayerSpawn`, và `NavMeshSurface` (collect **Children**, data bake lưu ở `Prefabs/Environment/NavMesh_Map_*.asset`). Sửa map xong phải bake lại: đặt prefab vào scene, `BuildNavMesh()`, `AssetDatabase.CreateAsset` đè lên file data cũ, save prefab. Thêm level mới = thêm map prefab + `LevelDefinitionSO` + entry trong `MainMenuView`, không đụng code.
+**Vòng đời một lượt chơi (một scene duy nhất):**
+
+1. Vào scene → `GameFlowController` ở state **`Menu`**: chưa có map, `Player` **tắt** (`LevelMapLoader.Awake` tắt nó), `MenuUiBinder` hiện menu overlay.
+2. Bấm PLAY một thẻ level → `MenuUiBinder` → `GameFlowController.StartRun(level)`: `LevelMapLoader.Load(level)` instantiate `LevelDefinitionSO.MapPrefab` vào `Map/`, bật `Player` và đặt tại `LevelMap.PlayerSpawn`, cắt blend camera (`PreviousStateIsValid = false`); phát `OnRunStarted` để `WaveDirector` nạp phase và `ZombieManager` prewarm pool; chuyển state `Countdown`.
+3. Retry / Next / Main Menu → `LevelLoader` **reload chính scene đó**. `Data/Levels/LevelSelection.asset` (`LevelSelectionSO`) mang level + cờ `AutoStart` qua lần reload: có cờ thì `GameFlowController.Start()` vào thẳng `StartRun`, không có thì về menu. `ConsumeAutoStart()` xoá cờ ngay khi đọc để lần Play sau trong Editor không tự nhảy vào trận.
+
+Reload scene là cách rẻ nhất để pool, physics và map chắc chắn sạch giữa hai lượt; chỉ "bấm PLAY từ menu" là khởi động tại chỗ vì lúc đó chưa có gì để dọn.
+
+⚠️ **Prewarm pool zombie phải xảy ra sau khi map tồn tại** — `NavMeshAgent` bật lên khi chưa có NavMesh sẽ log "Failed to create agent because there is no valid NavMesh" và không bao giờ bám mesh. Vì vậy `ZombieManager` tạo pool trong `OnRunStarted`, không phải `Awake`.
+
+Map prefab (`Prefabs/Environment/Map_FlatOutpost.prefab`, `Map_BurningHills.prefab`) có root `LevelMap` chứa: `Environment` (đất, tường biên, vật cản), `Directional Light`, `PlayerSpawn`, và `NavMeshSurface` (collect **Children**, data bake lưu ở `Prefabs/Environment/NavMesh_Map_*.asset`). Sửa map xong phải bake lại: đặt prefab vào scene, `BuildNavMesh()`, `AssetDatabase.CreateAsset` đè lên file data cũ, save prefab. Thêm level mới = thêm map prefab + `LevelDefinitionSO` rồi chạy lại Tools ▸ Zombie War ▸ UI menu 2 + 3 (tool tự thêm slot thẻ và nạp mảng `_levels` của `MenuUiBinder`), không đụng code.
 
 Camera portrait: vcam pitch 72°, follow offset (0, 14, −4.5); `CameraAspectAdapter` giữ **FOV ngang** cố định (40°) và suy ra FOV dọc theo aspect (clamp 45–70°), nên 9:16 / 9:19.5 / 3:4 đều thấy cùng bề rộng làn. Spawn ring đã nới lên 14–20 m (min 12) vì màn dọc nhìn xa về phía trước; `_navMeshSampleRadius = 5` ở cả hai level để spawn được khi player đứng trên plateau. UI: Canvas Scaler reference 1080×1920, match 0.5.
+
+Rung camera: Player có **hai** `CinemachineImpulseSource` — súng dùng source shape **Recoil** 0.12 s (`WeaponController._impulseSource`), bom dùng source shape Bump 0.2 s (`BombThrower._impulseSource`); lực lấy từ `_cameraImpulse` trong `GunDefinitionSO` (rifle 0.035, shotgun 0.07) / `BombDefinitionSO` (0.55). Mọi impulse đổ về một `CinemachineImpulseListener` trên `VCam_Follow`; `Core/CameraShakeController` (trên `CameraRig`) là công tắc duy nhất: đọc `SaveService.CameraShakeEnabled` (PlayerPrefs `zw_camera_shake`) và ghi `listener.m_Gain` = `_enabledGain` hoặc 0. Toggle "SCREEN SHAKE" nằm trong popup Pause (`SwitchToggleView`), nối qua `GameplayUiBinder` → `UIManager.ShowPausePopup(..., shakeEnabled, onShakeChanged)`.
 
 | Hệ thống | Script chính | Ghi chú |
 |---|---|---|
@@ -144,8 +170,62 @@ Camera portrait: vcam pitch 72°, follow offset (0, 14, −4.5); `CameraAspectAd
 | Weapons | `Weapons/WeaponController` (FSM Ready/Firing/Cooldown/Reloading/Switching), `Gun`, `ProjectileManager` (SphereCast, pool 180), `BombThrower` + `Bomb` (Rigidbody, fuse, telegraph ring, falloff) | Gun model gắn dưới `hand_r/GunSocket`; hướng nòng = hướng nhân vật |
 | Enemies | `Enemies/ZombieManager` (pool theo `ZombieDefinitionSO`, registry Collider→zombie, tick tập trung), `ZombieController` (FSM Spawning/Chase/Attack/HitStun/Knockback/Dying), `ZombieMaterialFx` (MPB `_HitAmount`/`_DissolveAmount`) | Shader `Art/Shaders/ZombieDissolve.shader` (HLSL URP, có ShadowCaster/DepthOnly) |
 | Level | `Level/LevelMapLoader` + `LevelMap` (map prefab, spawn, NavMesh), `WaveDirector` (phase, cap, weighted pick, scripted Giant @145 s, anti-spike), `SpawnPointResolver`, `FireHazardSpawner` + `FireZone` (P1, Level 2 @75 s/@120 s) | Level 2: plateau 3.5 m + 4 dốc 22° |
-| UI | `UI/*View` (HealthBar, Timer, Score, GunHud, BombButton, Countdown, PauseMenu, ResultPanel, MainMenu), `SafeAreaFitter`, `TimeTextFormatter` (zero-alloc) | 4 Canvas riêng theo tần suất: HUD / Countdown / Pause / Result |
+| UI | `UI/UIManager` (hub), `UI/Hud/*View`, `UI/Popup/{PopupBase,PopupManager,PopupBackdrop,PausePopupUI,ResultPopupUI}`, `UI/MainMenu/{MenuScreenView,LevelCardView}`, `SafeAreaFitter`, `UiButtonFx`, `TimeTextFormatter` (zero-alloc); ref gameplay nằm ở `Core/GameplayUiBinder` + `Core/MenuUiBinder` | Mọi màn hình trong `Prefabs/UI/UIRoot.prefab` — xem "Kiến trúc UI" |
 | Data | `Data/*SO` + instance trong `Assets/_ZombieWar/Data/{Player,Rules,Weapons,Zombies,Waves,Levels}` | Số liệu chép đúng spec §5–§10; chỉnh ở đây, không sửa code |
+
+## Kiến trúc UI
+
+Áp dụng `docs/UI-SYSTEM.md` (doc generic) vào project này.
+
+**Toàn bộ UI nằm trong một prefab: `Assets/_ZombieWar/Prefabs/UI/UIRoot.prefab`.** Nó chứa mọi màn hình (menu, HUD, countdown, popup layer), kèm `EventSystem` và `AudioSource` riêng — nghĩa là **không có reference nào từ trong prefab trỏ ra ngoài**. `GameplayRoot.prefab` đặt một instance tên `UIRoot` bên trong nó; menu và HUD là hai canvas của cùng prefab đó, bật/tắt theo state của `GameFlowController`.
+
+```
+UIRoot.prefab               [UIManager]        ← hub duy nhất, không giữ ref gameplay
+├── EventSystem             [EventSystem, InputSystemUIInputModule]
+├── UiAudio                 [AudioSource]      ← UI tự phát tiếng tap của mình
+├── Canvas_HUD      order 0   → TopBar (timer/kills/score/pause + health bar), Joystick, GunButton, BombButton
+├── Canvas_Menu     order 5  [MenuScreenView]  → title + N slot LevelCardView
+├── Canvas_Countdown order 10 [CountdownView]  ← không GraphicRaycaster, không chặn input
+└── Canvas_Popup    order 20 [PopupManager]    → Backdrop + PausePopup + ResultPopup (prefab, inactive)
+```
+
+### Binder — lớp trung gian giữ ref gameplay
+
+UI **không** được giữ reference tới hệ thống gameplay. Mọi reference bắc cầu nằm trong binder sống ngoài prefab UI, và **chỉ trỏ vào trong** UI (không bao giờ ngược lại):
+
+| Binder | Ở đâu | Giữ ref | Việc |
+|---|---|---|---|
+| `Core/GameplayUiBinder` | `GameplayRoot/Systems/Managers` | `UIManager`, `GameFlowController`, `PlayerHealth`, `WeaponController`, `BombThrower`, `CameraShakeController` | subscribe event gameplay → gọi setter của `UIManager`; đưa `LevelResult` thành `ResultData`; trao lệnh (`Pause`, `RequestSwitch`, `RequestThrow`, `Resume`, `Retry`, `GoToMenu`) cho UI qua `BindGameplayCommands` |
+| `Core/MenuUiBinder` | `GameplayRoot/Systems/Managers` | `UIManager`, `GameFlowController`, `LevelDefinitionSO[]` | khi flow vào state `Menu`: dựng `LevelCardData[]` từ level asset + `SaveService`, gọi `ShowMenuScreen`; thẻ được bấm → `GameFlowController.StartRun(level)` |
+
+- `UIManager` chỉ phơi ra setter (`SetHealth`, `SetScore`, `SetAmmo`…), lệnh mở popup, và `BindGameplayCommands` / `ShowMenuScreen(cards, onSelected)`. Nó không biết `GameState`, không biết `LevelDefinitionSO`, không biết `AudioService`.
+- Dữ liệu vào UI là **struct trình bày**: `UI/ResultData`, `UI/LevelCardData`. Popup và thẻ level không bao giờ nhận object gameplay.
+- View HUD (`HealthBarView`, `TimerView`, `ScoreView`, `GunHudView`, `BombButtonView`, `CountdownView`) là presenter câm; nút nối runtime bằng `Init(callback)` / `Setup(callbacks)`, không có persistent onClick nào trên prefab.
+- Toggle dạng công tắc dùng `UI/SwitchToggleView` bọc `Toggle` uGUI: `Toggle` chỉ fade được một graphic, trong khi switch của Layer Lab là frame + handle mỗi trạng thái, nên view bật/tắt hai nhánh visual `On`/`Off`. Sprite switch lấy từ `Sprite/Demo/Demo_UI/` của pack (nhóm `UiSkin.ToggleSprites`, copy vào `Art/UI/Sprites/Toggles/`).
+- Popup mở/đóng chỉ qua `PopupManager` (stack + draw order + backdrop dùng chung + phím Back qua `Keyboard.escapeKey`). Mọi đường đóng đi qua `PopupBase.OnClosed` nên callback không thể bị bỏ sót. Tween popup dùng `SetUpdate(true)` vì mở khi `timeScale = 0`.
+- **Health bar chạy bằng anchor** (`DOAnchorMax`), không `Image.Type = Filled` — sprite pill 9-slice sẽ bị cắt cụt đầu bo nếu dùng Filled, và anchor đọc đúng ngay frame đầu khi `CanvasScaler` chưa kịp size canvas.
+- **CanvasScaler match theo WIDTH** (`matchWidthOrHeight = 0`, reference 1080×1920) ở mọi canvas. Popup cao gần bằng design height tự co lại bằng `PopupBase._fitPadding`.
+- `AudioService` **không còn** `PlayUi`/`_uiVoice`: tiếng UI thuộc về UI (scene menu không có `AudioService` để mượn).
+
+### Art UI (Layer Lab) và editor tool
+
+Sprite/font UI lấy từ `Assets/ThirdParty/Layer Lab/GUI Pro-CasualGame/` nhưng **chỉ những asset thực dùng mới được copy** sang `Assets/_ZombieWar/Art/UI/` (`Fonts/`, `Sprites/{Buttons,Frames,Popups,Sliders,Labels,Icons}`) — copy bằng `AssetDatabase.CopyAsset` để giữ nguyên import settings, đặc biệt là **spriteBorder 9-slice**. Font UI là **LilitaOne** (TMP SDF, atlas nằm trong chính file `.asset`), thay `LiberationSans SDF`.
+
+⚠️ Nhiều sprite của pack có border phủ **hết** kích thước texture (ví dụ `Popup_Frame01_Navy` 52×64, border 26/39/26/25). Đó là chủ ý: vùng giữa 0 pixel nên khi kéo giãn nó lấy màu ruột ở đường biên. Cứ để `Image.Type = Sliced`, `pixelsPerUnitMultiplier = 1`, kích thước tuỳ ý. Hai ngoại lệ đã trả giá:
+- `Btn_MainButton_*` (55×145) **không** slice theo chiều dọc — giữ chiều cao nút quanh 130–150 để gradient không bị kéo méo.
+- Sprite tên `Circle` của pack (`Frame_BasicFrame_Circle01`) thực ra là **hình vuông bo góc**. Hình tròn thật duy nhất là `Btn_OtherButton_Circle02` — dùng nó cho joystick, badge số bom, badge index level.
+
+Menu **Tools ▸ Zombie War ▸ UI**:
+
+| Menu | Việc |
+|---|---|
+| `1. Import Layer Lab UI Assets` | Copy đúng danh sách asset khai trong `Scripts/Editor/UI/UiSkin.cs` sang `Art/UI/`; bỏ qua file đã có; kiểm tra font TMP có còn atlas sau khi copy |
+| `2. Rebuild UI Root Prefab` | Dựng lại `UIRoot.prefab` + hai prefab popup từ đầu (kể cả joystick `OnScreenStick` và `EventSystem`) |
+| `3. Install UI Into Gameplay Root` | Thay nhánh UI của `GameplayRoot.prefab` bằng instance của `UIRoot.prefab`, wire `GameplayUiBinder` / `MenuUiBinder` / `LevelMapLoader._virtualCamera`, và tắt sẵn object `Player` |
+
+Thêm level mới: thêm `LevelDefinitionSO` vào `Data/Levels/` rồi chạy lại menu 2 + 3 — tool tự thêm slot thẻ và nạp lại mảng `_levels` của binder.
+
+`UiSkin.cs` (assembly Editor) là nơi khai bảng màu + danh sách asset; `UiBuildUtility.Bind` ghi vào `[SerializeField] private` qua `SerializedObject` nên runtime không phải mở public setter. Đây là ngoại lệ #4 của `CODE-RULE.md` §4 (editor tool sinh UI) — **sau khi chạy tool thì prefab là nguồn sự thật**, chạy lại tool sẽ ghi đè mọi chỉnh tay trong prefab UI (menu 2 và 3 đều hỏi xác nhận).
 
 Editor tool: **Tools ▸ Zombie War ▸ Animation ▸ 1. Create Default Animator Recipe / 2. Assign Zombie Animation Pack / 3. Build Animators** đọc `Animation/AnimatorBuildRecipe.asset` (clip theo vai + ngưỡng blend + tốc độ phát) và dựng lại tại chỗ `SoldierAnimator.controller` (4 layer: Base Locomotion blend tree 2D, Upper Combat với `UpperBodyMask`, Hit Reaction, Full Body) và `ZombieAnimator.controller` (Base: blend 1D theo **m/s** Idle/Walk/WalkFast/Run + Attack/Knockback/Death; Hit Reaction thân trên), giữ nguyên GUID. Thiếu clip thì state để trống (log info, không phải lỗi). Layer Hit Reaction dùng Override (không Additive) vì clip flinch của pack là full pose. Soldier chưa có clip reload/hit/death trong pack.
 
@@ -157,7 +237,7 @@ Còn thiếu / biết trước: nhạc nền (project không có track nào), vi
 
 ## Build Android (sản phẩm APK)
 
-Player settings đã có: scripting backend **IL2CPP**, kiến trúc **chỉ ARM64**, min SDK **25**, `productName: Zombie War`, `companyName: DucHien`, application id `com.duchien.zombiewar`, orientation **Portrait** khoá cứng. Build scene list: `MainMenu`, `Gameplay`.
+Player settings đã có: scripting backend **IL2CPP**, kiến trúc **chỉ ARM64**, min SDK **25**, `productName: Zombie War`, `companyName: DucHien`, application id `com.duchien.zombiewar`, orientation **Portrait** khoá cứng. Build scene list: chỉ `Gameplay`.
 
 **Chưa có build script hay CLI**; build trong Editor (File → Build Settings → Android). `*.apk`, `*.aab`, `Builds/` bị gitignore — đưa APK lên **GitHub Release**, đừng cố commit. Nếu thêm method build trong Editor, dạng headless là:
 

@@ -31,4 +31,4 @@ MonoBehaviour:
   _propImpactVfx: {fileID: 4474901532229616265, guid: 8acb8f58135e1c6498568ff561f221b2, type: 3}
   _shotClip: {fileID: 8300000, guid: 8581f806dddef8046b4942de05b897be, type: 3}
   _reloadClip: {fileID: 8300000, guid: 406c929b7299afb469c82778f8d15d5b, type: 3}
-  _cameraImpulse: 0.06
+  _cameraImpulse: 0.035

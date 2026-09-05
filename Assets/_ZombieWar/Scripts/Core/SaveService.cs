@@ -9,12 +9,14 @@ namespace ZombieWar.Core
         private const string MusicVolumeKey = "zw_music_volume";
         private const string SfxVolumeKey = "zw_sfx_volume";
         private const string HapticsKey = "zw_haptics";
+        private const string CameraShakeKey = "zw_camera_shake";
         private const int FirstLevelIndex = 1;
 
         public int UnlockedLevel => PlayerPrefs.GetInt(UnlockedLevelKey, FirstLevelIndex);
         public float MusicVolume => PlayerPrefs.GetFloat(MusicVolumeKey, 1f);
         public float SfxVolume => PlayerPrefs.GetFloat(SfxVolumeKey, 1f);
         public bool HapticsEnabled => PlayerPrefs.GetInt(HapticsKey, 1) == 1;
+        public bool CameraShakeEnabled => PlayerPrefs.GetInt(CameraShakeKey, 1) == 1;
 
         public bool IsLevelUnlocked(int levelIndex) => levelIndex <= UnlockedLevel;
 
@@ -48,6 +50,12 @@ namespace ZombieWar.Core
             PlayerPrefs.SetFloat(MusicVolumeKey, musicVolume);
             PlayerPrefs.SetFloat(SfxVolumeKey, sfxVolume);
             PlayerPrefs.SetInt(HapticsKey, hapticsEnabled ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        public void SetCameraShakeEnabled(bool enabled)
+        {
+            PlayerPrefs.SetInt(CameraShakeKey, enabled ? 1 : 0);
             PlayerPrefs.Save();
         }
     }
