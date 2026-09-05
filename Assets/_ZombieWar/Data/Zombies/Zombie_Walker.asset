@@ -15,10 +15,11 @@ MonoBehaviour:
   _id: walker
   _displayName: Walker
   _prefab: {fileID: 126188387973491263, guid: f8a480dc0f0cb6b4db7186c2cca81e49, type: 3}
-  _poolPrewarm: 40
+  _poolPrewarm: 64
   _maxHp: 48
-  _moveSpeed: 2.3
+  _moveSpeed: 1.7
   _scoreReward: 10
+  _xpReward: 10
   _attackDamage: 10
   _attackCooldown: 1
   _attackRange: 1.4

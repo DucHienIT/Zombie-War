@@ -17,8 +17,9 @@ MonoBehaviour:
   _prefab: {fileID: 610786250769294143, guid: db7860cff9d5e2a4a8ac88dd68b15f7e, type: 3}
   _poolPrewarm: 1
   _maxHp: 1600
-  _moveSpeed: 1.35
+  _moveSpeed: 1.1
   _scoreReward: 300
+  _xpReward: 90
   _attackDamage: 28
   _attackCooldown: 2.6
   _attackRange: 2.2

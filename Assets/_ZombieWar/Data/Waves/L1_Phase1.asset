@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startTime: 0
   _endTime: 25
-  _spawnInterval: 1
-  _aliveCap: 12
+  _spawnInterval: 0.75
+  _aliveCap: 18
   _weights:
   - _definition: {fileID: 11400000, guid: 2b53a1328cda368459640a37e4f755af, type: 2}
     _weight: 100

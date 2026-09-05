@@ -20,7 +20,7 @@ MonoBehaviour:
   _joystickDeadZone: 0.12
   _targetScanInterval: 0.1
   _targetHoldDuration: 0.35
-  _anglePenaltyWeight: 0.35
+  _anglePenaltyWeight: 0.02
   _occlusionGrace: 0.2
   _aimToleranceDegrees: 8
   _switchLockDuration: 0.25
