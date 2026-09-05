@@ -25,3 +25,5 @@ MonoBehaviour:
   _aimToleranceDegrees: 8
   _switchLockDuration: 0.25
   _minCooldownAfterSwitch: 0.15
+  _hitVfx: {fileID: 8900434976353205322, guid: 8135e5954f80c0147a345ce2f7f57e08, type: 3}
+  _hitCameraImpulse: 0.2

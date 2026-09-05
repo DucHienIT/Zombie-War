@@ -17,7 +17,7 @@ MonoBehaviour:
   _description: 'Bullets pierce
 
     1 more zombie'
-  _icon: {fileID: 21300000, guid: eb6b016c6d4af2143aebc16e202ac0b5, type: 3}
+  _icon: {fileID: 21300000, guid: 324af8ccbb3f5184aac9467f829ee965, type: 3}
   _accentColor: {r: 0.30588236, g: 0.8039216, b: 0.8784314, a: 1}
   _maxStacks: 3
   _draftWeight: 1

@@ -42,6 +42,8 @@ namespace ZombieWar.Weapons
 
         public event Action<int> OnChargesChanged;
         public event Action<float> OnCooldownProgress;
+        // Blast centre and how many zombies it reached; feel systems key off the count.
+        public event Action<Vector3, int> OnExploded;
 
         public int Charges { get; private set; }
 
@@ -174,24 +176,30 @@ namespace ZombieWar.Weapons
         {
             float damageMultiplier = _stats.Multiplier(StatId.BombDamage);
             int count = Physics.OverlapSphereNonAlloc(center, radius, _blastBuffer, _blastMask, QueryTriggerInteraction.Ignore);
+            int zombiesHit = 0;
             for (int i = 0; i < count; i++)
             {
-                ApplyBlast(center, radius, damageMultiplier, _blastBuffer[i]);
+                if (ApplyBlast(center, radius, damageMultiplier, _blastBuffer[i]))
+                {
+                    zombiesHit++;
+                }
             }
 
             _vfx.Play(_definition.ExplosionVfx, center, Quaternion.identity);
             _audio.PlayWorld(_definition.ExplosionClip, center);
             _impulseSource.GenerateImpulseWithForce(_definition.CameraImpulse);
+            OnExploded?.Invoke(center, zombiesHit);
         }
 
-        private void ApplyBlast(Vector3 center, float radius, float damageMultiplier, Collider target)
+        // True when the target was a zombie that took the blast.
+        private bool ApplyBlast(Vector3 center, float radius, float damageMultiplier, Collider target)
         {
             Vector3 point = target.bounds.center;
             bool occluded = Physics.Linecast(center, point, out RaycastHit hit, _obstacleMask, QueryTriggerInteraction.Ignore)
                             && hit.collider != target;
             if (occluded)
             {
-                return;
+                return false;
             }
 
             Vector3 toTarget = point - center;
@@ -204,7 +212,7 @@ namespace ZombieWar.Weapons
             {
                 float damage = Mathf.Lerp(_definition.DamageAtCenter, _definition.DamageAtEdge, falloff) * damageMultiplier;
                 zombie.TakeDamage(new DamageInfo(damage, center, direction, force, DamageSource.Bomb));
-                return;
+                return true;
             }
 
             Rigidbody body = target.attachedRigidbody;
@@ -212,6 +220,8 @@ namespace ZombieWar.Weapons
             {
                 body.AddExplosionForce(force * _definition.PropForceMultiplier, center, radius, _definition.ExplosionUpwardsModifier, ForceMode.Impulse);
             }
+
+            return false;
         }
     }
 }

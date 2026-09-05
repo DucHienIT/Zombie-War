@@ -36,6 +36,8 @@ namespace ZombieWar.Player
 
         private void HandleDied()
         {
+            // A hit jolt may still be running on the pivot; the fall takes over completely.
+            _modelPivot.DOKill();
             _modelPivot.DOLocalRotate(_fallEulerAngles, _fallDuration).SetEase(_fallEase).SetLink(gameObject);
         }
     }

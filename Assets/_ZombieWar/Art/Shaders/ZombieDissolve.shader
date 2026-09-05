@@ -137,6 +137,8 @@ Shader "ZombieWar/ZombieDissolve"
             #pragma fragment ShadowFrag
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 
+            // Shadows.hlsl calls LerpWhiteTo, which lives in CommonMaterial.hlsl and is not pulled in by Core.hlsl.
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
             float3 _LightDirection;

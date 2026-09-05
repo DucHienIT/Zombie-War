@@ -48,6 +48,8 @@ namespace ZombieWar.Data
 
         [Header("Feedback")]
         [SerializeField] private PooledVfx _deathVfx;
+        // Frame freeze paid on this archetype's death; zero for fodder so the crowd never stutters.
+        [SerializeField] private float _deathHitStopDuration;
         [SerializeField] private AudioClip[] _attackClips;
         [SerializeField] private AudioClip[] _hitClips;
         [SerializeField] private AudioClip[] _deathClips;
@@ -79,6 +81,7 @@ namespace ZombieWar.Data
         public float KnockbackRestSpeed => _knockbackRestSpeed;
         public float BulletNudgeDistance => _bulletNudgeDistance;
         public PooledVfx DeathVfx => _deathVfx;
+        public float DeathHitStopDuration => _deathHitStopDuration;
         public AudioClip[] AttackClips => _attackClips;
         public AudioClip[] HitClips => _hitClips;
         public AudioClip[] DeathClips => _deathClips;

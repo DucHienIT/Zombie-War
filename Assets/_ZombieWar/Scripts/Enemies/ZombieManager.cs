@@ -28,6 +28,11 @@ namespace ZombieWar.Enemies
         // Minimum spacing between zombie voice clips so a crowd never becomes a noise wall.
         [SerializeField] private float _voiceInterval = 0.12f;
 
+        [Header("Corpse")]
+        // Layer a body launched by a lethal blast moves to while it dissolves. Bullets, aim and
+        // later blasts leave it out of their masks so the flying corpse never soaks a hit.
+        [SerializeField] private string _corpseLayerName = "Corpse";
+
         private readonly Dictionary<ZombieDefinitionSO, ComponentPool<ZombieController>> _pools = new Dictionary<ZombieDefinitionSO, ComponentPool<ZombieController>>(4);
         private readonly Dictionary<Collider, ZombieController> _byCollider = new Dictionary<Collider, ZombieController>(ActiveCapacity * 2);
         private readonly List<ZombieController> _active = new List<ZombieController>(ActiveCapacity);
@@ -37,6 +42,7 @@ namespace ZombieWar.Enemies
         private Action<ZombieController> _onDied;
         private Action<ZombieController> _onDespawnReady;
         private int _createdCount;
+        private int _corpseLayer;
         private float _lastVoiceTime;
 
         public event Action<ZombieController> OnZombieKilled;
@@ -51,6 +57,12 @@ namespace ZombieWar.Enemies
             {
                 Debug.LogError($"{LogPrefix} ZombieManager has an unassigned reference.", this);
                 return;
+            }
+
+            _corpseLayer = LayerMask.NameToLayer(_corpseLayerName);
+            if (_corpseLayer < 0)
+            {
+                Debug.LogError($"{LogPrefix} Layer {_corpseLayerName} does not exist; run Tools > Zombie War > Feel > 2. Install.", this);
             }
 
             _onCreated = HandleCreated;
@@ -172,7 +184,7 @@ namespace ZombieWar.Enemies
 
         private void HandleCreated(ZombieController zombie)
         {
-            zombie.Initialize(this, _player, _feedback, _createdCount++);
+            zombie.Initialize(this, _player, _feedback, _createdCount++, _corpseLayer);
             zombie.OnDied += _onDied;
             zombie.OnDespawnReady += _onDespawnReady;
             _byCollider[zombie.Collider] = zombie;

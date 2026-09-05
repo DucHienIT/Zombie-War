@@ -25,6 +25,7 @@ namespace ZombieWar.Weapons
         [SerializeField] private ProfileService _profile;
         [SerializeField] private PlayerStatSheet _stats;
 
+        private Transform _transform;
         private int _currentIndex;
         private float _stateTimer;
         private float _reloadDuration;
@@ -42,6 +43,7 @@ namespace ZombieWar.Weapons
 
         private void Awake()
         {
+            _transform = transform;
             bool missing = _guns == null || _guns.Length == 0 || _playerDefinition == null || _aim == null || _health == null
                            || _flow == null || _projectiles == null || _vfx == null || _audio == null || _impulseSource == null
                            || _profile == null || _stats == null;
@@ -95,7 +97,7 @@ namespace ZombieWar.Weapons
         {
             float deltaTime = Time.deltaTime;
             Gun gun = CurrentGun;
-            gun.TickRecoil(deltaTime);
+            gun.TickMotion(deltaTime);
 
             if (_flow.State != GameState.Playing || !_health.IsAlive)
             {
@@ -116,6 +118,26 @@ namespace ZombieWar.Weapons
                 case WeaponState.Switching:
                     TickSwitch(gun, deltaTime);
                     break;
+            }
+        }
+
+        // After the animator: the run cycle swings the hand up to 13 degrees off the body facing,
+        // so the barrel is re-aimed every frame and bullets leave where the gun visibly points.
+        private void LateUpdate()
+        {
+            if (!_health.IsAlive)
+            {
+                return;
+            }
+
+            Gun gun = CurrentGun;
+            if (_aim.HasTarget)
+            {
+                gun.AlignBarrelAt(_transform.forward, _aim.TargetPosition);
+            }
+            else
+            {
+                gun.AlignBarrel(_transform.forward);
             }
         }
 
@@ -225,6 +247,7 @@ namespace ZombieWar.Weapons
             State = WeaponState.Reloading;
             _reloadDuration = gun.Stats.ReloadDuration / _stats.Multiplier(StatId.ReloadSpeed);
             _stateTimer = _reloadDuration;
+            gun.BeginReloadMotion(_reloadDuration);
             _audio.PlayWorld(gun.Definition.ReloadClip, gun.Muzzle.position);
             OnReloadStarted?.Invoke();
             OnReloadProgress?.Invoke(0f);

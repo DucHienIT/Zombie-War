@@ -13,6 +13,8 @@ namespace ZombieWar.Enemies
         private const int StaggerSlots = 8;
         private const float FacingThresholdSqr = 0.0001f;
         private const float NavMeshRecoverRadius = 2f;
+        // Lateral component of the hit direction beyond which the flinch favours a flank over the head.
+        private const float SideHitThreshold = 0.5f;
 
         [SerializeField] private ZombieDefinitionSO _definition;
         [SerializeField] private NavMeshAgent _agent;
@@ -27,6 +29,8 @@ namespace ZombieWar.Enemies
         private ZombieManager _owner;
         private IDamageable _player;
         private FeedbackProfileSO _feedback;
+        private int _aliveLayer;
+        private int _corpseLayer;
         private float _hp;
         private ZombieState _state;
         private float _stateTimer;
@@ -52,6 +56,7 @@ namespace ZombieWar.Enemies
         private void Awake()
         {
             _transform = transform;
+            _aliveLayer = gameObject.layer;
             bool missing = _definition == null || _agent == null || _rigidbody == null || _collider == null
                            || _animation == null || _materialFx == null || _aimPoint == null;
             if (missing)
@@ -60,11 +65,12 @@ namespace ZombieWar.Enemies
             }
         }
 
-        public void Initialize(ZombieManager owner, IDamageable player, FeedbackProfileSO feedback, int instanceIndex)
+        public void Initialize(ZombieManager owner, IDamageable player, FeedbackProfileSO feedback, int instanceIndex, int corpseLayer)
         {
             _owner = owner;
             _player = player;
             _feedback = feedback;
+            _corpseLayer = corpseLayer;
             _destinationInterval = 1f / _definition.DestinationUpdateHz;
             _staggerOffset = (instanceIndex % StaggerSlots) / (float)StaggerSlots * _destinationInterval;
         }
@@ -80,8 +86,8 @@ namespace ZombieWar.Enemies
             _dissolveTimer = 0f;
             _destinationTimer = _staggerOffset;
 
+            RestoreBody();
             _collider.enabled = false;
-            _rigidbody.isKinematic = true;
             _agent.enabled = true;
             _agent.Warp(_transform.position);
             _agent.speed = _definition.MoveSpeed;
@@ -96,6 +102,7 @@ namespace ZombieWar.Enemies
         {
             _agent.enabled = false;
             _collider.enabled = false;
+            RestoreBody();
         }
 
         public void Tick(float deltaTime, Vector3 playerPosition)
@@ -135,21 +142,35 @@ namespace ZombieWar.Enemies
             _materialFx.FlashHit(_feedback.ZombieHitFlashDuration);
             _owner.PlayVoice(_definition.HitClips, _transform.position);
 
+            float force = info.Force * _definition.KnockbackForceMultiplier;
+            bool physical = force >= _definition.PhysicsKnockbackThreshold;
             if (_hp <= 0f)
             {
-                Die();
+                Die(info.Direction, physical ? force : 0f);
                 return;
             }
 
-            float force = info.Force * _definition.KnockbackForceMultiplier;
-            if (force >= _definition.PhysicsKnockbackThreshold)
+            HitSide side = HitSideOf(info.Direction);
+            if (physical)
             {
-                EnterKnockback(info.Direction, force);
+                EnterKnockback(info.Direction, force, side);
             }
             else if (_state != ZombieState.Knockback)
             {
-                EnterHitStun(info.Direction, info.Force);
+                EnterHitStun(info.Direction, info.Force, side);
             }
+        }
+
+        // A bullet travelling towards the zombie's right enters through its left flank.
+        private HitSide HitSideOf(Vector3 direction)
+        {
+            float lateral = Vector3.Dot(_transform.right, direction);
+            if (lateral > SideHitThreshold)
+            {
+                return HitSide.Left;
+            }
+
+            return lateral < -SideHitThreshold ? HitSide.Right : HitSide.Front;
         }
 
         private void TickSpawning(float deltaTime)
@@ -271,12 +292,12 @@ namespace ZombieWar.Enemies
             _player.TakeDamage(info);
         }
 
-        private void EnterHitStun(Vector3 direction, float force)
+        private void EnterHitStun(Vector3 direction, float force, HitSide side)
         {
             _state = ZombieState.HitStun;
             _stateTimer = _definition.HitStunDuration;
             _agent.isStopped = true;
-            _animation.TriggerHit();
+            _animation.TriggerHit(side);
 
             Vector3 nudge = direction;
             nudge.y = 0f;
@@ -292,7 +313,7 @@ namespace ZombieWar.Enemies
             }
         }
 
-        private void EnterKnockback(Vector3 direction, float force)
+        private void EnterKnockback(Vector3 direction, float force, HitSide side)
         {
             if (_state != ZombieState.Knockback)
             {
@@ -303,12 +324,8 @@ namespace ZombieWar.Enemies
 
             _state = ZombieState.Knockback;
             _stateTimer = _definition.KnockbackMaxDuration;
-
-            Vector3 impulse = direction;
-            impulse.y = 0f;
-            impulse = impulse.normalized + Vector3.up * _definition.KnockbackUpwardsFactor;
-            _rigidbody.AddForce(impulse.normalized * force, ForceMode.Impulse);
-            _animation.TriggerHit();
+            _rigidbody.AddForce(KnockbackImpulse(direction) * force, ForceMode.Impulse);
+            _animation.TriggerHit(side);
         }
 
         private void TickKnockback(float deltaTime)
@@ -343,19 +360,47 @@ namespace ZombieWar.Enemies
             EnterChase();
         }
 
-        private void Die()
+        private void Die(Vector3 direction, float launchForce)
         {
             _hp = 0f;
             _state = ZombieState.Dying;
             _stateTimer = _feedback.DeathPoseDuration;
             _dissolveTimer = 0f;
-            _collider.enabled = false;
             if (_agent.enabled)
             {
                 _agent.isStopped = true;
                 _agent.enabled = false;
             }
 
+            _animation.SetKnockback(false);
+            _animation.TriggerDeath();
+            _owner.PlayVoice(_definition.DeathClips, _transform.position);
+
+            if (launchForce > 0f)
+            {
+                LaunchCorpse(direction, launchForce);
+            }
+            else
+            {
+                SettleBody();
+            }
+
+            OnDied?.Invoke(this);
+        }
+
+        // A lethal blast keeps the body dynamic so it flies with the shockwave. The collider stays
+        // on so the corpse lands instead of sinking, but on the corpse layer so nothing targets it.
+        private void LaunchCorpse(Vector3 direction, float force)
+        {
+            gameObject.layer = _corpseLayer;
+            _collider.enabled = true;
+            _rigidbody.isKinematic = false;
+            _rigidbody.AddForce(KnockbackImpulse(direction) * force, ForceMode.Impulse);
+        }
+
+        private void SettleBody()
+        {
+            _collider.enabled = false;
             // Velocity can only be cleared while the body is still dynamic (mid-knockback deaths).
             if (!_rigidbody.isKinematic)
             {
@@ -363,11 +408,26 @@ namespace ZombieWar.Enemies
                 _rigidbody.angularVelocity = Vector3.zero;
                 _rigidbody.isKinematic = true;
             }
+        }
 
-            _animation.SetKnockback(false);
-            _animation.TriggerDeath();
-            _owner.PlayVoice(_definition.DeathClips, _transform.position);
-            OnDied?.Invoke(this);
+        private void RestoreBody()
+        {
+            if (!_rigidbody.isKinematic)
+            {
+                _rigidbody.velocity = Vector3.zero;
+                _rigidbody.angularVelocity = Vector3.zero;
+                _rigidbody.isKinematic = true;
+            }
+
+            gameObject.layer = _aliveLayer;
+        }
+
+        private Vector3 KnockbackImpulse(Vector3 direction)
+        {
+            Vector3 impulse = direction;
+            impulse.y = 0f;
+            impulse = impulse.normalized + Vector3.up * _definition.KnockbackUpwardsFactor;
+            return impulse.normalized;
         }
 
         private void TickDying(float deltaTime)

@@ -37,6 +37,7 @@ MonoBehaviour:
   _knockbackMaxDuration: 0.55
   _knockbackRestSpeed: 0.4
   _bulletNudgeDistance: 0.12
+  _deathHitStopDuration: 0.1
   _deathVfx: {fileID: 1803616269720018331, guid: a0ff922c8add8a34e90c60965aa80abc, type: 3}
   _attackClips:
   - {fileID: 8300000, guid: bc2baab908f1b004691a6ecf7044f61c, type: 3}

@@ -19,7 +19,7 @@ MonoBehaviour:
     Blast damage +20%
 
     Blast radius +12%'
-  _icon: {fileID: 21300000, guid: c83b29d7a203d3e4b9efdcd722a3fcc5, type: 3}
+  _icon: {fileID: 21300000, guid: 55c09588b3f5b71488269de611ea4644, type: 3}
   _accentColor: {r: 0.7058824, g: 0.4862745, b: 1, a: 1}
   _maxStacks: 3
   _draftWeight: 1

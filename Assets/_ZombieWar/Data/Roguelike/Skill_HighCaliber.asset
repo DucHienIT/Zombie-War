@@ -17,7 +17,7 @@ MonoBehaviour:
   _description: 'Damage +20%
 
     Knockback +15%'
-  _icon: {fileID: 21300000, guid: 61f9d1258140a264d959077bad8a59c6, type: 3}
+  _icon: {fileID: 21300000, guid: 558b500e21b55284fad5501f879b536d, type: 3}
   _accentColor: {r: 1, g: 0.60784316, b: 0.23921569, a: 1}
   _maxStacks: 5
   _draftWeight: 1

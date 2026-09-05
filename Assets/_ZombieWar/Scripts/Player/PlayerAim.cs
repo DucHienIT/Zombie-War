@@ -70,6 +70,7 @@ namespace ZombieWar.Player
 
             ZombieController best = null;
             float bestScore = NoTargetScore;
+            float currentScore = NoTargetScore;
             for (int i = 0; i < count; i++)
             {
                 if (!_zombies.TryGetZombie(_scanBuffer[i], out ZombieController candidate) || !candidate.IsTargetable)
@@ -83,6 +84,11 @@ namespace ZombieWar.Player
                 }
 
                 float score = ScoreCandidate(candidate, origin);
+                if (candidate == CurrentTarget)
+                {
+                    currentScore = score;
+                }
+
                 if (score < bestScore)
                 {
                     bestScore = score;
@@ -100,6 +106,14 @@ namespace ZombieWar.Player
             }
 
             if (best == null && currentIsValid)
+            {
+                return;
+            }
+
+            // In a crowd the nearest body changes every scan; a challenger only takes the aim
+            // when it is clearly better, so the soldier stops whipping between neighbours.
+            bool challengerTooClose = currentIsValid && bestScore > currentScore * (1f - _definition.TargetSwitchMargin);
+            if (challengerTooClose)
             {
                 return;
             }

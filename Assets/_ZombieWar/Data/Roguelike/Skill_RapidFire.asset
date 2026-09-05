@@ -17,7 +17,7 @@ MonoBehaviour:
   _description: 'Fire rate +15%
 
     Reload 12% faster'
-  _icon: {fileID: 21300000, guid: d14ff3e2b25b6c84d8d02d9ed8993022, type: 3}
+  _icon: {fileID: 21300000, guid: ccf73dc4210d6c14caeed3633463475c, type: 3}
   _accentColor: {r: 1, g: 0.8352941, b: 0.2901961, a: 1}
   _maxStacks: 5
   _draftWeight: 1

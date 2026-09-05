@@ -55,7 +55,7 @@ NavMeshAgent:
   m_AngularSpeed: 360
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 1.805
   m_BaseOffset: 0
@@ -124,6 +124,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 9029007566332087604}
+  _hitReactionLayerIndex: 1
   _speedDampTime: 0.1
 --- !u!114 &6903377377512566932
 MonoBehaviour:

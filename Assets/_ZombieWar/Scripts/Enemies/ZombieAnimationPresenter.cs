@@ -9,9 +9,10 @@ namespace ZombieWar.Enemies
         private static readonly int HitHash = Animator.StringToHash("Hit");
         private static readonly int DeathHash = Animator.StringToHash("Death");
         private static readonly int KnockbackHash = Animator.StringToHash("Knockback");
+        private static readonly int HitSideHash = Animator.StringToHash("HitSide");
 
         [SerializeField] private Animator _animator;
-        // Upper-body flinch layer built by AnimatorBuilder; muted while the death clip plays.
+        // Upper-body flinch layer of ZombieAnimator.controller; muted while the death clip plays.
         [SerializeField] private int _hitReactionLayerIndex = 1;
 
         [Header("Blend")]
@@ -23,7 +24,12 @@ namespace ZombieWar.Enemies
         }
 
         public void TriggerAttack() => _animator.SetTrigger(AttackHash);
-        public void TriggerHit() => _animator.SetTrigger(HitHash);
+        public void TriggerHit(HitSide side)
+        {
+            _animator.SetInteger(HitSideHash, (int)side);
+            _animator.SetTrigger(HitHash);
+        }
+
         public void SetKnockback(bool active) => _animator.SetBool(KnockbackHash, active);
 
         public void TriggerDeath()
