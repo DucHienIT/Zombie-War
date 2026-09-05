@@ -8,8 +8,10 @@ namespace ZombieWar.Core
         public readonly int HealthBonus;
         public readonly float DamageTaken;
         public readonly bool IsNewBest;
+        public readonly int CoinsEarned;
+        public readonly int XpEarned;
 
-        public LevelResult(bool won, int kills, int score, int healthBonus, float damageTaken, bool isNewBest)
+        public LevelResult(bool won, int kills, int score, int healthBonus, float damageTaken, bool isNewBest, int coinsEarned, int xpEarned)
         {
             Won = won;
             Kills = kills;
@@ -17,6 +19,8 @@ namespace ZombieWar.Core
             HealthBonus = healthBonus;
             DamageTaken = damageTaken;
             IsNewBest = isNewBest;
+            CoinsEarned = coinsEarned;
+            XpEarned = xpEarned;
         }
 
         public int TotalScore => Score + HealthBonus;

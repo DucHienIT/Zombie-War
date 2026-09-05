@@ -24,6 +24,8 @@ namespace ZombieWar.UI
         [SerializeField] private TMP_Text _healthBonusText;
         [SerializeField] private TMP_Text _damageTakenText;
         [SerializeField] private TMP_Text _totalText;
+        [SerializeField] private TMP_Text _coinsText;
+        [SerializeField] private TMP_Text _xpText;
         [SerializeField] private GameObject _newBestBadge;
 
         [Header("Buttons")]
@@ -46,7 +48,7 @@ namespace ZombieWar.UI
             base.Awake();
             bool missing = _titleBanner == null || _titleText == null || _killsText == null || _scoreText == null
                            || _healthBonusText == null || _damageTakenText == null || _totalText == null
-                           || _newBestBadge == null || _retryButton == null || _nextButton == null || _menuButton == null;
+                           || _coinsText == null || _xpText == null || _newBestBadge == null || _retryButton == null || _nextButton == null || _menuButton == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} ResultPopupUI has an unassigned reference.", this);
@@ -75,6 +77,8 @@ namespace ZombieWar.UI
             _scoreText.SetText("{0}", _result.Score);
             _healthBonusText.SetText("{0}", _result.HealthBonus);
             _damageTakenText.SetText("{0}", _result.DamageTaken);
+            _coinsText.SetText("+{0}", _result.CoinsEarned);
+            _xpText.SetText("+{0}", _result.XpEarned);
             _newBestBadge.SetActive(_result.IsNewBest);
             _nextButton.gameObject.SetActive(_result.Won && _result.HasNextLevel);
             PlayTotalCountUp(_result.TotalScore);

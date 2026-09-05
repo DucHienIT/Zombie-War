@@ -12,8 +12,11 @@ namespace ZombieWar.UI
         public readonly int TotalScore;
         public readonly bool IsNewBest;
         public readonly bool HasNextLevel;
+        public readonly int CoinsEarned;
+        public readonly int XpEarned;
 
-        public ResultData(bool won, int kills, int score, int healthBonus, int damageTaken, int totalScore, bool isNewBest, bool hasNextLevel)
+        public ResultData(bool won, int kills, int score, int healthBonus, int damageTaken, int totalScore, bool isNewBest, bool hasNextLevel,
+            int coinsEarned, int xpEarned)
         {
             Won = won;
             Kills = kills;
@@ -23,6 +26,8 @@ namespace ZombieWar.UI
             TotalScore = totalScore;
             IsNewBest = isNewBest;
             HasNextLevel = hasNextLevel;
+            CoinsEarned = coinsEarned;
+            XpEarned = xpEarned;
         }
     }
 }

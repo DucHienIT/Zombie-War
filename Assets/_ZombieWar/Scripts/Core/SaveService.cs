@@ -10,7 +10,19 @@ namespace ZombieWar.Core
         private const string SfxVolumeKey = "zw_sfx_volume";
         private const string HapticsKey = "zw_haptics";
         private const string CameraShakeKey = "zw_camera_shake";
+        private const string PlayerLevelKey = "zw_player_level";
+        private const string PlayerXpKey = "zw_player_xp";
+        private const string CoinsKey = "zw_coins";
+        private const string GunLevelKeyPrefix = "zw_gun_level_";
+        private const string GunUnlockedKeyPrefix = "zw_gun_unlocked_";
         private const int FirstLevelIndex = 1;
+        private const int FirstPlayerLevel = 1;
+
+        public int PlayerLevel => PlayerPrefs.GetInt(PlayerLevelKey, FirstPlayerLevel);
+        public int PlayerXp => PlayerPrefs.GetInt(PlayerXpKey, 0);
+        public int GetCoins(int startingCoins) => PlayerPrefs.GetInt(CoinsKey, startingCoins);
+        public int GetGunLevel(string gunId) => PlayerPrefs.GetInt(GunLevelKeyPrefix + gunId, 0);
+        public bool IsGunUnlocked(string gunId, bool unlockedByDefault) => PlayerPrefs.GetInt(GunUnlockedKeyPrefix + gunId, unlockedByDefault ? 1 : 0) == 1;
 
         public int UnlockedLevel => PlayerPrefs.GetInt(UnlockedLevelKey, FirstLevelIndex);
         public float MusicVolume => PlayerPrefs.GetFloat(MusicVolumeKey, 1f);
@@ -56,6 +68,26 @@ namespace ZombieWar.Core
         public void SetCameraShakeEnabled(bool enabled)
         {
             PlayerPrefs.SetInt(CameraShakeKey, enabled ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        public void SetProgress(int playerLevel, int playerXp, int coins)
+        {
+            PlayerPrefs.SetInt(PlayerLevelKey, playerLevel);
+            PlayerPrefs.SetInt(PlayerXpKey, playerXp);
+            PlayerPrefs.SetInt(CoinsKey, coins);
+            PlayerPrefs.Save();
+        }
+
+        public void SetGunLevel(string gunId, int level)
+        {
+            PlayerPrefs.SetInt(GunLevelKeyPrefix + gunId, level);
+            PlayerPrefs.Save();
+        }
+
+        public void SetGunUnlocked(string gunId, bool unlocked)
+        {
+            PlayerPrefs.SetInt(GunUnlockedKeyPrefix + gunId, unlocked ? 1 : 0);
             PlayerPrefs.Save();
         }
     }
