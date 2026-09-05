@@ -165,13 +165,56 @@ Rung camera: Player có **hai** `CinemachineImpulseSource` — súng dùng sourc
 
 | Hệ thống | Script chính | Ghi chú |
 |---|---|---|
-| Flow | `Core/GameFlowController` (Countdown→Playing→Paused/Won/Lost), `LevelTimer`, `ScoreTracker`, `SaveService` (PlayerPrefs) | Entry point duy nhất mỗi scene; UI chỉ subscribe event |
+| Flow | `Core/GameFlowController` (Countdown→Playing→Paused/LevelUp/Won/Lost), `LevelTimer`, `ScoreTracker`, `SaveService` (PlayerPrefs) | Entry point duy nhất mỗi scene; UI chỉ subscribe event |
 | Player | `Player/PlayerMotor` (Rigidbody), `PlayerAim` (OverlapSphereNonAlloc + Linecast LOS, hold 0.35 s), `PlayerHealth`, `PlayerAnimationPresenter`, `PlayerHitFlash` (MPB, property `_Color` vì material Autodesk Interactive), `PlayerDeathPresenter` (tween ngã, vì không có clip death) | Input: `PlayerInputReader` đọc action `Player/Move`; joystick là On-Screen Stick `<Gamepad>/leftStick` |
 | Weapons | `Weapons/WeaponController` (FSM Ready/Firing/Cooldown/Reloading/Switching), `Gun`, `ProjectileManager` (SphereCast, pool 180), `BombThrower` + `Bomb` (Rigidbody, fuse, telegraph ring, falloff) | Gun model gắn dưới `hand_r/GunSocket`; hướng nòng = hướng nhân vật |
 | Enemies | `Enemies/ZombieManager` (pool theo `ZombieDefinitionSO`, registry Collider→zombie, tick tập trung), `ZombieController` (FSM Spawning/Chase/Attack/HitStun/Knockback/Dying), `ZombieMaterialFx` (MPB `_HitAmount`/`_DissolveAmount`) | Shader `Art/Shaders/ZombieDissolve.shader` (HLSL URP, có ShadowCaster/DepthOnly) |
 | Level | `Level/LevelMapLoader` + `LevelMap` (map prefab, spawn, NavMesh), `WaveDirector` (phase, cap, weighted pick, scripted Giant @145 s, anti-spike), `SpawnPointResolver`, `FireHazardSpawner` + `FireZone` (P1, Level 2 @75 s/@120 s) | Level 2: plateau 3.5 m + 4 dốc 22° |
-| UI | `UI/UIManager` (hub), `UI/Hud/*View`, `UI/Popup/{PopupBase,PopupManager,PopupBackdrop,PausePopupUI,ResultPopupUI}`, `UI/MainMenu/{MenuScreenView,LevelCardView}`, `SafeAreaFitter`, `UiButtonFx`, `TimeTextFormatter` (zero-alloc); ref gameplay nằm ở `Core/GameplayUiBinder` + `Core/MenuUiBinder` | Mọi màn hình trong `Prefabs/UI/UIRoot.prefab` — xem "Kiến trúc UI" |
-| Data | `Data/*SO` + instance trong `Assets/_ZombieWar/Data/{Player,Rules,Weapons,Zombies,Waves,Levels}` | Số liệu chép đúng spec §5–§10; chỉnh ở đây, không sửa code |
+| UI | `UI/UIManager` (hub), `UI/Hud/*View`, `UI/Popup/{PopupBase,PopupManager,PopupBackdrop,PausePopupUI,ResultPopupUI,SkillChoicePopupUI,SkillCardView}`, `UI/MainMenu/{MenuScreenView,MenuHeaderView,MenuTabBarView,MenuTabButtonView,BattlePageView,LevelCardView,WeaponPageView,WeaponListItemView,WeaponDetailView,WeaponStatRowView}`, `SwitchToggleView`, `SafeAreaFitter`, `UiButtonFx`, `TimeTextFormatter` (zero-alloc); ref gameplay nằm ở `Core/GameplayUiBinder` + `Core/MenuUiBinder` | Mọi màn hình trong `Prefabs/UI/UIRoot.prefab` — xem "Kiến trúc UI" |
+| Roguelike | `Roguelike/RoguelikeDirector` (XP → battle level → draft), `BattleXpTracker`, `SkillDraft`, `Player/PlayerStatSheet`, `Data/{PassiveSkillSO,RoguelikeSettingsSO,StatId,StatModifier}` | Xem "Roguelike trong trận" bên dưới |
+| Meta | `Core/ProfileService` (level/XP/coin + cấp nâng cấp từng súng, lưu qua `SaveService`), `Data/ProgressionRulesSO`, phần `Upgrade` của `GunDefinitionSO` (`GetStats(level)` → struct `GunStats`, `GetUpgradeCost`) | Xem "Meta progression" bên dưới |
+| Data | `Data/*SO` + instance trong `Assets/_ZombieWar/Data/{Player,Rules,Weapons,Zombies,Waves,Levels,Roguelike}` | Số liệu gốc chép từ spec §5–§10; chỉnh ở đây, không sửa code. **Đã lệch spec theo yêu cầu user 2026-09-05:** cap zombie mỗi phase +50% và spawn interval −25% (L1 18/33/48/66/80, L2 24/39/57/75/90), `_moveSpeed` giảm 25% (Walker 1.7, Runner 2.7, Brute 1.25, Giant 1.1; ngưỡng blend animator 1.4/2.3/3.6 m/s giữ nguyên nên Walker chạy clip Walk, Runner blend WalkFast→Run), pool prewarm Walker/Runner/Brute 64/48/22, và `PlayerDefinition._anglePenaltyWeight` 0.35 → 0.02 để auto-aim ưu tiên zombie gần nhất (góc chỉ phá hoà) |
+
+### Roguelike trong trận (ngoài spec P0, thêm 2026-09-05 theo yêu cầu user)
+
+Giết quái nhận XP → đầy thanh thì lên **battle level** (chỉ sống trong một lượt chơi, khác hẳn level tài khoản của Meta progression) → hiện popup chọn 1 trong 3 passive skill. Data ở `Data/Roguelike/` (`RoguelikeSettings.asset` + 6 `Skill_*.asset`), XP mỗi loại quái ở `ZombieDefinitionSO._xpReward` (Walker 10 / Runner 14 / Brute 30 / Giant 90).
+
+**Passive = thuần stat modifier.** `PassiveSkillSO` chỉ chứa danh sách `StatModifier { StatId, Additive|Multiplicative, giá trị mỗi cấp }`. `PlayerStatSheet` (trên `Player`) gộp mọi stack đang sở hữu thành 12 stat sống: multiplicative nghỉ ở 1, additive nghỉ ở 0. Vì vậy **thêm skill thứ 7 = thêm một `.asset`, không sửa dòng code nào** (`CODE-RULE.md` §7 Open/Closed). Hệ quả: nếu cần một hiệu ứng không biểu diễn được bằng stat (ví dụ nổ dây chuyền khi kill) thì phải thêm `StatId` mới + đúng một chỗ đọc nó.
+
+Nơi tiêu thụ từng stat — đây là danh sách đầy đủ, thêm `StatId` mới thì bổ sung vào đây:
+
+| StatId | Đọc ở đâu |
+|---|---|
+| `WeaponDamage`, `FireRate`, `ReloadSpeed`, `Knockback`, `ProjectilePierce` | `WeaponController.Fire`/`BeginReload` → gói vào struct `ShotStats` cho `ProjectileManager`/`Projectile` |
+| `MoveSpeed` | `PlayerMotor.FixedUpdate` |
+| `MaxHealth`, `HealPerKill` | `PlayerHealth` (`HandleStatsChanged` cộng luôn máu vào, `Heal`) — heal/kill do `RoguelikeDirector` gọi |
+| `BombCharges`, `BombRadius`, `BombDamage` | `BombThrower` (`HandleStatsChanged`, `RequestThrow`, `Explode`) |
+| `XpGain` | `RoguelikeDirector.HandleZombieKilled` |
+
+⚠️ **Thứ tự nhân với Meta progression**: hệ số roguelike nhân **lên trên `gun.Stats`** (đã bao gồm cấp nâng cấp mua bằng coin), không nhân lên `definition`. Nhân nhầm chỗ là vô hiệu hoá toàn bộ shop.
+
+**Vòng đời một lần level-up**: `RoguelikeDirector.Update` thấy có nợ level-up (và flow đang `Playing`) → `SkillDraft.Roll` bốc N thẻ **khác nhau**, bỏ skill đã max → `OnChoiceOffered` → `GameplayUiBinder` dựng `SkillCardData` rồi gọi `GameFlowController.PauseForLevelUp()` (state **`LevelUp`**, `timeScale = 0`) và `UIManager.ShowSkillChoicePopup`. Người chơi chạm thẻ → popup `Close()` → `OnClosed` → `RoguelikeDirector.ChooseOffer(index)` cộng stack, rebuild stat sheet. Còn nợ thì mở luôn bộ thẻ kế tiếp; hết nợ mới `OnChoiceClosed` → `ResumeFromLevelUp()`.
+
+- Director **không tự dừng game**: nó chỉ phát event, flow mới đổi state. Nhờ vậy `PlayerMotor`/`WeaponController`/`WaveDirector`/`ZombieManager` tự đứng im vì đều gate sẵn trên `State == Playing`, không phải sửa gì.
+- `LevelUp` là state riêng chứ không mượn `Paused`, nếu không `GameplayUiBinder` sẽ mở popup Pause đè lên.
+- Popup chọn skill tắt cả `_closeOnBackKey` lẫn `_closeOnBackdropClick` — bắt buộc phải chọn.
+- **Layout thẻ**: 3 cột dọc xếp ngang (tên → badge NEW → icon → mô tả → hàng sao), theo mẫu UX user đưa. Hàng sao thay cho chữ "LV 3/5": số sao vàng = cấp **sau khi chọn**, tổng số sao = `MaxStacks`, nên nhìn là biết skill còn sâu bao nhiêu. Prefab author sẵn **5 slot sao** (trần sâu nhất trong pool); skill nông hơn ẩn bớt và `SkillCardView.DrawStars` dịch cả hàng lại cho vẫn cân giữa — thêm skill có `MaxStacks > 5` thì phải nâng `SkillStarSlots` trong `PopupPrefabBuilder`, view sẽ log error nếu quên. Badge NEW hiện khi `SkillCardData.IsNew` (tức chưa sở hữu stack nào).
+- Mô tả skill phải **ngắn, mỗi dòng một hiệu ứng** ("Damage +20%
+Knockback +15%") vì cột chỉ rộng 300 px — văn xuôi dài sẽ tràn.
+- Mọi skill đã max thì `SkillDraft.Roll` trả 0, director xoá nợ và không hỏi nữa.
+
+Đường cong XP: `base 80 × 1.35^(level-1)`, trần battle level 12. Đo bằng nhịp kill thật của L1 (~280 kill/lượt ≈ 4090 XP) thì một lượt đi hết được **battle level 10, tức 9 lần chọn skill** — khoảng 20 giây một lần. Tổng max stack của 6 skill là 24 > 12 nên không bao giờ full được, lựa chọn luôn có sức nặng.
+
+Editor tool **Tools ▸ Zombie War ▸ Roguelike**: `1. Create Skill Data` copy 6 icon từ Layer Lab rồi sinh 6 `Skill_*.asset` + `RoguelikeSettings.asset` (bỏ qua asset đã có để không đè số designer đã chỉnh, nhưng luôn nạp lại mảng `_skillPool`); `2. Install Into Gameplay Root` gắn `PlayerStatSheet` lên `Player`, `RoguelikeDirector` lên `Systems/Managers` rồi nối `_stats` cho `PlayerHealth`/`PlayerMotor`/`WeaponController`/`BombThrower` và `_rogue` cho `GameplayUiBinder`. Chạy sau UI menu 2 + 3 (menu 3 cũng nối `_rogue` nếu director đã tồn tại, nên hai thứ tự đều ra cùng kết quả).
+
+### Meta progression (ngoài spec P0, thêm 2026-09-05 theo yêu cầu user)
+
+Spec docx cố ý không có metagame; user đã quyết định thêm sau khi P0 xong. Toàn bộ state nằm trong **`Core/ProfileService`** (trên `Systems/Managers`), số liệu tĩnh ở `Data/Rules/ProgressionRules.asset` (`ProgressionRulesSO`: XP/kill, bonus thắng, coin theo điểm, đường cong XP lên cấp, coin khởi điểm) và mục `Upgrade` của mỗi `GunDefinitionSO` (max level, % damage/băng đạn/tốc bắn/nạp đạn mỗi cấp, giá gốc và hệ số tăng giá).
+
+- **Lưu**: PlayerPrefs qua `SaveService` (`zw_player_level`, `zw_player_xp`, `zw_coins`, `zw_gun_level_<id>`, `zw_gun_unlocked_<id>`). `ProfileService.EnsureLoaded()` đọc lười nên gọi từ `Awake` của hệ khác vẫn an toàn.
+- **Áp vào gameplay**: `Gun.Stats` (`GunStats`: Damage/FireInterval/MagazineSize/ReloadDuration) do `WeaponController.ApplyUpgrades()` gán trong `Awake` và khi `OnRunStarted`; `WeaponController`/`ProjectileManager` đọc `gun.Stats`, không đọc thẳng `definition` cho bốn chỉ số này. Range, spread, pellet, VFX vẫn lấy từ definition.
+- **Thưởng**: `GameFlowController.EndLevel` → `ProfileService.GrantRunRewards(kills, total, won)`; `LevelResult`/`ResultData` mang `CoinsEarned`/`XpEarned`, popup kết quả có hai hàng "COINS EARNED" / "XP EARNED".
+- **Nâng cấp** chỉ qua `ProfileService.TryUpgradeGun(gun)` (kiểm tra unlock, max level, đủ coin); `OnChanged` báo cho `MenuUiBinder` vẽ lại header + trang vũ khí.
 
 ## Kiến trúc UI
 
@@ -184,9 +227,9 @@ UIRoot.prefab               [UIManager]        ← hub duy nhất, không giữ 
 ├── EventSystem             [EventSystem, InputSystemUIInputModule]
 ├── UiAudio                 [AudioSource]      ← UI tự phát tiếng tap của mình
 ├── Canvas_HUD      order 0   → TopBar (timer/kills/score/pause + health bar), Joystick, GunButton, BombButton
-├── Canvas_Menu     order 5  [MenuScreenView]  → title + N slot LevelCardView
+├── Canvas_Menu     order 5  [MenuScreenView]  → Header [MenuHeaderView] (level + XP bar, coin, gear) + Pages/{Page_Shop, Page_Weapon [WeaponPageView], Page_Battle [BattlePageView], Page_Talent, Page_Locked} + TabBar [MenuTabBarView] 5 tab (tab LOCK khoá)
 ├── Canvas_Countdown order 10 [CountdownView]  ← không GraphicRaycaster, không chặn input
-└── Canvas_Popup    order 20 [PopupManager]    → Backdrop + PausePopup + ResultPopup (prefab, inactive)
+└── Canvas_Popup    order 20 [PopupManager]    → Backdrop + PausePopup + ResultPopup + SkillChoicePopup + WeaponDetailPopup + SettingsPopup (prefab, inactive)
 ```
 
 ### Binder — lớp trung gian giữ ref gameplay
@@ -196,7 +239,13 @@ UI **không** được giữ reference tới hệ thống gameplay. Mọi refere
 | Binder | Ở đâu | Giữ ref | Việc |
 |---|---|---|---|
 | `Core/GameplayUiBinder` | `GameplayRoot/Systems/Managers` | `UIManager`, `GameFlowController`, `PlayerHealth`, `WeaponController`, `BombThrower`, `CameraShakeController` | subscribe event gameplay → gọi setter của `UIManager`; đưa `LevelResult` thành `ResultData`; trao lệnh (`Pause`, `RequestSwitch`, `RequestThrow`, `Resume`, `Retry`, `GoToMenu`) cho UI qua `BindGameplayCommands` |
-| `Core/MenuUiBinder` | `GameplayRoot/Systems/Managers` | `UIManager`, `GameFlowController`, `LevelDefinitionSO[]` | khi flow vào state `Menu`: dựng `LevelCardData[]` từ level asset + `SaveService`, gọi `ShowMenuScreen`; thẻ được bấm → `GameFlowController.StartRun(level)` |
+| `Core/MenuUiBinder` | `GameplayRoot/Systems/Managers` | `UIManager`, `GameFlowController`, `ProfileService`, `LevelDefinitionSO[]` | khi flow vào state `Menu`: dựng `MenuHeaderData` + `LevelCardData[]` + `WeaponEntryData[]` (chỉ số hiện tại và sau nâng cấp) rồi gọi `ShowMenuScreen`; PLAY → `GameFlowController.StartRun(level)`; UPGRADE → `ProfileService.TryUpgradeGun`; `ProfileService.OnChanged` → `RefreshMenu` |
+
+Bố cục menu bám theo ba ảnh tham chiếu user đưa 2026-09-05 (kiểu tower-defense casual), giữ skin Layer Lab:
+- **Header** (`MenuHeaderView`): vương miện + "LEVEL n" + thanh XP "xp/next" bên trái, chip coin, nút bánh răng bên phải → `SettingsPopupUI` (toggle SCREEN SHAKE, cùng `SwitchToggleView` với popup Pause; `MenuUiBinder` giữ `CameraShakeController` để nối).
+- **Battle** (`BattlePageView` + `LevelCardView`): segmented NORMAL/HARD ở trên (HARD khoá, thuần visual, chưa có data), tiêu đề "CHAPTER n", khung artwork 520² (`LevelDefinitionSO._artwork`, rỗng thì giữ placeholder icon castle), hai mũi tên hai bên, tên level + chip best score, nút START to ở đáy, counter "i / n". Mặc định đứng ở chapter xa nhất đã mở.
+- **Weapon** (`WeaponPageView` + lưới `WeaponCardView` 3 cột, tối đa `UiRootPrefabBuilder.MaxWeaponSlots` = 6): banner "UNLOCKED", mỗi thẻ có pill tên, icon trong khung, "LEVEL n", thanh tiến độ "n/max"; súng chưa mở hiện khoá + "COMING SOON". Bấm thẻ → **`WeaponDetailPopupUI`** (prefab `Popups/WeaponDetailPopup`): tên, icon to, level, mô tả (`GunDefinitionSO._description`), lưới 2×3 `WeaponStatCellView` (ATTACK/RATE/MAGAZINE/RELOAD kèm giá trị sau nâng cấp màu xanh, SHOTS = pellet, TYPE = SINGLE/SPREAD), giá coin, nút UPGRADE, dòng hint ("NEEDS n MORE COINS" / "MAX LEVEL REACHED" / "LOCKED"). `UIManager` giữ mảng `WeaponEntryData` đang hiển thị và index popup đang mở để `RefreshMenu` sau nâng cấp vẽ lại cả popup.
+- **Shop**/**Talent** placeholder "COMING SOON"; tab thứ 5 là **LOCK** (icon khoá, `MenuTabButtonView._locked`, không có badge riêng vì `_lockBadge` là optional). Tab mặc định là Battle (`MenuScreenView._defaultTab`). Trang không phải Battle được author inactive nên `Awake` của view chạy lần đầu khi mở tab; `Bind` chỉ đụng field serialized nên gọi trước `Awake` vẫn đúng.
 
 - `UIManager` chỉ phơi ra setter (`SetHealth`, `SetScore`, `SetAmmo`…), lệnh mở popup, và `BindGameplayCommands` / `ShowMenuScreen(cards, onSelected)`. Nó không biết `GameState`, không biết `LevelDefinitionSO`, không biết `AudioService`.
 - Dữ liệu vào UI là **struct trình bày**: `UI/ResultData`, `UI/LevelCardData`. Popup và thẻ level không bao giờ nhận object gameplay.
@@ -221,9 +270,9 @@ Menu **Tools ▸ Zombie War ▸ UI**:
 |---|---|
 | `1. Import Layer Lab UI Assets` | Copy đúng danh sách asset khai trong `Scripts/Editor/UI/UiSkin.cs` sang `Art/UI/`; bỏ qua file đã có; kiểm tra font TMP có còn atlas sau khi copy |
 | `2. Rebuild UI Root Prefab` | Dựng lại `UIRoot.prefab` + hai prefab popup từ đầu (kể cả joystick `OnScreenStick` và `EventSystem`) |
-| `3. Install UI Into Gameplay Root` | Thay nhánh UI của `GameplayRoot.prefab` bằng instance của `UIRoot.prefab`, wire `GameplayUiBinder` / `MenuUiBinder` / `LevelMapLoader._virtualCamera`, và tắt sẵn object `Player` |
+| `3. Install UI Into Gameplay Root` | Thay nhánh UI của `GameplayRoot.prefab` bằng instance của `UIRoot.prefab`, wire `GameplayUiBinder` / `MenuUiBinder` / `LevelMapLoader._virtualCamera`, tạo (nếu thiếu) và wire `ProfileService` (`_rules` = `Data/Rules/ProgressionRules.asset`, tự tạo nếu chưa có; `_guns` = mọi `GunDefinitionSO` trong `Data/Weapons` sắp theo tên) vào `GameFlowController._profile` / `WeaponController._profile` / `MenuUiBinder._profile`, và tắt sẵn object `Player` |
 
-Thêm level mới: thêm `LevelDefinitionSO` vào `Data/Levels/` rồi chạy lại menu 2 + 3 — tool tự thêm slot thẻ và nạp lại mảng `_levels` của binder.
+Thêm level mới: thêm `LevelDefinitionSO` vào `Data/Levels/` rồi chạy lại menu 2 + 3 — tool tự nạp lại mảng `_levels` của binder. Thêm súng mới: thêm `GunDefinitionSO` vào `Data/Weapons/` (+ prefab `Gun` trên player) rồi chạy menu 2 + 3 — tool tự thêm slot list vũ khí và nạp lại `ProfileService._guns`; trang Weapon chỉ đủ chỗ cho 3 slot trước khi list đè lên panel chi tiết (`UiRootPrefabBuilder.MaxWeaponSlots`).
 
 `UiSkin.cs` (assembly Editor) là nơi khai bảng màu + danh sách asset; `UiBuildUtility.Bind` ghi vào `[SerializeField] private` qua `SerializedObject` nên runtime không phải mở public setter. Đây là ngoại lệ #4 của `CODE-RULE.md` §4 (editor tool sinh UI) — **sau khi chạy tool thì prefab là nguồn sự thật**, chạy lại tool sẽ ghi đè mọi chỉnh tay trong prefab UI (menu 2 và 3 đều hỏi xác nhận).
 
