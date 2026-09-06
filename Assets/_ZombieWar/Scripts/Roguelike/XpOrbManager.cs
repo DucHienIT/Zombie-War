@@ -173,9 +173,7 @@ namespace ZombieWar.Roguelike
         private void Despawn(int index)
         {
             XpOrb orb = _active[index];
-            int last = _active.Count - 1;
-            _active[index] = _active[last];
-            _active.RemoveAt(last);
+            _active.RemoveAtSwap(index);
             _pool.Release(orb);
         }
 

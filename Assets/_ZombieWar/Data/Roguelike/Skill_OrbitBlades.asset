@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: orbit_blades
   _displayName: ORBIT BLADES
-  _description: "Blades circle you\n+1 blade per level"
-  _icon: {fileID: 21300000, guid: dfaabbacfd933cd4baad9e21a995a1bd, type: 3}
+  _description: 'Blades circle you
+
+    +1 blade per level'
+  _icon: {fileID: 21300000, guid: 9ad1d08571dffe94ba109f5f5394c88d, type: 3}
   _accentColor: {r: 0.3058824, g: 0.8039216, b: 0.8784314, a: 1}
   _maxStacks: 5
   _draftWeight: 1

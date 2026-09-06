@@ -70,9 +70,7 @@ namespace ZombieWar.Weapons
                 }
 
                 Explode(bomb.Position, bomb.BlastRadius);
-                int last = _active.Count - 1;
-                _active[i] = _active[last];
-                _active.RemoveAt(last);
+                _active.RemoveAtSwap(i);
                 _pool.Release(bomb);
             }
         }

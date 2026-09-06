@@ -15,14 +15,14 @@ MonoBehaviour:
   _id: combat_instinct
   _displayName: COMBAT INSTINCT
   _description: Kills grant more battle XP, so level-ups come sooner.
-  _icon: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
-  _accentColor: {r: 0.24705882, g: 0.78431373, b: 1.0, a: 1}
+  _icon: {fileID: 21300000, guid: afe585765ae285749a27a5490bbcf473, type: 3}
+  _accentColor: {r: 0.24705882, g: 0.78431374, b: 1, a: 1}
   _modifiersPerRank:
   - _stat: 10
     _kind: 1
     _valuePerStack: 1.06
   _effectLabel: BATTLE XP
-  _valueFormat: '+{0:0}%'
+  _valueFormat: +{0:0}%
   _maxRank: 5
   _baseCost: 100
   _costGrowth: 1.4

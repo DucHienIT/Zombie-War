@@ -22,6 +22,7 @@ namespace ZombieWar.UI
         [SerializeField] private float _detailRevealDelay = 0.3f;
         [SerializeField] private float _detailRevealDuration = 0.3f;
         [SerializeField] private float _detailRevealSlide = 40f;
+        [SerializeField] private Ease _detailRevealEase = Ease.OutCubic;
 
         private SkillNodeData[] _data;
         private Action<int> _onUpgrade;
@@ -222,7 +223,7 @@ namespace ZombieWar.UI
             Vector2 rest = detailRect.anchoredPosition;
             detailRect.anchoredPosition = rest - new Vector2(0f, _detailRevealSlide);
             _detailGroup.DOFade(1f, _detailRevealDuration).SetDelay(_detailRevealDelay).SetUpdate(true).SetLink(gameObject);
-            detailRect.DOAnchorPos(rest, _detailRevealDuration).SetEase(Ease.OutCubic).SetDelay(_detailRevealDelay)
+            detailRect.DOAnchorPos(rest, _detailRevealDuration).SetEase(_detailRevealEase).SetDelay(_detailRevealDelay)
                 .SetUpdate(true).SetLink(gameObject);
         }
 

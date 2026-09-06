@@ -20,9 +20,9 @@ namespace ZombieWar.UI
         [SerializeField] private bool _locked;
 
         [Header("Colors")]
-        [SerializeField] private Color _selectedColor = Color.white;
-        [SerializeField] private Color _normalColor = Color.gray;
-        [SerializeField] private Color _lockedColor = Color.gray;
+        [SerializeField] private Color _selectedColor;
+        [SerializeField] private Color _normalColor;
+        [SerializeField] private Color _lockedColor;
 
         [Header("Select")]
         [SerializeField] private float _tintDuration = 0.18f;

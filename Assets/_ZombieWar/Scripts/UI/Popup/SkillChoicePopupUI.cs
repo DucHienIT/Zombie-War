@@ -54,7 +54,7 @@ namespace ZombieWar.UI
 
             if (_offerCount > _cards.Length)
             {
-                Debug.LogError($"{LogPrefix} {_offerCount} offers but only {_cards.Length} authored cards - rebuild the UI root.", this);
+                Debug.LogError($"{LogPrefix} {_offerCount} offers but only {_cards.Length} authored cards - duplicate a card slot in UIRoot.prefab and wire it into _cards.", this);
             }
 
             for (int i = 0; i < _cards.Length; i++)

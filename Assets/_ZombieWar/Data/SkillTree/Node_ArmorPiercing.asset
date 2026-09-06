@@ -15,14 +15,14 @@ MonoBehaviour:
   _id: armor_piercing
   _displayName: ARMOR PIERCING
   _description: Bullets pass through one more zombie.
-  _icon: {fileID: 21300000, guid: 7b15fe1bf0d440d691ac95d70487b548, type: 3}
-  _accentColor: {r: 1.0, g: 0.60784314, b: 0.23921569, a: 1}
+  _icon: {fileID: 21300000, guid: 324af8ccbb3f5184aac9467f829ee965, type: 3}
+  _accentColor: {r: 1, g: 0.60784316, b: 0.23921569, a: 1}
   _modifiersPerRank:
   - _stat: 2
     _kind: 0
     _valuePerStack: 1
   _effectLabel: PIERCE
-  _valueFormat: '+{0:0}'
+  _valueFormat: +{0:0}
   _maxRank: 1
   _baseCost: 800
   _costGrowth: 1

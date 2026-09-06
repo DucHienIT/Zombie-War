@@ -29,8 +29,8 @@ namespace ZombieWar.UI
         [SerializeField] private GameObject _costGroup;
         [SerializeField] private TMP_Text _costText;
         [SerializeField] private TMP_Text _hintText;
-        [SerializeField] private Color _affordableCostColor = Color.white;
-        [SerializeField] private Color _unaffordableCostColor = Color.red;
+        [SerializeField] private Color _affordableCostColor;
+        [SerializeField] private Color _unaffordableCostColor;
 
         [Header("Formats")]
         [SerializeField] private string _damageFormat = "{0:1}";

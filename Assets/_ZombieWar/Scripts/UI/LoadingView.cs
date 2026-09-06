@@ -18,6 +18,7 @@ namespace ZombieWar.UI
         [Header("Hint Pulse")]
         [SerializeField] private float _hintMinAlpha = 0.35f;
         [SerializeField] private float _hintPulseDuration = 0.7f;
+        [SerializeField] private Ease _hintPulseEase = Ease.InOutSine;
 
         private int _shownPercent = -1;
 
@@ -31,7 +32,7 @@ namespace ZombieWar.UI
 
             _hintText.DOFade(_hintMinAlpha, _hintPulseDuration)
                 .SetLoops(-1, LoopType.Yoyo)
-                .SetEase(Ease.InOutSine)
+                .SetEase(_hintPulseEase)
                 .SetUpdate(true)
                 .SetLink(gameObject);
         }

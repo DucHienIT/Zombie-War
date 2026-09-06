@@ -12,8 +12,8 @@ namespace ZombieWar.Weapons
 
         [Header("Telegraph")]
         // The ring breathes so the last half second reads as a countdown, not a static decal.
-        [SerializeField] private float _telegraphPulseAmplitude = 0.08f;
-        [SerializeField] private float _telegraphPulseFrequency = 5f;
+        [SerializeField] private float _telegraphPulseAmplitude = 0.05f;
+        [SerializeField] private float _telegraphPulseFrequency = 3f;
 
         private float _fuse;
         private float _telegraphLead;

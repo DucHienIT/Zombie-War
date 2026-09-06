@@ -15,7 +15,7 @@ MonoBehaviour:
   _id: blood_pact
   _displayName: BLOOD PACT
   _description: Heal 2 per kill
-  _icon: {fileID: 21300000, guid: 7f5721dc5748f8548aa63ce1eec4a337, type: 3}
+  _icon: {fileID: 21300000, guid: aab21a9058dfc1d4fa7eba97ae847d60, type: 3}
   _accentColor: {r: 1, g: 0.35686275, b: 0.2901961, a: 1}
   _maxStacks: 4
   _draftWeight: 1

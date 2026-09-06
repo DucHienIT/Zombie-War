@@ -15,14 +15,14 @@ MonoBehaviour:
   _id: toughness
   _displayName: TOUGHNESS
   _description: More hit points to start every run with.
-  _icon: {fileID: 21300000, guid: f7963dc5a8af4474bbedf183545c3526, type: 3}
-  _accentColor: {r: 0.23921569, g: 0.87843137, b: 0.62745098, a: 1}
+  _icon: {fileID: 21300000, guid: 69419fd83485617408beccd33eb8dc52, type: 3}
+  _accentColor: {r: 0.23921569, g: 0.8784314, b: 0.627451, a: 1}
   _modifiersPerRank:
   - _stat: 5
     _kind: 0
     _valuePerStack: 10
   _effectLabel: MAX HEALTH
-  _valueFormat: '+{0:0}'
+  _valueFormat: +{0:0}
   _maxRank: 5
   _baseCost: 120
   _costGrowth: 1.45

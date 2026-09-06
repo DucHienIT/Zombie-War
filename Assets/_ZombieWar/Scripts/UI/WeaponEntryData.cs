@@ -2,18 +2,6 @@ using UnityEngine;
 
 namespace ZombieWar.UI
 {
-    public readonly struct WeaponStatsData
-    {
-        public readonly float Damage;
-        public readonly float ShotsPerSecond;
-
-        public WeaponStatsData(float damage, float shotsPerSecond)
-        {
-            Damage = damage;
-            ShotsPerSecond = shotsPerSecond;
-        }
-    }
-
     // One gun as the weapon page and its detail sheet see it; neither touches GunDefinitionSO.
     public readonly struct WeaponEntryData
     {

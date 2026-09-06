@@ -15,14 +15,14 @@ MonoBehaviour:
   _id: heavy_impact
   _displayName: HEAVY IMPACT
   _description: Shots shove zombies further back.
-  _icon: {fileID: 21300000, guid: b3c533e0479f4ae08b9d8603a2b97b68, type: 3}
-  _accentColor: {r: 1.0, g: 0.60784314, b: 0.23921569, a: 1}
+  _icon: {fileID: 21300000, guid: b6bdd829081a4d34392d025f80466de2, type: 3}
+  _accentColor: {r: 1, g: 0.60784316, b: 0.23921569, a: 1}
   _modifiersPerRank:
   - _stat: 3
     _kind: 1
     _valuePerStack: 1.12
   _effectLabel: KNOCKBACK
-  _valueFormat: '+{0:0}%'
+  _valueFormat: +{0:0}%
   _maxRank: 4
   _baseCost: 320
   _costGrowth: 1.45

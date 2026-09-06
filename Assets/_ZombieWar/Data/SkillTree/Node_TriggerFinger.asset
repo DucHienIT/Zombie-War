@@ -15,14 +15,14 @@ MonoBehaviour:
   _id: trigger_finger
   _displayName: TRIGGER FINGER
   _description: A faster fire rate on every gun.
-  _icon: {fileID: 21300000, guid: bdda6db7b26d4f719d96e124aa4f953c, type: 3}
-  _accentColor: {r: 1.0, g: 0.60784314, b: 0.23921569, a: 1}
+  _icon: {fileID: 21300000, guid: ccf73dc4210d6c14caeed3633463475c, type: 3}
+  _accentColor: {r: 1, g: 0.60784316, b: 0.23921569, a: 1}
   _modifiersPerRank:
   - _stat: 1
     _kind: 1
     _valuePerStack: 1.05
   _effectLabel: FIRE RATE
-  _valueFormat: '+{0:0}%'
+  _valueFormat: +{0:0}%
   _maxRank: 5
   _baseCost: 200
   _costGrowth: 1.45

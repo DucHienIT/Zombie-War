@@ -40,6 +40,7 @@ namespace ZombieWar.UI
         [SerializeField] private float _glowMinAlpha = 0.18f;
         [SerializeField] private float _glowMaxAlpha = 0.55f;
         [SerializeField] private float _glowPulseDuration = 0.9f;
+        [SerializeField] private Ease _glowPulseEase = Ease.InOutSine;
 
         [Header("Selection")]
         [SerializeField] private float _selectedScale = 1.1f;
@@ -49,16 +50,30 @@ namespace ZombieWar.UI
         [Header("Feedback")]
         [SerializeField] private float _upgradePunchScale = 0.25f;
         [SerializeField] private float _upgradeDuration = 0.45f;
+        [SerializeField] private int _upgradePunchVibrato = 6;
+        [SerializeField] private int _unlockedPunchVibrato = 4;
+        [SerializeField] private float _unlockedPunchScaleFraction = 0.5f;
+        [SerializeField] private float _punchElasticity = 0.6f;
+        [SerializeField] private Ease _pipPopEase = Ease.OutBack;
         [SerializeField] private float _burstScale = 1.8f;
         [SerializeField] private float _burstAlpha = 0.9f;
         [SerializeField] private float _burstDuration = 0.5f;
+        [SerializeField] private Ease _burstScaleEase = Ease.OutCubic;
+        [SerializeField] private Ease _burstFadeEase = Ease.OutQuad;
         [SerializeField] private float _pipPopScale = 1.8f;
         [SerializeField] private float _pipPopDuration = 0.35f;
         [SerializeField] private float _colorTweenDuration = 0.35f;
         [SerializeField] private float _deniedShakeStrength = 12f;
         [SerializeField] private float _deniedShakeDuration = 0.3f;
+        [SerializeField] private int _deniedShakeVibrato = 14;
+        [SerializeField] private float _deniedShakeRandomness = 90f;
         [SerializeField] private float _revealDuration = 0.4f;
         [SerializeField] private Ease _revealEase = Ease.OutBack;
+        [SerializeField] private Ease _linkRevealEase = Ease.OutQuad;
+        // Fraction of the reveal duration the link's own scale-in tween takes.
+        [SerializeField] private float _linkRevealFraction = 0.6f;
+        // Fraction of the reveal duration the link starts ahead of the hexagon it feeds.
+        [SerializeField] private float _linkRevealLeadFraction = 0.3f;
 
         private Action _onClicked;
         private Vector3 _restScale;
@@ -157,7 +172,7 @@ namespace ZombieWar.UI
 
             _body.DOKill();
             _body.localScale = SelectionScale();
-            _body.DOPunchScale(Vector3.one * _upgradePunchScale, _upgradeDuration, 6, 0.6f).SetUpdate(true).SetLink(gameObject);
+            _body.DOPunchScale(Vector3.one * _upgradePunchScale, _upgradeDuration, _upgradePunchVibrato, _punchElasticity).SetUpdate(true).SetLink(gameObject);
             PlayBurst(data.Accent);
 
             int newest = data.Rank - 1;
@@ -166,7 +181,7 @@ namespace ZombieWar.UI
                 RectTransform pip = _pips[newest].rectTransform;
                 pip.DOKill();
                 pip.localScale = Vector3.one * _pipPopScale;
-                pip.DOScale(Vector3.one, _pipPopDuration).SetEase(Ease.OutBack).SetUpdate(true).SetLink(gameObject);
+                pip.DOScale(Vector3.one, _pipPopDuration).SetEase(_pipPopEase).SetUpdate(true).SetLink(gameObject);
             }
         }
 
@@ -194,7 +209,7 @@ namespace ZombieWar.UI
 
             _body.DOKill();
             _body.localScale = SelectionScale();
-            _body.DOPunchScale(Vector3.one * _upgradePunchScale * 0.5f, _upgradeDuration, 4, 0.6f).SetUpdate(true).SetLink(gameObject);
+            _body.DOPunchScale(Vector3.one * _upgradePunchScale * _unlockedPunchScaleFraction, _upgradeDuration, _unlockedPunchVibrato, _punchElasticity).SetUpdate(true).SetLink(gameObject);
         }
 
         public void PlayDenied()
@@ -206,7 +221,7 @@ namespace ZombieWar.UI
 
             _body.DOKill();
             _body.anchoredPosition = Vector2.zero;
-            _body.DOShakeAnchorPos(_deniedShakeDuration, _deniedShakeStrength, 14, 90f, false, true).SetUpdate(true).SetLink(gameObject);
+            _body.DOShakeAnchorPos(_deniedShakeDuration, _deniedShakeStrength, _deniedShakeVibrato, _deniedShakeRandomness, false, true).SetUpdate(true).SetLink(gameObject);
         }
 
         // The tree grows in from the root: the link draws first, then the hexagon pops.
@@ -229,7 +244,7 @@ namespace ZombieWar.UI
             RectTransform link = _link.rectTransform;
             link.DOKill();
             link.localScale = new Vector3(0f, 1f, 1f);
-            link.DOScaleX(1f, _revealDuration * 0.6f).SetEase(Ease.OutQuad).SetDelay(Mathf.Max(0f, delay - _revealDuration * 0.3f))
+            link.DOScaleX(1f, _revealDuration * _linkRevealFraction).SetEase(_linkRevealEase).SetDelay(Mathf.Max(0f, delay - _revealDuration * _linkRevealLeadFraction))
                 .SetUpdate(true).SetLink(gameObject);
         }
 
@@ -273,7 +288,7 @@ namespace ZombieWar.UI
             Color color = data.Accent;
             color.a = _glowMinAlpha;
             _glow.color = color;
-            _glow.DOFade(_glowMaxAlpha, _glowPulseDuration).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo)
+            _glow.DOFade(_glowMaxAlpha, _glowPulseDuration).SetEase(_glowPulseEase).SetLoops(-1, LoopType.Yoyo)
                 .SetUpdate(true).SetLink(gameObject);
         }
 
@@ -286,8 +301,8 @@ namespace ZombieWar.UI
             accent.a = _burstAlpha;
             _burst.color = accent;
             burst.localScale = Vector3.one;
-            burst.DOScale(_burstScale, _burstDuration).SetEase(Ease.OutCubic).SetUpdate(true).SetLink(gameObject);
-            _burst.DOFade(0f, _burstDuration).SetEase(Ease.OutQuad).SetUpdate(true).SetLink(gameObject).OnComplete(HideBurst);
+            burst.DOScale(_burstScale, _burstDuration).SetEase(_burstScaleEase).SetUpdate(true).SetLink(gameObject);
+            _burst.DOFade(0f, _burstDuration).SetEase(_burstFadeEase).SetUpdate(true).SetLink(gameObject).OnComplete(HideBurst);
         }
 
         private Vector3 SelectionScale() => _selected ? _restScale * _selectedScale : _restScale;

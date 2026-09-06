@@ -62,7 +62,7 @@ namespace ZombieWar.Enemies
             _corpseLayer = LayerMask.NameToLayer(_corpseLayerName);
             if (_corpseLayer < 0)
             {
-                Debug.LogError($"{LogPrefix} Layer {_corpseLayerName} does not exist; run Tools > Zombie War > Feel > 2. Install.", this);
+                Debug.LogError($"{LogPrefix} Layer {_corpseLayerName} does not exist; add it in Project Settings > Tags and Layers.", this);
             }
 
             _onCreated = HandleCreated;
@@ -167,9 +167,7 @@ namespace ZombieWar.Enemies
                     continue;
                 }
 
-                int last = _active.Count - 1;
-                _active[index] = _active[last];
-                _active.RemoveAt(last);
+                _active.RemoveAtSwap(index);
                 Release(zombie);
             }
 

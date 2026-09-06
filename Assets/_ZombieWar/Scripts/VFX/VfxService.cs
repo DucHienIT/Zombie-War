@@ -14,8 +14,11 @@ namespace ZombieWar.VFX
         [Serializable]
         private struct VfxPoolEntry
         {
-            public PooledVfx Prefab;
-            public int Prewarm;
+            [SerializeField] private PooledVfx _prefab;
+            [SerializeField] private int _prewarm;
+
+            public PooledVfx Prefab => _prefab;
+            public int Prewarm => _prewarm;
         }
 
         [SerializeField] private VfxPoolEntry[] _entries;
@@ -95,9 +98,7 @@ namespace ZombieWar.VFX
                 }
 
                 _pools[_prefabOfInstance[instance]].Release(instance);
-                int last = _active.Count - 1;
-                _active[i] = _active[last];
-                _active.RemoveAt(last);
+                _active.RemoveAtSwap(i);
             }
         }
     }

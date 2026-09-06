@@ -68,7 +68,7 @@ namespace ZombieWar.UI
 
             if (entries.Length > _cards.Length)
             {
-                Debug.LogError($"{LogPrefix} {entries.Length} weapons but only {_cards.Length} authored slots - rebuild the UI root.", this);
+                Debug.LogError($"{LogPrefix} {entries.Length} weapons but only {_cards.Length} authored slots - duplicate a card slot in UIRoot.prefab and wire it into _cards.", this);
             }
 
             _onWeaponSelected = onWeaponSelected;

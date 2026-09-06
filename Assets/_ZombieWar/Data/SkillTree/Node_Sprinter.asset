@@ -15,14 +15,14 @@ MonoBehaviour:
   _id: sprinter
   _displayName: SPRINTER
   _description: Move faster to slip out of the horde.
-  _icon: {fileID: 21300000, guid: e1bfe2bc2ea6e9042959f0208be90316, type: 3}
-  _accentColor: {r: 0.23921569, g: 0.87843137, b: 0.62745098, a: 1}
+  _icon: {fileID: 21300000, guid: e3ea9633e9147c04591b3540935f3555, type: 3}
+  _accentColor: {r: 0.23921569, g: 0.8784314, b: 0.627451, a: 1}
   _modifiersPerRank:
   - _stat: 4
     _kind: 1
     _valuePerStack: 1.05
   _effectLabel: MOVE SPEED
-  _valueFormat: '+{0:0}%'
+  _valueFormat: +{0:0}%
   _maxRank: 4
   _baseCost: 320
   _costGrowth: 1.45

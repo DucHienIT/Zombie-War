@@ -84,9 +84,7 @@ namespace ZombieWar.Weapons
         private void Despawn(int index)
         {
             Projectile projectile = _active[index];
-            int last = _active.Count - 1;
-            _active[index] = _active[last];
-            _active.RemoveAt(last);
+            _active.RemoveAtSwap(index);
             _pool.Release(projectile);
         }
     }

@@ -15,14 +15,14 @@ MonoBehaviour:
   _id: marksman
   _displayName: MARKSMAN
   _description: Every bullet hits harder.
-  _icon: {fileID: 21300000, guid: b5be0c1053ed402793572de71cee8147, type: 3}
-  _accentColor: {r: 1.0, g: 0.60784314, b: 0.23921569, a: 1}
+  _icon: {fileID: 21300000, guid: 2f05182b96a94ad438442173900114ec, type: 3}
+  _accentColor: {r: 1, g: 0.60784316, b: 0.23921569, a: 1}
   _modifiersPerRank:
   - _stat: 0
     _kind: 1
     _valuePerStack: 1.06
   _effectLabel: WEAPON DAMAGE
-  _valueFormat: '+{0:0}%'
+  _valueFormat: +{0:0}%
   _maxRank: 5
   _baseCost: 120
   _costGrowth: 1.45

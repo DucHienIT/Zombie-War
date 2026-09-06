@@ -15,14 +15,14 @@ MonoBehaviour:
   _id: field_medic
   _displayName: FIELD MEDIC
   _description: Every kill restores a little health.
-  _icon: {fileID: 21300000, guid: 967208b710104fb3a57a44552c93f053, type: 3}
-  _accentColor: {r: 0.23921569, g: 0.87843137, b: 0.62745098, a: 1}
+  _icon: {fileID: 21300000, guid: 7f5721dc5748f8548aa63ce1eec4a337, type: 3}
+  _accentColor: {r: 0.23921569, g: 0.8784314, b: 0.627451, a: 1}
   _modifiersPerRank:
   - _stat: 6
     _kind: 0
     _valuePerStack: 0.5
   _effectLabel: HEAL PER KILL
-  _valueFormat: '+{0:1}'
+  _valueFormat: +{0:1}
   _maxRank: 4
   _baseCost: 200
   _costGrowth: 1.45

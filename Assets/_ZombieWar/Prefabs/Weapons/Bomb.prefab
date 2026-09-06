@@ -100,8 +100,8 @@ MonoBehaviour:
   _rigidbody: {fileID: 1295530678009611725}
   _telegraphRing: {fileID: 8784482413635206377}
   _trail: {fileID: 6119820182626241110}
-  _telegraphPulseAmplitude: 0.08
-  _telegraphPulseFrequency: 5
+  _telegraphPulseAmplitude: 0.05
+  _telegraphPulseFrequency: 3
 --- !u!96 &6119820182626241110
 TrailRenderer:
   serializedVersion: 3

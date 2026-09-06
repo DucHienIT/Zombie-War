@@ -44,8 +44,11 @@ namespace ZombieWar.UI
         [Header("Animation")]
         [SerializeField] private float _swapDuration = 0.16f;
         [SerializeField] private float _swapSlide = 22f;
+        [SerializeField] private Ease _swapEase = Ease.OutCubic;
         [SerializeField] private float _valuePunchScale = 0.3f;
         [SerializeField] private float _valuePunchDuration = 0.4f;
+        [SerializeField] private int _valuePunchVibrato = 5;
+        [SerializeField] private float _valuePunchElasticity = 0.5f;
 
         private Action _onUpgrade;
         private SkillNodeData _pending;
@@ -121,7 +124,7 @@ namespace ZombieWar.UI
             _hasPending = false;
             Draw(_pending);
             _content.anchoredPosition = new Vector2(0f, -_swapSlide);
-            _content.DOAnchorPosY(0f, _swapDuration).SetEase(Ease.OutCubic).SetUpdate(true).SetLink(gameObject);
+            _content.DOAnchorPosY(0f, _swapDuration).SetEase(_swapEase).SetUpdate(true).SetLink(gameObject);
             _group.DOFade(1f, _swapDuration).SetUpdate(true).SetLink(gameObject);
         }
 
@@ -177,7 +180,7 @@ namespace ZombieWar.UI
         {
             target.DOKill();
             target.localScale = Vector3.one;
-            target.DOPunchScale(Vector3.one * _valuePunchScale, _valuePunchDuration, 5, 0.5f).SetUpdate(true).SetLink(gameObject);
+            target.DOPunchScale(Vector3.one * _valuePunchScale, _valuePunchDuration, _valuePunchVibrato, _valuePunchElasticity).SetUpdate(true).SetLink(gameObject);
         }
 
         private void HandleUpgradeClicked() => _onUpgrade?.Invoke();

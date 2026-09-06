@@ -15,14 +15,14 @@ MonoBehaviour:
   _id: second_heart
   _displayName: SECOND HEART
   _description: A big reserve of hit points.
-  _icon: {fileID: 21300000, guid: 7b7fdbe2e9314ccbbfaf22a70fb32cdd, type: 3}
-  _accentColor: {r: 0.23921569, g: 0.87843137, b: 0.62745098, a: 1}
+  _icon: {fileID: 21300000, guid: 1ae4b9c3e114d2c4683e5b97413faf0f, type: 3}
+  _accentColor: {r: 0.23921569, g: 0.8784314, b: 0.627451, a: 1}
   _modifiersPerRank:
   - _stat: 5
     _kind: 0
     _valuePerStack: 40
   _effectLabel: MAX HEALTH
-  _valueFormat: '+{0:0}'
+  _valueFormat: +{0:0}
   _maxRank: 1
   _baseCost: 800
   _costGrowth: 1

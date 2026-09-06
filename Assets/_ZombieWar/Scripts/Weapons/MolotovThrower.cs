@@ -113,7 +113,7 @@ namespace ZombieWar.Weapons
                 }
 
                 Ignite(flight.Bottle.Position, flight.Burn);
-                RemoveAtSwap(_flights, i);
+                _flights.RemoveAtSwap(i);
                 _bottlePool.Release(flight.Bottle);
             }
         }
@@ -141,7 +141,7 @@ namespace ZombieWar.Weapons
                     continue;
                 }
 
-                RemoveAtSwap(_fires, i);
+                _fires.RemoveAtSwap(i);
                 _firePool.Release(fire.Zone);
             }
         }
@@ -162,11 +162,5 @@ namespace ZombieWar.Weapons
             }
         }
 
-        private static void RemoveAtSwap<T>(List<T> list, int index)
-        {
-            int last = list.Count - 1;
-            list[index] = list[last];
-            list.RemoveAt(last);
-        }
     }
 }

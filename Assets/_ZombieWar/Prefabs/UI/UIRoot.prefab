@@ -1029,7 +1029,7 @@ MonoBehaviour:
   _maxTag: {fileID: 3276632534230218432}
   _link: {fileID: 1770041359230891586}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -1037,21 +1037,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &89771942348937350
 GameObject:
   m_ObjectHideFlags: 0
@@ -1650,7 +1663,7 @@ MonoBehaviour:
   _maxTag: {fileID: 467500933198562070}
   _link: {fileID: 2546743090024963769}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -1658,21 +1671,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &192955843143535482
 GameObject:
   m_ObjectHideFlags: 0
@@ -3892,7 +3918,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2f05182b96a94ad438442173900114ec, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -6835,7 +6861,7 @@ MonoBehaviour:
   _maxTag: {fileID: 350494738918287141}
   _link: {fileID: 2644021482738309860}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -6843,21 +6869,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &903725974304328515
 GameObject:
   m_ObjectHideFlags: 0
@@ -7110,7 +7149,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 69419fd83485617408beccd33eb8dc52, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -7498,7 +7537,7 @@ MonoBehaviour:
   _maxTag: {fileID: 2971937575449465300}
   _link: {fileID: 2751505222612988574}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -7506,21 +7545,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &1026608728615675266
 GameObject:
   m_ObjectHideFlags: 0
@@ -8483,7 +8535,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ccf73dc4210d6c14caeed3633463475c, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -9024,7 +9076,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 55c09588b3f5b71488269de611ea4644, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -9240,7 +9292,7 @@ MonoBehaviour:
   _maxTag: {fileID: 825448684583724022}
   _link: {fileID: 173880662486094642}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -9248,21 +9300,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &1263821342702133184
 GameObject:
   m_ObjectHideFlags: 0
@@ -11507,8 +11572,11 @@ MonoBehaviour:
   _lockedHintColor: {r: 1, g: 0.768627, b: 0.301961, a: 1}
   _swapDuration: 0.16
   _swapSlide: 22
+  _swapEase: 9
   _valuePunchScale: 0.3
   _valuePunchDuration: 0.4
+  _valuePunchVibrato: 5
+  _valuePunchElasticity: 0.5
 --- !u!1 &1655953876376845852
 GameObject:
   m_ObjectHideFlags: 0
@@ -12272,7 +12340,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 55c09588b3f5b71488269de611ea4644, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -12892,7 +12960,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 65e255a3d5d2f814b8bba604cd8a1db8, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -13930,7 +13998,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e3ea9633e9147c04591b3540935f3555, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -15739,7 +15807,7 @@ MonoBehaviour:
   _maxTag: {fileID: 3640359183400617294}
   _link: {fileID: 938883267781376308}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -15747,21 +15815,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &2433819241334207299
 GameObject:
   m_ObjectHideFlags: 0
@@ -15827,7 +15908,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1ae4b9c3e114d2c4683e5b97413faf0f, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -17605,7 +17686,7 @@ MonoBehaviour:
   _maxTag: {fileID: 4460608153608232031}
   _link: {fileID: 3986474024277240716}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -17613,21 +17694,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &2812024301617176052
 GameObject:
   m_ObjectHideFlags: 0
@@ -18726,7 +18820,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -96}
-  m_SizeDelta: {x: 150, y: 160}
+  m_SizeDelta: {x: 264, y: 160}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &8879223171983902785
 CanvasRenderer:
@@ -18757,7 +18851,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 136271c82c8e8c04aa310507d16f31c9, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -20572,7 +20666,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f3b6df9276928484f8f9faec95467610, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -20788,6 +20882,7 @@ MonoBehaviour:
   _detailRevealDelay: 0.3
   _detailRevealDuration: 0.3
   _detailRevealSlide: 40
+  _detailRevealEase: 9
 --- !u!1 &3181529022686110258
 GameObject:
   m_ObjectHideFlags: 0
@@ -20928,7 +21023,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b6bdd829081a4d34392d025f80466de2, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -21003,7 +21098,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 324af8ccbb3f5184aac9467f829ee965, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -21273,7 +21368,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 132, y: 132}
+  m_SizeDelta: {x: 240, y: 132}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6744398752365314639
 CanvasRenderer:
@@ -21303,7 +21398,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 417ad76c38e828e4db204a7cf79d21cd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 21714aaddd2f2bd47b0ceeb3843ccd6f, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -21595,7 +21690,7 @@ MonoBehaviour:
   _maxTag: {fileID: 4277944202493194873}
   _link: {fileID: 2364905892714690361}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -21603,21 +21698,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &3319598788463092326
 GameObject:
   m_ObjectHideFlags: 0
@@ -22426,7 +22534,7 @@ MonoBehaviour:
   _maxTag: {fileID: 1026608728615675266}
   _link: {fileID: 4299012960399421170}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -22434,21 +22542,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &3488353877059154245
 GameObject:
   m_ObjectHideFlags: 0
@@ -22739,7 +22860,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: afe585765ae285749a27a5490bbcf473, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -25282,7 +25403,7 @@ MonoBehaviour:
   _maxTag: {fileID: 3705637721668595269}
   _link: {fileID: 1830270547640323713}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -25290,21 +25411,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &3887205139903030225
 GameObject:
   m_ObjectHideFlags: 0
@@ -26451,7 +26585,7 @@ MonoBehaviour:
   _maxTag: {fileID: 795833049783584460}
   _link: {fileID: 0}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -26459,21 +26593,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &4102899632908154718
 GameObject:
   m_ObjectHideFlags: 0
@@ -26681,7 +26828,7 @@ MonoBehaviour:
   _maxTag: {fileID: 709203837800361373}
   _link: {fileID: 368241369270033179}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -26689,21 +26836,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &4118416476432382594
 GameObject:
   m_ObjectHideFlags: 0
@@ -28246,7 +28406,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 90ee3b9779014c228a6ed68e8e57b1e8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7f5721dc5748f8548aa63ce1eec4a337, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -29265,7 +29425,7 @@ MonoBehaviour:
   _maxTag: {fileID: 1723704367430598045}
   _link: {fileID: 2360606783147679049}
   _lockedHexColor: {r: 0.105882, g: 0.152941, b: 0.25098, a: 1}
-  _lockedIconColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 1}
+  _lockedIconColor: {r: 0.65, g: 0.68, b: 0.72, a: 0.8}
   _unlockedIconColor: {r: 1, g: 1, b: 1, a: 1}
   _emptyPipColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.7}
   _lockedLinkColor: {r: 0.305882, g: 0.368627, b: 0.458824, a: 0.55}
@@ -29273,21 +29433,34 @@ MonoBehaviour:
   _glowMinAlpha: 0.18
   _glowMaxAlpha: 0.55
   _glowPulseDuration: 0.9
+  _glowPulseEase: 4
   _selectedScale: 1.1
   _selectDuration: 0.25
   _selectEase: 27
   _upgradePunchScale: 0.25
   _upgradeDuration: 0.45
+  _upgradePunchVibrato: 6
+  _unlockedPunchVibrato: 4
+  _unlockedPunchScaleFraction: 0.5
+  _punchElasticity: 0.6
+  _pipPopEase: 27
   _burstScale: 1.8
   _burstAlpha: 0.9
   _burstDuration: 0.5
+  _burstScaleEase: 9
+  _burstFadeEase: 6
   _pipPopScale: 1.8
   _pipPopDuration: 0.35
   _colorTweenDuration: 0.35
   _deniedShakeStrength: 12
   _deniedShakeDuration: 0.3
+  _deniedShakeVibrato: 14
+  _deniedShakeRandomness: 90
   _revealDuration: 0.4
   _revealEase: 27
+  _linkRevealEase: 6
+  _linkRevealFraction: 0.6
+  _linkRevealLeadFraction: 0.3
 --- !u!1 &4445554137243806538
 GameObject:
   m_ObjectHideFlags: 0
@@ -31243,7 +31416,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 132, y: 132}
+  m_SizeDelta: {x: 240, y: 132}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3007572916759949111
 CanvasRenderer:
@@ -31273,7 +31446,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 417ad76c38e828e4db204a7cf79d21cd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b571f35d0e3ee5c4991709beb2890a48, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -31318,7 +31491,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 132, y: 132}
+  m_SizeDelta: {x: 240, y: 132}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7524313573875721896
 CanvasRenderer:
@@ -31348,7 +31521,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 417ad76c38e828e4db204a7cf79d21cd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 03293cbd535e1a049a613bcdad64044b, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -32506,7 +32679,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -96}
-  m_SizeDelta: {x: 150, y: 160}
+  m_SizeDelta: {x: 264, y: 160}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &4940752968422267885
 CanvasRenderer:
@@ -32537,7 +32710,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 136271c82c8e8c04aa310507d16f31c9, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -32581,7 +32754,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 132, y: 132}
+  m_SizeDelta: {x: 240, y: 132}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5220177908622220886
 CanvasRenderer:
@@ -32611,7 +32784,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 417ad76c38e828e4db204a7cf79d21cd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b6951b7d1db83f44694c2e601228f2aa, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -36709,7 +36882,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -96}
-  m_SizeDelta: {x: 150, y: 160}
+  m_SizeDelta: {x: 264, y: 160}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &8240307716812262566
 CanvasRenderer:
@@ -36740,7 +36913,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 136271c82c8e8c04aa310507d16f31c9, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -37983,7 +38156,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -96}
-  m_SizeDelta: {x: 150, y: 160}
+  m_SizeDelta: {x: 264, y: 160}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &7262818812199414140
 CanvasRenderer:
@@ -38014,7 +38187,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 136271c82c8e8c04aa310507d16f31c9, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4

@@ -63,10 +63,7 @@ namespace ZombieWar.UI
         public void Bind(in SkillCardData data, Action onChosen)
         {
             _onChosen = onChosen;
-            // The plate art is near black, so the accent has to land on the white line icon
-            // itself to read as this skill's colour.
             _icon.sprite = data.Icon;
-            _icon.color = data.AccentColor;
             _nameText.text = data.DisplayName;
             _descriptionText.text = data.Description;
             _newBadge.SetActive(data.IsNew);
