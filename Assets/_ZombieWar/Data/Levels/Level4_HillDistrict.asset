@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4820d9bd5f4e3424f9fac491e5efeb5a, type: 3}
+  m_Name: Level4_HillDistrict
+  m_EditorClassIdentifier: 
+  _levelIndex: 4
+  _displayName: Hill District
+  _artwork: {fileID: 0}
+  _mapPrefab: {fileID: 5028678196323562947, guid: b124a3da1d5126546afeeafafb94c054, type: 3}
+  _nextLevel: {fileID: 0}
+  _duration: 180
+  _countdownDuration: 3
+  _phases:
+  - {fileID: 11400000, guid: 7cdfd5610a3f3024b8f00aae77d29c27, type: 2}
+  - {fileID: 11400000, guid: 72c6f5f4ac3b98f40830d394c0e771c0, type: 2}
+  - {fileID: 11400000, guid: 08e822be3f7a83b4199afbe0828b2552, type: 2}
+  - {fileID: 11400000, guid: d9c0e28387c61044aac58cbab8055136, type: 2}
+  - {fileID: 11400000, guid: 8f7aed34d7f0d5244858b54feb524c4a, type: 2}
+  _spawnRingInner: 14
+  _spawnRingOuter: 20
+  _minSpawnDistance: 12
+  _viewportMargin: 0.05
+  _navMeshSampleRadius: 5
+  _spawnAttempts: 12
