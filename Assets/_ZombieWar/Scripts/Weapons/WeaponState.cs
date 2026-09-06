@@ -4,7 +4,6 @@ namespace ZombieWar.Weapons
     {
         Ready,
         Firing,
-        Cooldown,
-        Switching
+        Cooldown
     }
 }

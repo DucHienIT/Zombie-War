@@ -17,7 +17,7 @@ MonoBehaviour:
   _description: 'A drone fights beside you
 
     Stronger per level'
-  _icon: {fileID: 21300000, guid: 59b2068f5660ba845b09f7e26d62910f, type: 3}
+  _icon: {fileID: 21300000, guid: 2dbe824bad694e65b79ac84e0fc6ac17, type: 3}
   _accentColor: {r: 0.61, g: 0.91, b: 0.48, a: 1}
   _maxStacks: 5
   _draftWeight: 1

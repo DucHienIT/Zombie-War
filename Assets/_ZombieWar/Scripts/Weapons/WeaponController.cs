@@ -28,7 +28,6 @@ namespace ZombieWar.Weapons
         private Transform _transform;
         private int _currentIndex;
         private float _stateTimer;
-        private float _pendingCooldownAfterSwitch;
 
         public event Action<Gun> OnGunChanged;
         public event Action<Gun> OnShotFired;
@@ -49,6 +48,7 @@ namespace ZombieWar.Weapons
             }
 
             ApplyUpgrades();
+            _currentIndex = ResolveEquippedIndex();
             for (int i = 0; i < _guns.Length; i++)
             {
                 _guns[i].SetVisible(i == _currentIndex);
@@ -73,9 +73,21 @@ namespace ZombieWar.Weapons
         }
 
         // Upgrades bought in the menu land here, so a run always starts with the saved levels.
+        // The gun itself was chosen on the weapon-select screen (or kept from the previous run,
+        // for Retry/Next Level) and is fixed for the whole run - there is no in-match switching.
         private void HandleRunStarted(LevelDefinitionSO level)
         {
             ApplyUpgrades();
+            int index = ResolveEquippedIndex();
+            if (index != _currentIndex)
+            {
+                _guns[_currentIndex].SetVisible(false);
+                _currentIndex = index;
+                Gun gun = CurrentGun;
+                gun.SetVisible(true);
+                _aim.SetScanRange(gun.Definition.Range);
+            }
+
             OnGunChanged?.Invoke(CurrentGun);
         }
 
@@ -86,6 +98,20 @@ namespace ZombieWar.Weapons
                 Gun gun = _guns[i];
                 gun.ApplyUpgrade(_profile.GetGunLevel(gun.Definition));
             }
+        }
+
+        private int ResolveEquippedIndex()
+        {
+            GunDefinitionSO equipped = _profile.EquippedGun;
+            for (int i = 0; i < _guns.Length; i++)
+            {
+                if (_guns[i].Definition == equipped)
+                {
+                    return i;
+                }
+            }
+
+            return 0;
         }
 
         // Everything runs after the animator, in this order: the barrel is re-aimed (the run cycle
@@ -117,9 +143,6 @@ namespace ZombieWar.Weapons
                 case WeaponState.Cooldown:
                     TickCooldown(deltaTime);
                     break;
-                case WeaponState.Switching:
-                    TickSwitch(deltaTime);
-                    break;
             }
         }
 
@@ -141,26 +164,6 @@ namespace ZombieWar.Weapons
             {
                 gun.AlignBarrel(_transform.forward);
             }
-        }
-
-        public void RequestSwitch()
-        {
-            if (State == WeaponState.Switching || _guns.Length < 2 || _flow.State != GameState.Playing)
-            {
-                return;
-            }
-
-            float remainingCooldown = State == WeaponState.Cooldown ? _stateTimer : 0f;
-            CurrentGun.SetVisible(false);
-            _currentIndex = (_currentIndex + 1) % _guns.Length;
-            Gun next = CurrentGun;
-            next.SetVisible(true);
-            _aim.SetScanRange(next.Definition.Range);
-
-            State = WeaponState.Switching;
-            _stateTimer = _playerDefinition.SwitchLockDuration;
-            _pendingCooldownAfterSwitch = Mathf.Max(_playerDefinition.MinCooldownAfterSwitch, remainingCooldown);
-            OnGunChanged?.Invoke(next);
         }
 
         private void TryFire(Gun gun)
@@ -223,18 +226,6 @@ namespace ZombieWar.Weapons
             }
 
             State = WeaponState.Ready;
-        }
-
-        private void TickSwitch(float deltaTime)
-        {
-            _stateTimer -= deltaTime;
-            if (_stateTimer > 0f)
-            {
-                return;
-            }
-
-            State = WeaponState.Cooldown;
-            _stateTimer = _pendingCooldownAfterSwitch;
         }
     }
 }

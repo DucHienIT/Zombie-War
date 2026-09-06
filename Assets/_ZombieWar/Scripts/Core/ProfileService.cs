@@ -18,6 +18,7 @@ namespace ZombieWar.Core
         private readonly SaveService _save = new SaveService();
         private int[] _gunLevels;
         private bool[] _gunUnlocked;
+        private int _equippedGunIndex;
         private SkillTreeProgress _skills;
         private bool _loaded;
 
@@ -36,6 +37,17 @@ namespace ZombieWar.Core
             {
                 EnsureLoaded();
                 return _skills;
+            }
+        }
+
+        // The gun a run starts with; chosen on the pre-battle weapon-select screen and kept
+        // for Retry/Next Level, since those skip that screen and jump straight into Countdown.
+        public GunDefinitionSO EquippedGun
+        {
+            get
+            {
+                EnsureLoaded();
+                return _guns[_equippedGunIndex];
             }
         }
 
@@ -65,6 +77,20 @@ namespace ZombieWar.Core
         }
 
         public int GetUpgradeCost(GunDefinitionSO gun) => gun.GetUpgradeCost(GetGunLevel(gun));
+
+        // Only an unlocked gun may be equipped; the weapon-select screen never offers a locked one anyway.
+        public void SetEquippedGun(GunDefinitionSO gun)
+        {
+            EnsureLoaded();
+            int index = IndexOf(gun);
+            if (index < 0 || !_gunUnlocked[index])
+            {
+                return;
+            }
+
+            _equippedGunIndex = index;
+            _save.SetEquippedGunId(gun.Id);
+        }
 
         public bool CanUpgrade(GunDefinitionSO gun)
         {
@@ -160,6 +186,17 @@ namespace ZombieWar.Core
 
                 _gunLevels[i] = Mathf.Clamp(_save.GetGunLevel(gun.Id), 0, gun.MaxUpgradeLevel);
                 _gunUnlocked[i] = _save.IsGunUnlocked(gun.Id, gun.UnlockedByDefault);
+            }
+
+            string equippedId = _save.GetEquippedGunId(_guns[0].Id);
+            _equippedGunIndex = 0;
+            for (int i = 0; i < _guns.Length; i++)
+            {
+                if (_guns[i] != null && _guns[i].Id == equippedId)
+                {
+                    _equippedGunIndex = i;
+                    break;
+                }
             }
         }
 

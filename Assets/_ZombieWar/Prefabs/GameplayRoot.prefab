@@ -1420,22 +1420,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _entries:
-  - Prefab: {fileID: 3264251641068707433, guid: ec5285e6d1fcadf4bbfc3a12da447acf, type: 3}
-    Prewarm: 6
-  - Prefab: {fileID: 5174221843972224886, guid: 6e1476d8dc6bbf447a87aff67bde725a, type: 3}
-    Prewarm: 3
-  - Prefab: {fileID: 1348457769765022127, guid: ca75323a3eb2de448a5464d2a4b63cab, type: 3}
-    Prewarm: 24
-  - Prefab: {fileID: 4474901532229616265, guid: 8acb8f58135e1c6498568ff561f221b2, type: 3}
-    Prewarm: 16
-  - Prefab: {fileID: 2700273723727027051, guid: 3f4366681f98d51488a85b3d0665ab26, type: 3}
-    Prewarm: 3
-  - Prefab: {fileID: 1803616269720018331, guid: a0ff922c8add8a34e90c60965aa80abc, type: 3}
-    Prewarm: 16
-  - Prefab: {fileID: 8900434976353205322, guid: 8135e5954f80c0147a345ce2f7f57e08, type: 3}
-    Prewarm: 4
-  - Prefab: {fileID: 2323939475474075167, guid: 608abe7e546b5b146b5643e220ffee60, type: 3}
-    Prewarm: 16
+  - _prefab: {fileID: 0}
+    _prewarm: 0
+  - _prefab: {fileID: 0}
+    _prewarm: 0
+  - _prefab: {fileID: 0}
+    _prewarm: 0
+  - _prefab: {fileID: 0}
+    _prewarm: 0
+  - _prefab: {fileID: 0}
+    _prewarm: 0
+  - _prefab: {fileID: 0}
+    _prewarm: 0
+  - _prefab: {fileID: 0}
+    _prewarm: 0
+  - _prefab: {fileID: 0}
+    _prewarm: 0
   _poolParent: {fileID: 1304034925982292424}
 --- !u!1 &2861930500921527059
 GameObject:
@@ -5747,6 +5747,7 @@ MonoBehaviour:
   _weapons: {fileID: 6468280450332108366}
   _cameraShake: {fileID: 7999020213214323880}
   _rogue: {fileID: 5561710302172639988}
+  _abilities: {fileID: 6866345778990028579}
 --- !u!114 &9096182643732134147
 MonoBehaviour:
   m_ObjectHideFlags: 0

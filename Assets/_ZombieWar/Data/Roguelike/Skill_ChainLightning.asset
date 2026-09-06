@@ -17,7 +17,7 @@ MonoBehaviour:
   _description: 'Bolt jumps between zombies
 
     +1 jump per level'
-  _icon: {fileID: 21300000, guid: 36235ecd514ae3b41ad780e064076bf9, type: 3}
+  _icon: {fileID: 21300000, guid: cc1f9605bb8f49458ef8dc4fd7e1f915, type: 3}
   _accentColor: {r: 0.44, g: 0.83, b: 1, a: 1}
   _maxStacks: 5
   _draftWeight: 1

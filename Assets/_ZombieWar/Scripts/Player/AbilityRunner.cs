@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using ZombieWar.Core;
@@ -13,6 +14,26 @@ namespace ZombieWar.Player
     {
         private const string LogPrefix = "[Ability]";
         private const int SlotCapacity = 8;
+
+        // Sized for a HUD buffer: the largest snapshot CopyEquipped could ever fill.
+        public const int MaxEquipped = SlotCapacity;
+
+        // What one owned active skill looks like from outside the runner - enough for a HUD
+        // icon plus a read-only cooldown fraction (0 = ready, 1 = just triggered). A continuous
+        // ability (no cooldown) always reads 0 here.
+        public readonly struct EquippedSkill
+        {
+            public readonly ActiveSkillSO Skill;
+            public readonly int Stacks;
+            public readonly float CooldownFraction;
+
+            public EquippedSkill(ActiveSkillSO skill, int stacks, float cooldownFraction)
+            {
+                Skill = skill;
+                Stacks = stacks;
+                CooldownFraction = cooldownFraction;
+            }
+        }
 
         [SerializeField] private GameFlowController _flow;
         [SerializeField] private PlayerHealth _health;
@@ -35,6 +56,10 @@ namespace ZombieWar.Player
         }
 
         public int EquippedCount => _slots.Count;
+
+        // Fired whenever the owned set of active skills changes shape (a new one drafted, a
+        // fresh run starting) - never on a plain cooldown tick.
+        public event Action OnLoadoutChanged;
 
         private void Awake()
         {
@@ -109,6 +134,24 @@ namespace ZombieWar.Player
             {
                 _slots[i].Skill.OnEquipped(_context, _slots[i].Stacks);
             }
+
+            OnLoadoutChanged?.Invoke();
+        }
+
+        // Zero-alloc snapshot for the HUD: copies at most buffer.Length entries and returns how
+        // many it wrote, so the caller's own fixed-size array never has to grow.
+        public int CopyEquipped(EquippedSkill[] buffer)
+        {
+            int count = Mathf.Min(buffer.Length, _slots.Count);
+            for (int i = 0; i < count; i++)
+            {
+                Slot slot = _slots[i];
+                float cooldown = slot.Skill.CooldownFor(slot.Stacks);
+                float fraction = cooldown > 0f ? Mathf.Clamp01(slot.CooldownRemaining / cooldown) : 0f;
+                buffer[i] = new EquippedSkill(slot.Skill, slot.Stacks, fraction);
+            }
+
+            return count;
         }
 
         private void Update()

@@ -23,6 +23,7 @@ namespace ZombieWar.Core
         private WeaponEntryData[] _weapons;
         private SkillNodeData[] _skills;
         private bool _menuShown;
+        private LevelDefinitionSO _pendingLevel;
 
         private void Awake()
         {
@@ -234,7 +235,23 @@ namespace ZombieWar.Core
                 return;
             }
 
-            _flow.StartRun(level);
+            // The run only actually starts once a gun is picked; Retry/Next Level skip this
+            // screen entirely and keep whatever was equipped here.
+            _pendingLevel = level;
+            _ui.ShowWeaponSelectPopup(_weapons, HandleWeaponPicked);
+        }
+
+        private void HandleWeaponPicked(int index)
+        {
+            GunDefinitionSO[] guns = _profile.Guns;
+            if (index < 0 || index >= guns.Length || guns[index] == null)
+            {
+                Debug.LogError($"{LogPrefix} Weapon select closed without a valid pick.", this);
+                return;
+            }
+
+            _profile.SetEquippedGun(guns[index]);
+            _flow.StartRun(_pendingLevel);
         }
     }
 }

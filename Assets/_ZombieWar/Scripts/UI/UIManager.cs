@@ -23,6 +23,7 @@ namespace ZombieWar.UI
         [SerializeField] private ScoreView _score;
         [SerializeField] private GunHudView _gunHud;
         [SerializeField] private XpBarView _xpBar;
+        [SerializeField] private ActiveSkillHudView _activeSkillsHud;
         [SerializeField] private Button _pauseButton;
 
         [Header("Popups")]
@@ -30,18 +31,17 @@ namespace ZombieWar.UI
         [SerializeField] private ResultPopupUI _resultPopup;
         [SerializeField] private SkillChoicePopupUI _skillPopup;
         [SerializeField] private WeaponDetailPopupUI _weaponPopup;
+        [SerializeField] private WeaponSelectPopupUI _weaponSelectPopup;
         [SerializeField] private SettingsPopupUI _settingsPopup;
 
         [Header("Audio")]
         [SerializeField] private AudioSource _audioSource;
         [SerializeField] private AudioClip _tapClip;
-        [SerializeField] private AudioClip _gunSwitchClip;
         [SerializeField] private AudioClip _winClip;
         [SerializeField] private AudioClip _loseClip;
         [SerializeField] private AudioClip _levelUpClip;
 
         private Action _onPauseRequested;
-        private Action _onSwitchGunRequested;
         private Action<int> _onUpgradeWeaponRequested;
         private WeaponEntryData[] _menuWeapons;
         private int _openWeapon = -1;
@@ -50,9 +50,9 @@ namespace ZombieWar.UI
         {
             bool missing = _hudCanvas == null || _menuScreen == null || _countdown == null || _popups == null
                            || _healthBar == null || _timer == null || _score == null || _gunHud == null
-                           || _xpBar == null || _pauseButton == null || _pausePopup == null
-                           || _resultPopup == null || _skillPopup == null || _weaponPopup == null || _settingsPopup == null
-                           || _audioSource == null;
+                           || _xpBar == null || _activeSkillsHud == null || _pauseButton == null || _pausePopup == null
+                           || _resultPopup == null || _skillPopup == null || _weaponPopup == null || _weaponSelectPopup == null
+                           || _settingsPopup == null || _audioSource == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} UIManager has an unassigned reference - the HUD would run blind.", this);
@@ -60,13 +60,11 @@ namespace ZombieWar.UI
             }
 
             _pauseButton.onClick.AddListener(HandlePauseClicked);
-            _gunHud.Init(HandleSwitchGunClicked);
         }
 
-        public void BindGameplayCommands(Action onPause, Action onSwitchGun)
+        public void BindGameplayCommands(Action onPause)
         {
             _onPauseRequested = onPause;
-            _onSwitchGunRequested = onSwitchGun;
         }
 
         public void ShowGameplayScreen()
@@ -104,6 +102,14 @@ namespace ZombieWar.UI
             _popups.Show(_settingsPopup);
         }
 
+        // The whole run keeps this gun - there is no in-match switch, so it must be picked here,
+        // right after a level is chosen and before the countdown starts.
+        public void ShowWeaponSelectPopup(WeaponEntryData[] weapons, Action<int> onPicked)
+        {
+            _weaponSelectPopup.Setup(weapons, Wrap(onPicked));
+            _popups.Show(_weaponSelectPopup);
+        }
+
         // The grid tile only reports which gun was tapped; the sheet and its upgrade live here.
         private void HandleWeaponSelected(int index)
         {
@@ -136,6 +142,8 @@ namespace ZombieWar.UI
         public void SetGun(Sprite icon, string displayName) => _gunHud.SetGun(icon, displayName);
 
         public void SetXp(float normalized, int battleLevel) => _xpBar.SetXp(normalized, battleLevel);
+
+        public void SetActiveSkills(ActiveSkillHudEntry[] skills, int count) => _activeSkillsHud.SetSkills(skills, count);
 
         public void ShowCountdown(bool visible) => _countdown.SetVisible(visible);
 
@@ -226,12 +234,6 @@ namespace ZombieWar.UI
         {
             PlayTap();
             _onPauseRequested?.Invoke();
-        }
-
-        private void HandleSwitchGunClicked()
-        {
-            Play(_gunSwitchClip);
-            _onSwitchGunRequested?.Invoke();
         }
 
         private void Play(AudioClip clip)

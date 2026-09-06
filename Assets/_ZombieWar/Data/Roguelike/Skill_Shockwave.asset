@@ -17,7 +17,7 @@ MonoBehaviour:
   _description: 'Blasts the crowd away
 
     Wider per level'
-  _icon: {fileID: 21300000, guid: f3b6df9276928484f8f9faec95467610, type: 3}
+  _icon: {fileID: 21300000, guid: f4cf15cb18944fb0add18ba3fa6435a2, type: 3}
   _accentColor: {r: 0.79, g: 0.72, b: 1, a: 1}
   _maxStacks: 5
   _draftWeight: 1
