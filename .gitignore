@@ -81,3 +81,7 @@ Thumbs.db
 
 # Editor screenshots taken via Unity MCP
 Captures/
+
+# Local-only debug cheat window (level jump / force win-lose) - not shared, not for shipping
+/Assets/_ZombieWar/Scripts/Editor/
+/Assets/_ZombieWar/Scripts/Editor.meta

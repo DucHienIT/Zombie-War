@@ -164,6 +164,20 @@ namespace ZombieWar.Core
             SetState(GameState.Playing);
         }
 
+        // Editor-only test hook (see Scripts/Editor/DebugCheatWindow): ends the run immediately
+        // instead of waiting for the timer or the player dying, so result popups and rewards can
+        // be checked without playing a level to completion.
+        public void DebugForceEndLevel(bool won)
+        {
+            if (_level == null || State == GameState.Menu || State == GameState.Won || State == GameState.Lost)
+            {
+                return;
+            }
+
+            Time.timeScale = 1f;
+            EndLevel(won);
+        }
+
         public void Retry() => _levelLoader.RestartWith(_level);
 
         public void GoToMenu() => _levelLoader.ReturnToMenu();
