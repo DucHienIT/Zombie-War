@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: shotgun
   _displayName: Shotgun
-  _icon: {fileID: 21300000, guid: 796e79499e75b814d8f622d2d8f86e15, type: 3}
+  _icon: {fileID: 21300000, guid: 03293cbd535e1a049a613bcdad64044b, type: 3}
+  _description: Nine pellets at point blank. Shreds anything up close.
   _animatorWeaponType: 1
   _damage: 10
   _fireInterval: 0.9
@@ -24,8 +25,15 @@ MonoBehaviour:
   _pelletCount: 9
   _spreadAngle: 14
   _knockback: 2.6
+  _pierce: 0
   _muzzleVfx: {fileID: 5174221843972224886, guid: 6e1476d8dc6bbf447a87aff67bde725a, type: 3}
   _fleshImpactVfx: {fileID: 1348457769765022127, guid: ca75323a3eb2de448a5464d2a4b63cab, type: 3}
   _propImpactVfx: {fileID: 4474901532229616265, guid: 8acb8f58135e1c6498568ff561f221b2, type: 3}
   _shotClip: {fileID: 8300000, guid: 67535d6a9b045954e925424a157be5d5, type: 3}
   _cameraImpulse: 0.07
+  _unlockedByDefault: 1
+  _maxUpgradeLevel: 5
+  _damageGainPerLevel: 0.12
+  _fireIntervalCutPerLevel: 0.03
+  _baseUpgradeCost: 150
+  _upgradeCostGrowth: 1.6

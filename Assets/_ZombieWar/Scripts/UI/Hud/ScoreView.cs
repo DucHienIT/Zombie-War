@@ -17,13 +17,17 @@ namespace ZombieWar.UI
         [SerializeField] private float _punchDuration = 0.25f;
 
         private int _shownKills = -1;
+        private Vector3 _punchRestScale;
 
         private void Awake()
         {
             if (_killsText == null || _scoreText == null || _killsPunchTarget == null)
             {
                 Debug.LogError($"{LogPrefix} ScoreView has an unassigned reference.", this);
+                return;
             }
+
+            _punchRestScale = _killsPunchTarget.localScale;
         }
 
         public void SetScore(int kills, int score)
@@ -39,7 +43,12 @@ namespace ZombieWar.UI
             _killsText.SetText("{0}", kills);
             if (!isFirstBind)
             {
-                _killsPunchTarget.DOPunchScale(Vector3.one * _punchScale, _punchDuration, 1, 0f).SetLink(gameObject);
+                // Kills land faster than one punch lasts: without resetting to the authored scale
+                // first, every punch would take the inflated scale as its new rest and the chip
+                // would grow without bound.
+                _killsPunchTarget.DOKill();
+                _killsPunchTarget.localScale = _punchRestScale;
+                _killsPunchTarget.DOPunchScale(_punchRestScale * _punchScale, _punchDuration, 1, 0f).SetLink(gameObject);
             }
         }
     }

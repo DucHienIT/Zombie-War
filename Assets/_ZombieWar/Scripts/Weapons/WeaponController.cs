@@ -187,7 +187,7 @@ namespace ZombieWar.Weapons
             var shot = new ShotStats(
                 gun.Stats.Damage * _stats.Multiplier(StatId.WeaponDamage),
                 definition.Knockback * _stats.Multiplier(StatId.Knockback),
-                Mathf.RoundToInt(_stats.Additive(StatId.ProjectilePierce)));
+                definition.Pierce + Mathf.RoundToInt(_stats.Additive(StatId.ProjectilePierce)));
             SpawnPellets(definition, origin, forward, shot);
             // Attached, not dropped at a world position: the flash rides the muzzle while the soldier runs.
             _vfx.Play(definition.MuzzleVfx, muzzle);

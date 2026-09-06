@@ -21,13 +21,17 @@ namespace ZombieWar.UI
 
         private readonly TimeTextFormatter _formatter = new TimeTextFormatter();
         private int _shownSeconds = -1;
+        private Vector3 _pulseRestScale;
 
         private void Awake()
         {
             if (_text == null || _pulseTarget == null)
             {
                 Debug.LogError($"{LogPrefix} TimerView has an unassigned reference.", this);
+                return;
             }
+
+            _pulseRestScale = _pulseTarget.localScale;
         }
 
         public void SetRemaining(float remaining)
@@ -44,7 +48,9 @@ namespace ZombieWar.UI
 
             if (seconds == _pulseAtSeconds || seconds <= _warningAtSeconds)
             {
-                _pulseTarget.DOPunchScale(Vector3.one * _pulseScale, _pulseDuration, 1, 0f).SetLink(gameObject);
+                _pulseTarget.DOKill();
+                _pulseTarget.localScale = _pulseRestScale;
+                _pulseTarget.DOPunchScale(_pulseRestScale * _pulseScale, _pulseDuration, 1, 0f).SetLink(gameObject);
             }
         }
     }

@@ -22,6 +22,8 @@ namespace ZombieWar.Player
         // Movement expressed in the soldier's local frame: x = strafe, y = forward. Feeds the locomotion blend tree.
         public Vector2 LocalMoveDirection { get; private set; }
         public float NormalizedSpeed { get; private set; }
+        // Top speed the soldier is allowed to reach right now, boosted stats included.
+        public float CurrentMoveSpeed { get; private set; }
         public Vector3 WorldMoveDirection { get; private set; }
         public Vector3 Forward => _transform.forward;
 
@@ -42,6 +44,7 @@ namespace ZombieWar.Player
             Vector2 input = canMove ? _input.MoveVector : Vector2.zero;
 
             float moveSpeed = _definition.MoveSpeed * _stats.Multiplier(StatId.MoveSpeed);
+            CurrentMoveSpeed = moveSpeed;
             // Camera is north-up, so joystick axes map straight onto world X/Z.
             Vector3 targetVelocity = new Vector3(input.x, 0f, input.y) * moveSpeed;
             Vector3 velocity = _rigidbody.velocity;

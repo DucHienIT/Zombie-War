@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace ZombieWar.Data
 {
-    // The game runs in a single scene, so this asset only has to survive a scene reload:
-    // retry and "next level" reload the scene with AutoStart set, everything else lands
-    // on the menu overlay.
+    // This asset only has to survive the trip through the Loading scene: retry and
+    // "next level" leave AutoStart set so the fresh Gameplay scene starts the run at once,
+    // everything else lands on the menu overlay.
     [CreateAssetMenu(menuName = "Zombie War/Level Selection", fileName = "LevelSelection")]
     public sealed class LevelSelectionSO : ScriptableObject
     {

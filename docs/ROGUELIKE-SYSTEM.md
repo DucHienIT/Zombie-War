@@ -8,11 +8,11 @@ Tài liệu hệ thống roguelike của **Zombie War**. Viết ngày 2026-09-05
 
 ## 1. Tóm tắt
 
-Giết quái → nhận **XP** → đầy thanh thì lên **battle level** → game dừng lại và hiện popup **chọn 1 trong 3 skill**. Battle level chỉ sống trong đúng một lượt chơi và mất khi hết màn — khác hẳn level tài khoản của hệ meta progression (mua nâng cấp súng bằng coin).
+Giết quái → rơi **XP orb** tại xác → player lại gần, orb hút về và **chạm mới nhận XP** (2026-09-06) → đầy thanh thì lên **battle level** → game dừng lại và hiện popup **chọn 1 trong 3 skill**. Battle level chỉ sống trong đúng một lượt chơi và mất khi hết màn — khác hẳn level tài khoản của hệ meta progression (mua nâng cấp súng bằng coin).
 
 Có hai loại skill, cùng một popup, cùng hàng sao:
 
-- **11 passive** — thuần **stat modifier**, **mỗi skill đúng một hiệu ứng** (user 2026-09-05: thẻ nhiều hiệu ứng khó đọc), tức mỗi `StatId` có đúng một passive; thêm cái thứ 12 chỉ cần thêm một `.asset`.
+- **8 passive** — thuần **stat modifier**, **mỗi skill đúng một hiệu ứng** (user 2026-09-05: thẻ nhiều hiệu ứng khó đọc); thêm cái thứ 9 chỉ cần thêm một `.asset`.
 - **6 active** — **tự kích hoạt**, không có nút bấm: game vốn đã auto-aim + auto-fire, người chơi chỉ di chuyển, nên một nút bấm sẽ đi ngược thiết kế đó. Mỗi active là một hành vi riêng → một subclass `ActiveSkillSO` + một controller author sẵn trên `Player` + một `.asset`. Hai active đầu (AUTO GRENADE, ORBIT BLADES) đi cùng hệ thống; bốn active sau (MOLOTOV, CHAIN LIGHTNING, SHOCKWAVE, SENTRY DRONE) thêm ngày 2026-09-05 theo đề xuất được user duyệt, lấp bốn khoảng trống: kiểm soát khu vực theo thời gian, sát thương lan trong đám đông, phòng thủ phản ứng, đồng đội tự bắn.
 
 Cơ chế **ném bom thủ công đã bỏ hẳn** (quyết định user 2026-09-05): không còn nút bom, charge, cooldown riêng trên HUD. Quả bom vẫn tồn tại — dưới dạng active skill AUTO GRENADE — để giữ yêu cầu spec §6 (sát thương + lực vật lý).
@@ -24,10 +24,16 @@ Cơ chế **ném bom thủ công đã bỏ hẳn** (quyết định user 2026-09
 ```
 ZombieManager.OnZombieKilled
         │
+        ├──► RoguelikeDirector.HandleZombieKilled   • hồi máu nếu có HealPerKill (tính ngay lúc kill)
+        │
         ▼
-RoguelikeDirector.HandleZombieKilled
-   • hồi máu nếu có HealPerKill
-   • BattleXpTracker.AddXp(xpReward × XpGain)   → trả về số cấp vừa lên
+XpOrbManager.HandleZombieKilled
+   • lấy XpOrb từ pool, Drop(xpReward, vị trí xác, điểm rơi rải ngẫu nhiên)
+   • Update duy nhất: bật lên → lơ lửng thở; vào _magnetRadius thì bay về player (gia tốc)
+        │
+        ▼ (vào _collectRadius)
+RoguelikeDirector.CollectXp(value)
+   • BattleXpTracker.AddXp(value × XpGain)   → trả về số cấp vừa lên
    • OnXpChanged  ─────────────────────────────► GameplayUiBinder → UIManager.SetXp → XpBarView
         │
         ▼ (còn nợ level-up, và flow đang Playing)
@@ -181,9 +187,9 @@ _stats.EndRebuild();   _abilities.EndRebuild();
 
 ---
 
-## 4. Thiết kế 11 passive skill
+## 4. Thiết kế 8 passive skill
 
-Tất cả đều là stat modifier và **mỗi skill đúng một hiệu ứng** (user 2026-09-05: thẻ gộp 2–3 hiệu ứng làm người chơi khó đọc — bản đầu có 6 passive đa hiệu ứng, đã tách ra cùng ngày). Hệ quả: 11 `StatId` ↔ 11 passive, mỗi stat có đúng một thẻ nâng nó, nên đọc tên thẻ là biết nó vặn nút nào. Cột "Mỗi cấp" là giá trị cộng/nhân cho **một** stack; nhiều stack thì additive cộng dồn, multiplicative **nhân dồn** (2 cấp `1.2` → `1.44`, không phải `1.4`).
+Tất cả đều là stat modifier và **mỗi skill đúng một hiệu ứng** (user 2026-09-05: thẻ gộp 2–3 hiệu ứng làm người chơi khó đọc — bản đầu có 6 passive đa hiệu ứng, đã tách ra cùng ngày). Mỗi stat có tối đa một thẻ nâng nó, nên đọc tên thẻ là biết nó vặn nút nào; ba stat bom (`ExtraBombsPerVolley`, `BombRadius`, `BombDamage`) vẫn nằm trong `StatId` và được `BombThrower` đọc nhưng **không còn passive nào cấp** (user 2026-09-06 bỏ ba thẻ bom vì chúng chỉ có nghĩa khi đã bốc AUTO GRENADE). Cột "Mỗi cấp" là giá trị cộng/nhân cho **một** stack; nhiều stack thì additive cộng dồn, multiplicative **nhân dồn** (2 cấp `1.2` → `1.44`, không phải `1.4`).
 
 | Skill | Mỗi cấp | Trần | Icon (`Item_Icon_*` 256) | Màu |
 |---|---|---|---|---|
@@ -195,20 +201,17 @@ Tất cả đều là stat modifier và **mỗi skill đúng một hiệu ứng*
 | **VETERAN** | `XpGain ×1.08` | 4 | `Exp` | xanh `#73A6FF` |
 | **VITALITY** | `MaxHealth +15` | 4 | `Heart` | hồng đỏ `#FF808C` |
 | **BLOOD PACT** | `HealPerKill +2` | 4 | `First-Aid` | đỏ `#FF5B4A` |
-| **EXTRA PAYLOAD** | `ExtraBombsPerVolley +1` | 3 | `Bullet_Pack` | tím hồng `#D98CF2` |
-| **BIG BLAST** | `BombRadius ×1.12` | 3 | `Gasoline` | tím lam `#8C99FF` |
-| **DEMOLITIONIST** | `BombDamage ×1.20` | 3 | `Hammer` | tím `#B47CFF` |
 
-Lịch sử: RAPID FIRE từng có thêm `ReloadSpeed`; băng đạn/nạp đạn đã bỏ khỏi game (2026-09-05) nên stat đó bị xoá và enum đánh số lại. Cùng ngày, HIGH CALIBER (kèm knockback), ADRENALINE (kèm XP), BLOOD PACT (kèm máu tối đa) và DEMOLITIONIST (gộp cả ba stat bom) được tách thành SLUG ROUNDS / VETERAN / VITALITY / EXTRA PAYLOAD / BIG BLAST; bốn thẻ cũ giữ tên và giữ đúng một hiệu ứng, số liệu mỗi cấp không đổi.
+Lịch sử: RAPID FIRE từng có thêm `ReloadSpeed`; băng đạn/nạp đạn đã bỏ khỏi game (2026-09-05) nên stat đó bị xoá và enum đánh số lại. Cùng ngày, HIGH CALIBER (kèm knockback), ADRENALINE (kèm XP), BLOOD PACT (kèm máu tối đa) và DEMOLITIONIST (gộp cả ba stat bom) được tách thành SLUG ROUNDS / VETERAN / VITALITY / EXTRA PAYLOAD / BIG BLAST; bốn thẻ cũ giữ tên và giữ đúng một hiệu ứng, số liệu mỗi cấp không đổi. Ngày 2026-09-06 user bỏ hẳn ba thẻ bom (EXTRA PAYLOAD, BIG BLAST, DEMOLITIONIST) cùng ba icon `Bullet_Pack`/`Gasoline`/`Hammer` chỉ chúng dùng.
 
 **Ý đồ thiết kế**: mỗi thẻ là một nút vặn đơn, nên ba thẻ trong một lần bốc so sánh được ngay với nhau, và mỗi nhóm dưới đây trả lời một câu hỏi khác nhau về lối chơi.
 
 - Nhóm súng: sát thương (HIGH CALIBER), nhịp bắn (RAPID FIRE), xuyên đám đông (PIERCING ROUNDS), đẩy lùi (SLUG ROUNDS)
 - Nhóm cơ động / cuộn tuyết: tốc chạy (ADRENALINE), XP (VETERAN)
 - Nhóm sinh tồn: máu tối đa (VITALITY), hồi máu theo kill (BLOOD PACT) — nguồn hồi máu **duy nhất** trong trận, nên nó là lựa chọn "cứu mạng" thật sự
-- Nhóm bom: số quả mỗi volley (EXTRA PAYLOAD), bán kính (BIG BLAST), sát thương nổ (DEMOLITIONIST) — cả ba chỉ có tác dụng khi đã bốc AUTO GRENADE. `SkillDraft` **chưa** lọc điều kiện này nên chúng vẫn có thể được chào khi chưa có lựu đạn (biết trước, chưa xử lý; nếu làm thì thêm một danh sách "cần sở hữu" vào `SkillDefinitionSO` và lọc trong `SkillDraft.Roll`).
+- Không còn nhóm bom: EXTRA PAYLOAD / BIG BLAST / DEMOLITIONIST đã xoá (2026-09-06) vì là thẻ chết khi chưa có AUTO GRENADE và `SkillDraft` không lọc điều kiện sở hữu. Muốn đưa lại thì thêm một danh sách "cần sở hữu" vào `SkillDefinitionSO` và lọc trong `SkillDraft.Roll` trước.
 
-**Tổng trần passive = 42 stack, cộng 6 active × 5 = 72**, trong khi cả lượt chỉ đi được tối đa 11 lần chọn (battle level 12). Người chơi **không bao giờ full được** — đó là lý do lựa chọn có sức nặng.
+**Tổng trần passive = 33 stack, cộng 6 active × 5 = 63**, trong khi cả lượt chỉ đi được tối đa 11 lần chọn (battle level 12). Người chơi **không bao giờ full được** — đó là lý do lựa chọn có sức nặng.
 
 ### 6 active skill (tự kích hoạt)
 
@@ -266,7 +269,7 @@ Tức khoảng **20 giây một lần chọn** trong màn 3 phút.
 | `ExtraBombsPerVolley` | cộng | `BombThrower.ThrowVolley` (số quả thêm mỗi volley) |
 | `BombRadius` | nhân | `BombThrower.ThrowVolley` → `Bomb.BlastRadius` |
 | `BombDamage` | nhân | `BombThrower.Explode` |
-| `XpGain` | nhân | `RoguelikeDirector.HandleZombieKilled` |
+| `XpGain` | nhân | `RoguelikeDirector.CollectXp` — gọi từ `XpOrbManager` khi nhặt orb, không phải lúc kill |
 
 ### ⚠️ Thứ tự nhân với meta progression
 
@@ -299,7 +302,7 @@ Nằm trong `TopBar` ngay dưới thanh máu: badge tròn hiện battle level + 
 
 - **Hàng sao thay cho chữ "LV 3/5"**: số sao vàng = cấp **sau khi chọn**, tổng số sao = `MaxStacks`. Nhìn phát biết skill còn sâu bao nhiêu, không phải đọc và trừ nhẩm giữa lúc đang bị vây.
 - Prefab author sẵn **5 slot sao** trong mảng `SkillCardView._stars` (bằng trần sâu nhất trong pool). Skill nông hơn ẩn bớt sao và `SkillCardView.DrawStars` dịch cả hàng lại cho vẫn cân giữa.
-- Badge **NEW** hiện khi `SkillCardData.IsNew` (chưa sở hữu stack nào).
+- Badge **NEW** hiện khi `SkillCardData.IsNew` (chưa sở hữu stack nào); ngược lại badge **UPGRADE** (`Label_Tag01_Green`, chữ trắng, cùng vị trí) — `SkillDraft` vốn chào lại skill đã học cho tới khi max, badge này (user 2026-09-06) làm rõ thẻ đó là nâng cấp. `SkillCardView._upgradeBadge` là ref bắt buộc như `_newBadge`.
 - **Phân biệt passive / active** (user phản hồi 2026-09-05: hai loại nhìn y hệt nhau): mỗi thẻ có **chip loại** dưới tên — `PASSIVE` trên tag `Label_Tag01_SkyBlue` (nhạt, chữ ink) và `ACTIVE` trên `Label_Tag01_Blue` (xanh đậm, chữ trắng) — cộng **đĩa icon tô cyan** cho active, trắng cho passive. Dữ liệu vào view là `SkillCardData.IsActive`, binder lấy từ `SkillDefinitionSO.Kind` (thuộc tính đa hình, không `is`-check). Tag của pack là art có màu sẵn nên view **đổi sprite** theo loại chứ không tint.
 - Icon được **tô màu accent của skill**. Sprite nền đĩa tròn của pack gần như đen nên tint lên nó không ăn thua; phải tô lên chính icon nét trắng.
 - Popup tắt cả `_closeOnBackKey` lẫn `_closeOnBackdropClick` — **bắt buộc phải chọn**.
@@ -323,6 +326,7 @@ Hệ này **không có editor tool** (quyết định user 2026-09-05: không gi
 - `_stats` cho `PlayerHealth`, `PlayerMotor`, `WeaponController`, `BombThrower`.
 - `_rogue` cho `GameplayUiBinder`.
 - `AbilityRunner` trên `Player`: `_flow`, `_health`, `_bombs`, `_blades`; `RoguelikeDirector._abilities` → runner.
+- `XpOrbManager` trên `Systems/Managers`: `_definition` = `Data/Roguelike/XpOrb.asset` (`XpOrbDefinitionSO`: `_prefab`, `_poolSize` 96, `_scatterRadius` 0.8, `_popHeight` 0.7, `_popDuration` 0.4, `_hoverHeight` 0.5, `_bobAmplitude` 0.08, `_bobFrequency` 1.6, `_spinDegreesPerSecond` 120, `_magnetRadius` 2.5, `_collectRadius` 0.45, `_flySpeed` 4, `_flyAcceleration` 22, `_collectVfx`/`_collectClip` để trống), `_flow`, `_zombies`, `_rogue`, `_playerHealth`, `_player` = `Player`, `_poolParent` = `Pools/XpOrbPool`, `_vfx`, `_audio`. Prefab `Prefabs/Pickups/XpOrb.prefab`: root `XpOrb` (component `XpOrb`, không collider — nhặt bằng so `sqrMagnitude` trong manager) + con `Gem` (Cube 0.22 xoay 45°/45°, `WFXM_M_GlowPalet Add`, không đổ bóng). Pool prewarm ở `Awake` (không cần NavMesh nên không phải chờ map như zombie).
 - Nhánh `Abilities/OrbitBlades` (local 0; từ 2026-09-06 không còn là con của `Player` vì vòng cưa ăn rotation của nhân vật — user báo sai): `OrbitBladesController` với `_flow`, `_zombies`, `_anchor` = `Player` (chỉ đọc position, controller đặt `transform.position = anchor + up × _height` 1 m mỗi Update), `_enemyMask` = layer Enemy, `_pivot` = con `Pivot`, `_blades` = 6 con `Blade1..6` (Cylinder dẹt 0.6 × 0.04 × 0.6, material `WFXM_M_GlowPalet Add`, không collider — va chạm bằng overlap, author **inactive**; `Awake` của controller cũng gọi `Deactivate()`). Muốn trần ORBIT BLADES cao hơn 5 thì thêm Blade7… vào mảng `_blades`.
 - `BombThrower` không còn ref nào từ UI; `BombDefinition` mất `_chargesPerLevel`/`_cooldown`, thêm `_poolSize` (8) và `_volleyScatter` (1.6).
 - `MolotovThrower` trên `Player` (cạnh `BombThrower`): `_definition` = `Data/Weapons/MolotovDefinition.asset`, `_prefab` = `Prefabs/Weapons/Molotov.prefab` (layer Bomb, Rigidbody không khoá xoay để chai lăn, trail copy từ Bomb), `_bottlePoolParent` = `Pools/MolotovPool`, `_firePoolParent` = `Pools/PlayerFirePool` (pool `FireZone` riêng, tách khỏi `FireZonePool` của hazard), `_throwOrigin`, `_aim`, `_motor`, `_health`, `_flow`, `_zombies`, `_audio`, `_burnMask` = Enemy.
@@ -370,7 +374,9 @@ Active thứ 7 tốn đúng năm bước, và không bước nào đụng vào d
 |---|---|
 | Lên 2 cấp cùng lúc (giết Giant) | Nợ được xếp hàng; chọn xong thẻ đầu là mở luôn bộ thứ hai, không thả `timeScale` ra giữa chừng |
 | Mọi skill đã kịch trần | `SkillDraft.Roll` trả 0 → director xoá nợ và không hỏi nữa |
-| Chết đúng lúc lên cấp | `HandleZombieKilled` và `Update` đều gate `State == Playing`; `OnLevelEnded` xoá sạch nợ |
+| Chết đúng lúc lên cấp | `CollectXp`, `HandleZombieKilled` và `Update` đều gate `State == Playing`; `OnLevelEnded` xoá sạch nợ |
+| Orb còn nằm trên đất khi hết màn | `XpOrbManager` trả hết về pool ở `OnLevelEnded`/`OnRunStarted`; XP đó mất — battle level chỉ sống trong lượt nên không có gì để giữ |
+| Player chết giữa đám orb | Orb không hút khi `PlayerHealth.IsAlive` false và đứng yên khi flow không `Playing` |
 | Hết giờ khi popup đang mở | Không xảy ra: `timeScale = 0` nên `LevelTimer` không chạy |
 | Bấm nút bom/đổi súng khi popup mở | Backdrop chặn raycast, và `RequestThrow`/`RequestSwitch` vẫn tự gate `State == Playing` |
 | Chơi lại / sang màn mới | Scene reload; `OnRunStarted` reset tracker, xoá stack, rebuild stat sheet về mặc định |

@@ -66,14 +66,21 @@ namespace ZombieWar.UI
 
         private void HandleSettingsClicked() => _onSettings?.Invoke();
 
+        // Every page is switched off first, the target one back on: the default page is already
+        // active when the menu binds, and only an off-then-on replays its entrance animation.
         private void ShowPage(int tab)
         {
             for (int i = 0; i < _pages.Length; i++)
             {
                 if (_pages[i] != null)
                 {
-                    _pages[i].SetActive(i == tab);
+                    _pages[i].SetActive(false);
                 }
+            }
+
+            if (tab >= 0 && tab < _pages.Length && _pages[tab] != null)
+            {
+                _pages[tab].SetActive(true);
             }
         }
     }

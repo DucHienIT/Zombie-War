@@ -25,6 +25,8 @@ namespace ZombieWar.Data
         // Total cone angle in degrees; pellets are spread across it.
         [SerializeField] private float _spreadAngle = 1.5f;
         [SerializeField] private float _knockback = 0.6f;
+        // Zombies one bullet passes through before it is spent; the ProjectilePierce passive adds to it.
+        [SerializeField] private int _pierce;
 
         [Header("Feedback")]
         [SerializeField] private PooledVfx _muzzleVfx;
@@ -56,6 +58,7 @@ namespace ZombieWar.Data
         public int PelletCount => _pelletCount;
         public float SpreadAngle => _spreadAngle;
         public float Knockback => _knockback;
+        public int Pierce => _pierce;
         public PooledVfx MuzzleVfx => _muzzleVfx;
         public PooledVfx FleshImpactVfx => _fleshImpactVfx;
         public PooledVfx PropImpactVfx => _propImpactVfx;

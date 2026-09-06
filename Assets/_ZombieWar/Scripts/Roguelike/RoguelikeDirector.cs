@@ -8,7 +8,7 @@ using ZombieWar.Player;
 
 namespace ZombieWar.Roguelike
 {
-    // Owns the progression inside one run: kills feed XP, a full bar owes the player a pick,
+    // Owns the progression inside one run: collected orbs feed XP, a full bar owes the player a pick,
     // and a pick rebuilds the stat sheet. It never freezes the game itself - it announces the
     // choice and leaves what a modal moment means to the central state machine.
     public sealed class RoguelikeDirector : MonoBehaviour
@@ -114,6 +114,19 @@ namespace ZombieWar.Roguelike
             OnChoiceClosed?.Invoke();
         }
 
+        // Experience arrives from XpOrbManager when the player walks into an orb, not from
+        // the kill itself: the drop has to be picked up to count.
+        public void CollectXp(float baseXp)
+        {
+            if (_flow.State != GameState.Playing)
+            {
+                return;
+            }
+
+            _pendingLevelUps += _xp.AddXp(baseXp * _stats.Multiplier(StatId.XpGain));
+            OnXpChanged?.Invoke(_xp.Normalized, _xp.Level);
+        }
+
         public int StacksOf(SkillDefinitionSO skill)
         {
             _stacks.TryGetValue(skill, out int owned);
@@ -157,9 +170,6 @@ namespace ZombieWar.Roguelike
             {
                 _playerHealth.Heal(heal);
             }
-
-            _pendingLevelUps += _xp.AddXp(zombie.Definition.XpReward * _stats.Multiplier(StatId.XpGain));
-            OnXpChanged?.Invoke(_xp.Normalized, _xp.Level);
         }
 
         private bool TryOpenChoice()

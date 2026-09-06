@@ -98,9 +98,9 @@ namespace ZombieWar.UI
             }
         }
 
-        public void ShowSettingsPopup(bool shakeEnabled, Action<bool> onShakeChanged)
+        public void ShowSettingsPopup(in SettingsData data, Action<SettingId, bool> onChanged)
         {
-            _settingsPopup.Setup(shakeEnabled, Wrap(onShakeChanged));
+            _settingsPopup.Setup(data, Wrap(onChanged));
             _popups.Show(_settingsPopup);
         }
 
@@ -191,6 +191,20 @@ namespace ZombieWar.UI
             {
                 PlayTap();
                 action(value);
+            };
+        }
+
+        private Action<SettingId, bool> Wrap(Action<SettingId, bool> action)
+        {
+            if (action == null)
+            {
+                return null;
+            }
+
+            return (id, value) =>
+            {
+                PlayTap();
+                action(id, value);
             };
         }
 

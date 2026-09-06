@@ -14,6 +14,7 @@ namespace ZombieWar.Core
         [SerializeField] private GameFlowController _flow;
         [SerializeField] private ProfileService _profile;
         [SerializeField] private CameraShakeController _cameraShake;
+        [SerializeField] private SettingsService _settings;
         // Chapter order on the battle page.
         [SerializeField] private LevelDefinitionSO[] _levels;
 
@@ -25,7 +26,7 @@ namespace ZombieWar.Core
 
         private void Awake()
         {
-            bool missing = _ui == null || _flow == null || _profile == null || _cameraShake == null
+            bool missing = _ui == null || _flow == null || _profile == null || _cameraShake == null || _settings == null
                            || _levels == null || _levels.Length == 0;
             if (missing)
             {
@@ -179,7 +180,29 @@ namespace ZombieWar.Core
 
         private void HandleSettingsRequested()
         {
-            _ui.ShowSettingsPopup(_cameraShake.IsEnabled, _cameraShake.SetEnabled);
+            SettingsData data = new SettingsData(_settings.SoundEnabled, _settings.MusicEnabled, _settings.HapticsEnabled,
+                _cameraShake.IsEnabled);
+            _ui.ShowSettingsPopup(data, HandleSettingChanged);
+        }
+
+        // The sheet only says which row moved; which service owns that row is decided here.
+        private void HandleSettingChanged(SettingId id, bool enabled)
+        {
+            switch (id)
+            {
+                case SettingId.Sound:
+                    _settings.SetSoundEnabled(enabled);
+                    break;
+                case SettingId.Music:
+                    _settings.SetMusicEnabled(enabled);
+                    break;
+                case SettingId.Haptics:
+                    _settings.SetHapticsEnabled(enabled);
+                    break;
+                case SettingId.CameraShake:
+                    _cameraShake.SetEnabled(enabled);
+                    break;
+            }
         }
 
         private void RefreshCards()

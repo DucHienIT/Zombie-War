@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82b06dcfa861b5a49be8d72a3de5cc5d, type: 3}
+  m_Name: Gun_SMG
+  m_EditorClassIdentifier: 
+  _id: smg
+  _displayName: SMG
+  _icon: {fileID: 21300000, guid: b571f35d0e3ee5c4991709beb2890a48, type: 3}
+  _description: Sprays fast and wide. Short reach, low kick.
+  _animatorWeaponType: 0
+  _damage: 7
+  _fireInterval: 0.1
+  _range: 6
+  _projectileSpeed: 34
+  _projectileRadius: 0.05
+  _pelletCount: 1
+  _spreadAngle: 5
+  _knockback: 0.3
+  _pierce: 0
+  _muzzleVfx: {fileID: 3264251641068707433, guid: ec5285e6d1fcadf4bbfc3a12da447acf, type: 3}
+  _fleshImpactVfx: {fileID: 1348457769765022127, guid: ca75323a3eb2de448a5464d2a4b63cab, type: 3}
+  _propImpactVfx: {fileID: 4474901532229616265, guid: 8acb8f58135e1c6498568ff561f221b2, type: 3}
+  _shotClip: {fileID: 8300000, guid: 1b145bcffd767854fb0c71c37678ebaa, type: 3}
+  _cameraImpulse: 0.02
+  _unlockedByDefault: 1
+  _maxUpgradeLevel: 5
+  _damageGainPerLevel: 0.12
+  _fireIntervalCutPerLevel: 0.03
+  _baseUpgradeCost: 150
+  _upgradeCostGrowth: 1.6

@@ -21,13 +21,17 @@ namespace ZombieWar.UI
 
         private Tween _fillTween;
         private int _shownLevel = -1;
+        private Vector3 _punchRestScale;
 
         private void Awake()
         {
             if (_fill == null || _levelText == null || _levelPunchTarget == null)
             {
                 Debug.LogError($"{LogPrefix} XpBarView has an unassigned reference.", this);
+                return;
             }
+
+            _punchRestScale = _levelPunchTarget.localScale;
         }
 
         public void SetXp(float normalized, int battleLevel)
@@ -45,7 +49,9 @@ namespace ZombieWar.UI
             _levelText.SetText("{0}", battleLevel);
             if (!isFirstBind)
             {
-                _levelPunchTarget.DOPunchScale(Vector3.one * _punchScale, _punchDuration, 1, 0f).SetLink(gameObject);
+                _levelPunchTarget.DOKill();
+                _levelPunchTarget.localScale = _punchRestScale;
+                _levelPunchTarget.DOPunchScale(_punchRestScale * _punchScale, _punchDuration, 1, 0f).SetLink(gameObject);
             }
         }
     }

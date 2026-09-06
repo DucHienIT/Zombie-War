@@ -6,8 +6,8 @@ namespace ZombieWar.Core
     {
         private const string UnlockedLevelKey = "zw_unlocked_level";
         private const string BestScoreKeyPrefix = "zw_best_score_";
-        private const string MusicVolumeKey = "zw_music_volume";
-        private const string SfxVolumeKey = "zw_sfx_volume";
+        private const string SoundKey = "zw_sound";
+        private const string MusicKey = "zw_music";
         private const string HapticsKey = "zw_haptics";
         private const string CameraShakeKey = "zw_camera_shake";
         private const string PlayerLevelKey = "zw_player_level";
@@ -27,8 +27,8 @@ namespace ZombieWar.Core
         public int GetSkillRank(string nodeId) => PlayerPrefs.GetInt(SkillRankKeyPrefix + nodeId, 0);
 
         public int UnlockedLevel => PlayerPrefs.GetInt(UnlockedLevelKey, FirstLevelIndex);
-        public float MusicVolume => PlayerPrefs.GetFloat(MusicVolumeKey, 1f);
-        public float SfxVolume => PlayerPrefs.GetFloat(SfxVolumeKey, 1f);
+        public bool SoundEnabled => PlayerPrefs.GetInt(SoundKey, 1) == 1;
+        public bool MusicEnabled => PlayerPrefs.GetInt(MusicKey, 1) == 1;
         public bool HapticsEnabled => PlayerPrefs.GetInt(HapticsKey, 1) == 1;
         public bool CameraShakeEnabled => PlayerPrefs.GetInt(CameraShakeKey, 1) == 1;
 
@@ -59,11 +59,21 @@ namespace ZombieWar.Core
             return true;
         }
 
-        public void SetAudioSettings(float musicVolume, float sfxVolume, bool hapticsEnabled)
+        public void SetSoundEnabled(bool enabled)
         {
-            PlayerPrefs.SetFloat(MusicVolumeKey, musicVolume);
-            PlayerPrefs.SetFloat(SfxVolumeKey, sfxVolume);
-            PlayerPrefs.SetInt(HapticsKey, hapticsEnabled ? 1 : 0);
+            PlayerPrefs.SetInt(SoundKey, enabled ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        public void SetMusicEnabled(bool enabled)
+        {
+            PlayerPrefs.SetInt(MusicKey, enabled ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        public void SetHapticsEnabled(bool enabled)
+        {
+            PlayerPrefs.SetInt(HapticsKey, enabled ? 1 : 0);
             PlayerPrefs.Save();
         }
 

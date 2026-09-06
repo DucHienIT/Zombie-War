@@ -15,6 +15,9 @@ namespace ZombieWar.UI
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _descriptionText;
         [SerializeField] private GameObject _newBadge;
+        // Owned skills are offered again until they cap; the badge says so, since the same
+        // card otherwise reads as a fresh pick.
+        [SerializeField] private GameObject _upgradeBadge;
 
         [Header("Kind")]
         // The pack's tags are pre-coloured art, so each kind gets its own sprite rather than a tint.
@@ -44,7 +47,7 @@ namespace ZombieWar.UI
         private void Awake()
         {
             bool missing = _button == null || _iconPlate == null || _icon == null || _nameText == null || _descriptionText == null
-                           || _newBadge == null || _kindChip == null || _kindText == null
+                           || _newBadge == null || _upgradeBadge == null || _kindChip == null || _kindText == null
                            || _passiveKindSprite == null || _activeKindSprite == null
                            || _stars == null || _stars.Length == 0 || _starRow == null;
             if (missing)
@@ -67,6 +70,7 @@ namespace ZombieWar.UI
             _nameText.text = data.DisplayName;
             _descriptionText.text = data.Description;
             _newBadge.SetActive(data.IsNew);
+            _upgradeBadge.SetActive(!data.IsNew);
             _kindText.text = data.IsActive ? _activeLabel : _passiveLabel;
             _kindText.color = data.IsActive ? _activeKindTextColor : _passiveKindTextColor;
             _kindChip.sprite = data.IsActive ? _activeKindSprite : _passiveKindSprite;

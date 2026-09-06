@@ -26,6 +26,15 @@ namespace ZombieWar.Audio
             }
         }
 
+        // Every world sound goes through these voices, so muting them mutes gameplay audio.
+        public void SetMuted(bool muted)
+        {
+            for (int i = 0; i < _worldVoices.Length; i++)
+            {
+                _worldVoices[i].mute = muted;
+            }
+        }
+
         public void PlayWorld(AudioClip clip, Vector3 position)
         {
             if (clip == null || IsMerged(clip))
