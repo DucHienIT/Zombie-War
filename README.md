@@ -1,6 +1,6 @@
 # Zombie War
 
-Game bắn súng 3D góc nhìn top-down cho mobile, làm trên Unity với Universal Render Pipeline (URP), Input System mới, và hỗ trợ render cả **2D lẫn 3D**. Đề bài và tiêu chí nghiệm thu xem tại [docs/GAME_SPEC.md](docs/GAME_SPEC.md). Quy tắc code xem tại [CODE-RULE.md](CODE-RULE.md).
+Game bắn súng 3D góc nhìn top-down cho mobile, màn hình dọc, làm trên Unity với Universal Render Pipeline (URP) và Input System mới. **Dev mới bắt đầu tại [Tài liệu hệ thống và hướng dẫn phát triển](docs/DEVELOPER-GUIDE.md)**: kiến trúc, luồng gameplay, save, cách thêm nội dung, debug và kiểm thử. Thiết kế gốc xem tại [GDD](docs/Zombie_War_SPEC_GDD_V1.0.docx); quy tắc code xem tại [CODE-RULE.md](CODE-RULE.md).
 
 ## Yêu cầu
 
@@ -33,10 +33,10 @@ Pipeline asset đang dùng `Assets/Settings/UniversalRP.asset` có hai renderer,
 
 | Index | Renderer | Dùng cho |
 |-------|----------|----------|
-| `0` (mặc định) | `Renderer2D.asset` | Sprite, đèn 2D, tilemap |
-| `1` | `UniversalRenderer.asset` | Mesh 3D, scene 3D có ánh sáng/bóng |
+| `0` | `Renderer2D.asset` | Sprite, đèn 2D, tilemap |
+| `1` (mặc định) | `UniversalRenderer.asset` | Mesh 3D, scene 3D có ánh sáng/bóng |
 
-Mặc định là 2D. Để render scene hoặc camera 3D, chọn camera và đặt **Camera → Rendering → Renderer** thành `UniversalRenderer (1)`. Cần thêm renderer (ví dụ pass UI hay post-processing riêng) thì thêm vào **Renderer List** trên `UniversalRP.asset`.
+Mặc định hiện là renderer 3D (index 1); camera để **Renderer: Default** dùng đường render này. Camera 2D có thể chọn renderer index 0. Cần thêm renderer thì thêm vào **Renderer List** trên `UniversalRP.asset`.
 
 ## Cấu trúc project
 
