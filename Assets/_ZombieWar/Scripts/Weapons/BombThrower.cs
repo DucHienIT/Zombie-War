@@ -101,7 +101,7 @@ namespace ZombieWar.Weapons
         {
             Vector3 velocity = ThrowSolver.LaunchVelocity(origin, target, _definition.FlightTime);
             Bomb bomb = _pool.Get(origin, Quaternion.identity);
-            bomb.Launch(velocity, _definition.FuseDuration, _definition.TelegraphLead, blastRadius);
+            bomb.Launch(velocity, _definition.FuseDuration, blastRadius);
             _active.Add(bomb);
         }
 

@@ -158,7 +158,7 @@ namespace ZombieWar.Weapons
             Gun gun = CurrentGun;
             if (_aim.HasTarget)
             {
-                gun.AlignBarrelAt(_transform.forward, _aim.TargetPosition);
+                gun.AlignBarrelAt(_transform.forward, _aim.TargetAimPoint);
             }
             else
             {
@@ -182,9 +182,9 @@ namespace ZombieWar.Weapons
             GunDefinitionSO definition = gun.Definition;
             Transform muzzle = gun.Muzzle;
             Vector3 origin = muzzle.position;
+            // Taken in full 3D: the barrel is elevated towards the target, so a shot up a ramp or
+            // down off the plateau follows the line the muzzle is actually pointing along.
             Vector3 forward = muzzle.forward;
-            forward.y = 0f;
-            forward.Normalize();
 
             // The menu upgrade is baked into gun.Stats; the run's passives scale it from there.
             var shot = new ShotStats(

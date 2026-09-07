@@ -28,6 +28,7 @@ namespace ZombieWar.Player
         [SerializeField] private Transform _pivot;
         // Authored count is the ceiling any stack level can reach.
         [SerializeField] private Transform[] _blades;
+        [SerializeField] private TrailRenderer[] _bladeTrails;
         // Contact radius of one blade, matched to the authored disc.
         [SerializeField] private float _bladeRadius = 0.35f;
 
@@ -82,6 +83,8 @@ namespace ZombieWar.Player
                 _blades[i].localRotation = turn;
             }
 
+            ClearTrails();
+
             _pivot.gameObject.SetActive(bladeCount > 0);
         }
 
@@ -95,6 +98,18 @@ namespace ZombieWar.Player
 
             _pivot.gameObject.SetActive(false);
             _nextHitTime.Clear();
+            ClearTrails();
+        }
+
+        private void OnDisable() => ClearTrails();
+
+        private void ClearTrails()
+        {
+            if (_bladeTrails == null) return;
+            for (int i = 0; i < _bladeTrails.Length; i++)
+            {
+                if (_bladeTrails[i] != null) _bladeTrails[i].Clear();
+            }
         }
 
         private void Update()

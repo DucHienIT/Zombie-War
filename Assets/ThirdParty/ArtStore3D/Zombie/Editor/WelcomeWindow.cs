@@ -35,9 +35,9 @@ static WelcomeWindow()
 
         void OnEnable()
         {
-            banner = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/ArtStore3D/Zombie/Editor/Images/ArtStore3D.png");
-            tonIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/ArtStore3D/Zombie/Editor/Images/Ton.png");
-            usdtIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/ArtStore3D/Zombie/Editor/Images/USDTRC20.png");
+            banner = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/ArtStore3D/Fat Zombie(Low Poly)/Editor/Images/ArtStore3D.png");
+            tonIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/ArtStore3D/Fat Zombie(Low Poly)/Editor/Images/Ton.png");
+            usdtIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/ArtStore3D/Fat Zombie(Low Poly)/Editor/Images/USDTRC20.png");
       Debug.Log("<color=green><b>Thank you for using my asset!</b></color> If you like it, please take a moment to rate it on the Asset Store. It helps me a lot!");
         }
 
@@ -86,7 +86,7 @@ string supportText = "Your support ensures the continued growth and quality of t
             GUILayout.Space(20);
             
             if (GUILayout.Button("Support by Rating & Reviewing", GUILayout.Height(30)))
-                Application.OpenURL("https://u3d.as/2UU9");
+                Application.OpenURL("https://u3d.as/3nDj");
 
             GUILayout.Space(20);
             GUILayout.Label("Crypto Donations:", EditorStyles.boldLabel);

@@ -42,12 +42,20 @@ namespace ZombieWar.Enemies
         private Action<ZombieController> _onDied;
         private Action<ZombieController> _onDespawnReady;
         private int _createdCount;
+        private ZombieController _boss;
+        private bool _bossDefeated;
         private int _corpseLayer;
         private float _lastVoiceTime;
 
         public event Action<ZombieController> OnZombieKilled;
+        public event Action<ZombieController, float> OnZombieDamaged;
+        public event Action<ZombieController> OnBossSpawned;
+        public event Action<float> OnBossHealthChanged;
+        public event Action OnBossDefeated;
 
         public int ActiveCount => _active.Count;
+        // A level flagged as boss-gated reads this instead of the clock to decide the run is won.
+        public bool BossDefeated => _bossDefeated;
 
         private void Awake()
         {
@@ -84,6 +92,8 @@ namespace ZombieWar.Enemies
         // under it logs an error and never attaches, and the map carries the baked data.
         private void HandleRunStarted(LevelDefinitionSO level)
         {
+            _boss = null;
+            _bossDefeated = false;
             if (_pools.Count > 0)
             {
                 return;
@@ -107,12 +117,30 @@ namespace ZombieWar.Enemies
             ZombieController zombie = pool.Get(position, rotation);
             _active.Add(zombie);
             _audio.PlayWorld(definition.SpawnClip, position);
+            if (definition.IsBoss)
+            {
+                _boss = zombie;
+                _bossDefeated = false;
+                OnBossSpawned?.Invoke(zombie);
+            }
+
             return zombie;
         }
 
         public bool TryGetZombie(Collider collider, out ZombieController zombie)
         {
             return _byCollider.TryGetValue(collider, out zombie);
+        }
+
+        // Bodies report through their owner so presenters subscribe once here instead of to
+        // every pooled zombie.
+        public void ReportDamage(ZombieController zombie, float amount)
+        {
+            OnZombieDamaged?.Invoke(zombie, amount);
+            if (zombie == _boss)
+            {
+                OnBossHealthChanged?.Invoke(zombie.HealthNormalized);
+            }
         }
 
         public void PlayVoice(AudioClip[] clips, Vector3 position)
@@ -191,12 +219,28 @@ namespace ZombieWar.Enemies
         private void HandleDied(ZombieController zombie)
         {
             _vfx.Play(zombie.Definition.DeathVfx, zombie.Position, Quaternion.identity);
+            ClearBossIfItIs(zombie);
             OnZombieKilled?.Invoke(zombie);
         }
 
         private void HandleDespawnReady(ZombieController zombie)
         {
+            // A boss recycled without dying (stuck off the mesh) would leave a boss-gated level
+            // with no way to end, so it closes the gate here as well.
+            ClearBossIfItIs(zombie);
             _despawnQueue.Add(zombie);
+        }
+
+        private void ClearBossIfItIs(ZombieController zombie)
+        {
+            if (zombie != _boss)
+            {
+                return;
+            }
+
+            _boss = null;
+            _bossDefeated = true;
+            OnBossDefeated?.Invoke();
         }
     }
 }

@@ -15,7 +15,6 @@ namespace ZombieWar.Data
         [SerializeField] private float _throwRange = 6f;
         [SerializeField] private float _flightTime = 0.55f;
         [SerializeField] private float _fuseDuration = 1.2f;
-        [SerializeField] private float _telegraphLead = 0.45f;
         // Extra bombs in a volley land up to this far from the first, so they never stack on one spot.
         [SerializeField] private float _volleyScatter = 1.6f;
 
@@ -38,7 +37,6 @@ namespace ZombieWar.Data
         public float ThrowRange => _throwRange;
         public float FlightTime => _flightTime;
         public float FuseDuration => _fuseDuration;
-        public float TelegraphLead => _telegraphLead;
         public float VolleyScatter => _volleyScatter;
         public float BlastRadius => _blastRadius;
         public float DamageAtCenter => _damageAtCenter;

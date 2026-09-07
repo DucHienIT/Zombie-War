@@ -82,6 +82,10 @@ Thumbs.db
 # Editor screenshots taken via Unity MCP
 Captures/
 
-# Local-only debug cheat window (level jump / force win-lose) - not shared, not for shipping
-/Assets/_ZombieWar/Scripts/Editor/
-/Assets/_ZombieWar/Scripts/Editor.meta
+# Local-only debug cheat window (level jump / force win-lose) - not shared, not for shipping.
+# Only this one file is ignored: the rest of Scripts/Editor/ (build tool + asmdef) is committed.
+/Assets/_ZombieWar/Scripts/Editor/DebugCheatWindow.cs
+/Assets/_ZombieWar/Scripts/Editor/DebugCheatWindow.cs.meta
+
+# Local-only options of the third-party BuildReport editor tool (stores a machine-specific output path)
+/ProjectSettings/BuildReportToolOptions.xml

@@ -27,6 +27,9 @@ namespace ZombieWar.Player
         public ZombieController CurrentTarget { get; private set; }
         public bool HasTarget => CurrentTarget != null && CurrentTarget.IsTargetable;
         public Vector3 TargetPosition => CurrentTarget.Position;
+        // Chest of the current target: the barrel elevates towards this, so a slope between the two
+        // no longer throws the shot over or under the body.
+        public Vector3 TargetAimPoint => CurrentTarget.AimPoint.position;
         public float AimErrorDegrees { get; private set; }
 
         private void Awake()

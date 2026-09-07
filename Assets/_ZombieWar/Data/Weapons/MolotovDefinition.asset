@@ -16,6 +16,6 @@ MonoBehaviour:
   _firePoolSize: 6
   _throwRange: 6
   _flightTime: 0.6
-  _firePrefab: {fileID: 7135708135450928788, guid: 95093a5930faadc4e833bd414cc99362, type: 3}
+  _firePrefab: {fileID: 7135708135450928788, guid: 3d1ba86e3ecccc14d9783795f9874fbd, type: 3}
   _throwClip: {fileID: 8300000, guid: 406c929b7299afb469c82778f8d15d5b, type: 3}
   _igniteClip: {fileID: 8300000, guid: 79ee7751ab191f548b7f3232381afa0a, type: 3}

@@ -25,6 +25,8 @@ namespace ZombieWar.Level
         private SpawnPointResolver _resolver;
         private int _phaseIndex;
         private int _scriptedCursor;
+        // Bodies still owed by the scripted entry under the cursor; a boss must never be lost to a failed placement.
+        private int _scriptedRemaining;
         private int _hazardCursor;
         private float _spawnTimer;
         private float _smoothedDeltaTime;
@@ -66,6 +68,7 @@ namespace ZombieWar.Level
             _resolver = new SpawnPointResolver(level, _camera);
             _phaseIndex = 0;
             _scriptedCursor = 0;
+            _scriptedRemaining = 0;
             _hazardCursor = 0;
             _spawnTimer = 0f;
             _smoothedDeltaTime = Time.fixedDeltaTime;
@@ -102,6 +105,7 @@ namespace ZombieWar.Level
             {
                 _phaseIndex++;
                 _scriptedCursor = 0;
+                _scriptedRemaining = 0;
                 _hazardCursor = 0;
             }
         }
@@ -117,9 +121,20 @@ namespace ZombieWar.Level
             while (_scriptedCursor < spawns.Length && elapsed >= spawns[_scriptedCursor].Time)
             {
                 ScriptedSpawn spawn = spawns[_scriptedCursor];
-                for (int i = 0; i < spawn.Count; i++)
+                if (_scriptedRemaining <= 0)
                 {
-                    TrySpawn(spawn.Definition);
+                    _scriptedRemaining = spawn.Count;
+                }
+
+                while (_scriptedRemaining > 0 && TrySpawn(spawn.Definition))
+                {
+                    _scriptedRemaining--;
+                }
+
+                if (_scriptedRemaining > 0)
+                {
+                    // The ring had no free spot this frame; the debt is kept and retried next frame.
+                    return;
                 }
 
                 _scriptedCursor++;
@@ -169,18 +184,19 @@ namespace ZombieWar.Level
             return _smoothedDeltaTime > lowFpsDeltaTime ? _maxIntervalStretch : 1f;
         }
 
-        private void TrySpawn(ZombieDefinitionSO definition)
+        private bool TrySpawn(ZombieDefinitionSO definition)
         {
             Vector3 playerPosition = _player.position;
             if (!_resolver.TryResolve(playerPosition, out Vector3 spawnPosition))
             {
-                return;
+                return false;
             }
 
             Vector3 facing = playerPosition - spawnPosition;
             facing.y = 0f;
             Quaternion rotation = facing.sqrMagnitude > 0f ? Quaternion.LookRotation(facing) : Quaternion.identity;
             _zombies.Spawn(definition, spawnPosition, rotation);
+            return true;
         }
     }
 }

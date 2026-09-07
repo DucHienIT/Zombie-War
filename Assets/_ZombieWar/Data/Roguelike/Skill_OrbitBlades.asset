@@ -25,7 +25,7 @@ MonoBehaviour:
   _bladesPerStack: 1
   _orbitRadius: 2.2
   _spinDegreesPerSecond: 240
-  _baseDamage: 14
+  _baseDamage: 9.5
   _damagePerStack: 1.2
   _knockback: 1.2
-  _hitInterval: 0.4
+  _hitInterval: 0.28

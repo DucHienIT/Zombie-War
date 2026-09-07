@@ -12,6 +12,10 @@ namespace ZombieWar.Data
         [SerializeField] private string _displayName;
         [SerializeField] private ZombieController _prefab;
         [SerializeField] private int _poolPrewarm = 16;
+        // A boss owns the HUD boss bar, and on a level that requires it the clock cannot end the run
+        // while it lives. Keep RepathTimeout and PhysicsKnockbackThreshold high on a boss so it is
+        // never recycled out of the arena with that gate still closed.
+        [SerializeField] private bool _isBoss;
 
         [Header("Stats")]
         [SerializeField] private float _maxHp = 48f;
@@ -59,6 +63,7 @@ namespace ZombieWar.Data
         public string DisplayName => _displayName;
         public ZombieController Prefab => _prefab;
         public int PoolPrewarm => _poolPrewarm;
+        public bool IsBoss => _isBoss;
         public float MaxHp => _maxHp;
         public float MoveSpeed => _moveSpeed;
         public int ScoreReward => _scoreReward;

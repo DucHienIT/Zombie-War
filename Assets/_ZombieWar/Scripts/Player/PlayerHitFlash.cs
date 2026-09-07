@@ -18,6 +18,7 @@ namespace ZombieWar.Player
         private Color[] _baseColors;
         private int _colorPropertyId;
         private float _timer;
+        private bool _blockApplied;
 
         private void Awake()
         {
@@ -74,6 +75,14 @@ namespace ZombieWar.Player
 
         private void Apply(float blend)
         {
+            // A renderer holding a property block is skipped by the SRP Batcher, and blend 0 resolves to the authored
+            // color anyway, so the soldier drops his block once the flash is over.
+            if (blend <= 0f)
+            {
+                ClearBlock();
+                return;
+            }
+
             for (int i = 0; i < _renderers.Length; i++)
             {
                 Renderer renderer = _renderers[i];
@@ -81,6 +90,23 @@ namespace ZombieWar.Player
                 _block.SetColor(_colorPropertyId, Color.Lerp(_baseColors[i], _flashColor, blend));
                 renderer.SetPropertyBlock(_block);
             }
+
+            _blockApplied = true;
+        }
+
+        private void ClearBlock()
+        {
+            if (!_blockApplied)
+            {
+                return;
+            }
+
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                _renderers[i].SetPropertyBlock(null);
+            }
+
+            _blockApplied = false;
         }
     }
 }

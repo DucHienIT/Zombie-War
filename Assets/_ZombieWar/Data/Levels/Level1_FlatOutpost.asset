@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _levelIndex: 1
   _displayName: Flat Outpost
+  _artwork: {fileID: 0}
   _mapPrefab: {fileID: 2259449601778017970, guid: 0414d434983d20c4d89766211dd33337, type: 3}
   _nextLevel: {fileID: 11400000, guid: ff06822f45f98d445a639299a83e6f75, type: 2}
   _duration: 180
@@ -24,6 +25,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 928769d74f87a3a44871be2536d5540f, type: 2}
   - {fileID: 11400000, guid: 73badeaa62648724e8b0bddb4d23807e, type: 2}
   - {fileID: 11400000, guid: a7f5a587c27e97244b2a926a5cb2658a, type: 2}
+  _requiresBossDefeat: 1
   _spawnRingInner: 14
   _spawnRingOuter: 20
   _minSpawnDistance: 12

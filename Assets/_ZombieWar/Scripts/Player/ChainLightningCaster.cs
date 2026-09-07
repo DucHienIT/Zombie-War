@@ -32,6 +32,8 @@ namespace ZombieWar.Player
         // Metres each inner point is thrown off the straight line.
         [SerializeField] private float _jitter = 0.35f;
         [SerializeField] private float _boltDuration = 0.18f;
+        [SerializeField] private float _flickerInterval;
+        [SerializeField] private AnimationCurve _widthOverLifetime;
 
         [Header("Feedback")]
         [SerializeField] private PooledVfx _hitVfx;
@@ -42,6 +44,9 @@ namespace ZombieWar.Player
         private Vector3[] _points;
         private float[] _authoredWidths;
         private float _boltTimer;
+        private float _flickerTimer;
+        private Vector3[] _boltStarts;
+        private Vector3[] _boltEnds;
         private int _litBolts;
 
         public bool HasTarget => _aim.HasTarget;
@@ -58,6 +63,8 @@ namespace ZombieWar.Player
 
             _points = new Vector3[_segmentsPerBolt + 1];
             _authoredWidths = new float[_bolts.Length];
+            _boltStarts = new Vector3[_bolts.Length];
+            _boltEnds = new Vector3[_bolts.Length];
             for (int i = 0; i < _bolts.Length; i++)
             {
                 _authoredWidths[i] = _bolts[i].widthMultiplier;
@@ -81,6 +88,7 @@ namespace ZombieWar.Player
             }
 
             _struck.Clear();
+            ClearBolts();
             ZombieController current = _aim.CurrentTarget;
             Vector3 from = _origin.position;
             float amount = damage;
@@ -102,6 +110,7 @@ namespace ZombieWar.Player
 
             _litBolts = count;
             _boltTimer = _boltDuration;
+            _flickerTimer = _flickerInterval;
             _audio.PlayWorld(_zapClip, _origin.position);
         }
 
@@ -143,12 +152,20 @@ namespace ZombieWar.Player
 
         private void DrawBolt(int index, Vector3 from, Vector3 to)
         {
+            _boltStarts[index] = from;
+            _boltEnds[index] = to;
             int last = _points.Length - 1;
+            float phase = Time.time / Mathf.Max(_flickerInterval, Mathf.Epsilon);
             for (int i = 0; i <= last; i++)
             {
                 Vector3 point = Vector3.Lerp(from, to, i / (float)last);
                 bool inner = i > 0 && i < last;
-                _points[i] = inner ? point + Random.insideUnitSphere * _jitter : point;
+                // Visual noise must not consume the random sequence used by combat and loot.
+                Vector3 offset = new Vector3(
+                    Mathf.PerlinNoise(index + i, phase) * 2f - 1f,
+                    Mathf.PerlinNoise(index + i + 17f, phase) * 2f - 1f,
+                    Mathf.PerlinNoise(index + i + 37f, phase) * 2f - 1f);
+                _points[i] = inner ? point + offset * (_jitter * Mathf.Sin(Mathf.PI * i / last)) : point;
             }
 
             LineRenderer bolt = _bolts[index];
@@ -166,9 +183,13 @@ namespace ZombieWar.Player
 
             _boltTimer -= Time.deltaTime;
             float remaining = Mathf.Clamp01(_boltTimer / _boltDuration);
+            _flickerTimer -= Time.deltaTime;
+            bool redraw = _flickerTimer <= 0f;
+            if (redraw) _flickerTimer = _flickerInterval;
             for (int i = 0; i < _litBolts; i++)
             {
-                _bolts[i].widthMultiplier = _authoredWidths[i] * remaining;
+                if (redraw) DrawBolt(i, _boltStarts[i], _boltEnds[i]);
+                _bolts[i].widthMultiplier = _authoredWidths[i] * _widthOverLifetime.Evaluate(1f - remaining);
             }
 
             if (_boltTimer > 0f)
@@ -176,6 +197,13 @@ namespace ZombieWar.Player
                 return;
             }
 
+            ClearBolts();
+        }
+
+        private void OnDisable() => ClearBolts();
+
+        private void ClearBolts()
+        {
             for (int i = 0; i < _litBolts; i++)
             {
                 _bolts[i].gameObject.SetActive(false);

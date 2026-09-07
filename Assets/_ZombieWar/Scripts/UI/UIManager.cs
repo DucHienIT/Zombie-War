@@ -24,6 +24,7 @@ namespace ZombieWar.UI
         [SerializeField] private GunHudView _gunHud;
         [SerializeField] private XpBarView _xpBar;
         [SerializeField] private ActiveSkillHudView _activeSkillsHud;
+        [SerializeField] private BossHealthBarView _bossBar;
         [SerializeField] private Button _pauseButton;
 
         [Header("Popups")]
@@ -50,7 +51,7 @@ namespace ZombieWar.UI
         {
             bool missing = _hudCanvas == null || _menuScreen == null || _countdown == null || _popups == null
                            || _healthBar == null || _timer == null || _score == null || _gunHud == null
-                           || _xpBar == null || _activeSkillsHud == null || _pauseButton == null || _pausePopup == null
+                           || _xpBar == null || _activeSkillsHud == null || _bossBar == null || _pauseButton == null || _pausePopup == null
                            || _resultPopup == null || _skillPopup == null || _weaponPopup == null || _weaponSelectPopup == null
                            || _settingsPopup == null || _audioSource == null;
             if (missing)
@@ -144,6 +145,12 @@ namespace ZombieWar.UI
         public void SetXp(float normalized, int battleLevel) => _xpBar.SetXp(normalized, battleLevel);
 
         public void SetActiveSkills(ActiveSkillHudEntry[] skills, int count) => _activeSkillsHud.SetSkills(skills, count);
+
+        public void ShowBossBar(string displayName) => _bossBar.Show(displayName);
+
+        public void SetBossHealth(float normalized) => _bossBar.SetHealth(normalized);
+
+        public void HideBossBar() => _bossBar.Hide();
 
         public void ShowCountdown(bool visible) => _countdown.SetVisible(visible);
 

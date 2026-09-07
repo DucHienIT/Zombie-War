@@ -423,14 +423,20 @@ Hot path tái sử dụng buffer/list, physics NonAlloc, registry collider, mana
 
 ### Android build
 
-1. Compile sạch, không warning/error mới do thay đổi.
-2. Kiểm tra hai scene enabled đúng thứ tự, portrait, Input System, URP.
-3. Chuyển Android, kiểm tra SDK/NDK/JDK, backend/architecture và cấu hình ký của team; không lưu password/keystore vào tài liệu.
-4. Build Development để test/profile trên máy thật, sau đó build cấu hình phát hành đã thống nhất.
-5. Thử fresh launch/resume/touch/save/relaunch, map đông quái; cài đè phải kiểm tra profile cũ.
-6. Bàn giao commit, Unity version, cấu hình build, thiết bị/OS và kết quả smoke test.
+Build qua menu **`Tools ▸ Zombie War ▸ Build ▸ Android APK (Release)`** (hoặc bản Development khi cần profiler), không mở File → Build Settings bấm tay. Tool là `Assets/_ZombieWar/Scripts/Editor/AndroidBuilder.cs`; nó ghi lại mọi player setting ảnh hưởng tới output ở mỗi lần build (IL2CPP, ARM64, min SDK 25, stripping Low, portrait, APK không phải AAB, development on/off theo menu), nên cấu hình không thể trôi giữa hai lần build. Chi tiết bảng setting và cách ký APK xem `CLAUDE.md` mục "Build Android".
 
-Snapshot ProjectSettings: AndroidMinSdkVersion = 25, AndroidTargetSdkVersion = 0. Đây không phải xác nhận đáp ứng store hiện hành. Tài liệu này không xác nhận APK đã build thành công.
+1. Compile sạch, không warning/error mới do thay đổi.
+2. Kiểm tra hai scene enabled đúng thứ tự — tool tự huỷ build nếu Loading không ở index 0 hoặc thiếu Gameplay.
+3. Kiểm tra SDK/NDK/JDK đã cài kèm Android Build Support; cấu hình ký lấy từ biến môi trường `ZW_ANDROID_KEYSTORE*`, không lưu password/keystore vào tài liệu hay repo.
+3b. Texture/audio không cần chỉnh tay: `TextureImportRules` và `AudioImportRules` ép ASTC + maxSize theo thư mục và mono Vorbis ngay lúc import. Thêm asset mới chỉ cần thả vào đúng thư mục trong `_ZombieWar`; muốn giữ một texture ở độ phân giải cao hơn luật thì set maxSize của nó trong Inspector, lần import sau không ghi đè.
+4. Tăng `bundleVersion`/`bundleVersionCode` bằng tay trước bản release — tool cố ý không tự tăng, và tên file APK sinh từ hai số này.
+5. Build Development để test/profile trên máy thật, sau đó build Release.
+6. Thử fresh launch/resume/touch/save/relaunch, map đông quái; cài đè phải kiểm tra profile cũ.
+7. Bàn giao commit, Unity version, cấu hình build, thiết bị/OS và kết quả smoke test.
+
+Log sau build in thời gian, dung lượng và 15 asset nặng nhất trong gói — dùng bảng đó khi cần cắt dung lượng APK, không đoán theo tổng size.
+
+Snapshot ProjectSettings: AndroidMinSdkVersion = 25, AndroidTargetSdkVersion = 0 (Auto). Đây không phải xác nhận đáp ứng store hiện hành. Tài liệu này không xác nhận APK đã build thành công.
 
 ## 14. Giới hạn và hướng nâng cấp
 

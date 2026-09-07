@@ -126,6 +126,15 @@ MonoBehaviour:
   _animator: {fileID: 2052130631855905267}
   _hitReactionLayerIndex: 1
   _speedDampTime: 0.1
+  _gaits:
+  - _controller: {fileID: 9100000, guid: 429328e6f5d5d3544b26602477452d20, type: 2}
+    _locomotionSpeed: 1
+  - _controller: {fileID: 22100000, guid: 5a5c73270cbcb354abe6c466f7960476, type: 2}
+    _locomotionSpeed: 1
+  - _controller: {fileID: 22100000, guid: 14e9ab1c371c5294eaea3b09e04695a1, type: 2}
+    _locomotionSpeed: 2
+  - _controller: {fileID: 22100000, guid: 2ca48f22f65cf9b48bcb845ebcefec05, type: 2}
+    _locomotionSpeed: 1.9
 --- !u!114 &6297876665996542485
 MonoBehaviour:
   m_ObjectHideFlags: 0

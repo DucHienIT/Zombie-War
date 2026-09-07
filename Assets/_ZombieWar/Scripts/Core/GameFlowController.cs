@@ -34,6 +34,8 @@ namespace ZombieWar.Core
         public event Action<LevelResult> OnLevelEnded;
 
         public GameState State { get; private set; }
+        // A boss level runs past its clock until the boss is down, so surviving the timer is not a win on its own.
+        public bool AwaitingBoss => _level != null && _level.RequiresBossDefeat && !_zombies.BossDefeated;
         public LevelDefinitionSO Level => _level;
         public float ElapsedTime => _timer.Elapsed;
         public float RemainingTime => _timer.Remaining;
@@ -219,7 +221,7 @@ namespace ZombieWar.Core
         {
             _timer.Tick(deltaTime);
             OnRemainingTimeChanged?.Invoke(_timer.Remaining);
-            if (_timer.IsFinished)
+            if (_timer.IsFinished && !AwaitingBoss)
             {
                 EndLevel(true);
             }

@@ -28,6 +28,10 @@ namespace ZombieWar.Weapons
         [Header("Aim")]
         // How far the barrel may swing away from the body facing to stay on the target.
         [SerializeField] private float _aimYawLimitDegrees = 25f;
+        // How far the barrel may tilt up or down. The body never pitches, so this limit alone covers
+        // the whole climb: 60 degrees still reaches a body at the foot of the level 2 plateau from
+        // two metres back off the edge, and nothing steeper can reach the soldier anyway.
+        [SerializeField] private float _aimPitchLimitDegrees = 60f;
 
         private Transform _transform;
         private Vector3 _restPosition;
@@ -95,27 +99,32 @@ namespace ZombieWar.Weapons
         // animator has run, so the locomotion sway of the arm never bends where bullets go.
         public void AlignBarrel(Vector3 bodyForward)
         {
-            SetBarrelDirection(bodyForward);
+            SetBarrelDirection(bodyForward, 0f);
         }
 
-        // Same, but swung towards the target within the yaw limit so a shot inside the aim
-        // tolerance leaves the muzzle pointing exactly at what it hits.
-        public void AlignBarrelAt(Vector3 bodyForward, Vector3 targetPosition)
+        // Same, but swung towards the target within the yaw and pitch limits so a shot inside the
+        // aim tolerance leaves the muzzle pointing exactly at what it hits, uphill or downhill.
+        public void AlignBarrelAt(Vector3 bodyForward, Vector3 targetPoint)
         {
-            Vector3 toTarget = targetPosition - _transform.position;
-            toTarget.y = 0f;
-            if (toTarget.sqrMagnitude <= 0f)
+            Vector3 toTarget = targetPoint - _transform.position;
+            Vector3 heading = toTarget;
+            heading.y = 0f;
+            float groundDistance = heading.magnitude;
+            if (groundDistance <= 0f)
             {
-                SetBarrelDirection(bodyForward);
+                SetBarrelDirection(bodyForward, 0f);
                 return;
             }
 
-            float yaw = Vector3.SignedAngle(bodyForward, toTarget, Vector3.up);
+            float yaw = Vector3.SignedAngle(bodyForward, heading, Vector3.up);
             yaw = Mathf.Clamp(yaw, -_aimYawLimitDegrees, _aimYawLimitDegrees);
-            SetBarrelDirection(Quaternion.AngleAxis(yaw, Vector3.up) * bodyForward);
+            float pitch = Mathf.Atan2(toTarget.y, groundDistance) * Mathf.Rad2Deg;
+            pitch = Mathf.Clamp(pitch, -_aimPitchLimitDegrees, _aimPitchLimitDegrees);
+            SetBarrelDirection(Quaternion.AngleAxis(yaw, Vector3.up) * bodyForward, pitch);
         }
 
-        private void SetBarrelDirection(Vector3 direction)
+        // The elevation is applied on top of a levelled heading, so tilting the barrel never rolls it.
+        private void SetBarrelDirection(Vector3 direction, float pitchDegrees)
         {
             direction.y = 0f;
             if (direction.sqrMagnitude <= 0f)
@@ -123,7 +132,8 @@ namespace ZombieWar.Weapons
                 return;
             }
 
-            _transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+            // A positive X euler pitches the nose down, so the elevation towards the target is negated.
+            _transform.rotation = Quaternion.LookRotation(direction, Vector3.up) * Quaternion.Euler(-pitchDegrees, 0f, 0f);
         }
 
         public void SetVisible(bool visible)

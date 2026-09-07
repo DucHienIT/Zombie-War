@@ -19,6 +19,6 @@ MonoBehaviour:
   _accentColor: {r: 1, g: 0.43529412, b: 0.70980394, a: 1}
   _maxStacks: 5
   _draftWeight: 1
-  _baseInterval: 7
+  _baseInterval: 4.5
   _intervalPerStack: 0.84
-  _minInterval: 2
+  _minInterval: 1.5

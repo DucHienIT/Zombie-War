@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using ZombieWar.Data;
+using ZombieWar.Enemies;
 using ZombieWar.Player;
 using ZombieWar.Roguelike;
 using ZombieWar.UI;
@@ -22,6 +23,7 @@ namespace ZombieWar.Core
         [SerializeField] private CameraShakeController _cameraShake;
         [SerializeField] private RoguelikeDirector _rogue;
         [SerializeField] private AbilityRunner _abilities;
+        [SerializeField] private ZombieManager _zombies;
 
         private SkillCardData[] _skillCards;
         private Action<int> _onSkillPicked;
@@ -31,7 +33,7 @@ namespace ZombieWar.Core
         private void Awake()
         {
             bool missing = _ui == null || _flow == null || _playerHealth == null || _weapons == null
-                           || _cameraShake == null || _rogue == null || _abilities == null;
+                           || _cameraShake == null || _rogue == null || _abilities == null || _zombies == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} GameplayUiBinder has an unassigned reference - the HUD would never update.", this);
@@ -56,6 +58,9 @@ namespace ZombieWar.Core
             _rogue.OnChoiceOffered += HandleChoiceOffered;
             _rogue.OnChoiceClosed += HandleChoiceClosed;
             _abilities.OnLoadoutChanged += HandleLoadoutChanged;
+            _zombies.OnBossSpawned += HandleBossSpawned;
+            _zombies.OnBossHealthChanged += HandleBossHealthChanged;
+            _zombies.OnBossDefeated += HandleBossDefeated;
         }
 
         private void OnDisable()
@@ -71,6 +76,9 @@ namespace ZombieWar.Core
             _rogue.OnChoiceOffered -= HandleChoiceOffered;
             _rogue.OnChoiceClosed -= HandleChoiceClosed;
             _abilities.OnLoadoutChanged -= HandleLoadoutChanged;
+            _zombies.OnBossSpawned -= HandleBossSpawned;
+            _zombies.OnBossHealthChanged -= HandleBossHealthChanged;
+            _zombies.OnBossDefeated -= HandleBossDefeated;
         }
 
         private void HandleStateChanged(GameState state)
@@ -84,6 +92,8 @@ namespace ZombieWar.Core
             if (state == GameState.Countdown)
             {
                 _ui.ShowGameplayScreen();
+                // A retry reloads the scene, but a fresh run started from the menu reuses this HUD.
+                _ui.HideBossBar();
             }
 
             _ui.SetPauseButtonInteractable(state == GameState.Playing);
@@ -98,6 +108,13 @@ namespace ZombieWar.Core
         }
 
         private void HandleCountdownChanged(int seconds) => _ui.SetCountdownSeconds(seconds);
+
+        // The bar carries the archetype's display name, so the HUD never holds a ZombieDefinitionSO.
+        private void HandleBossSpawned(ZombieController boss) => _ui.ShowBossBar(boss.Definition.DisplayName);
+
+        private void HandleBossHealthChanged(float normalized) => _ui.SetBossHealth(normalized);
+
+        private void HandleBossDefeated() => _ui.HideBossBar();
 
         private void HandleRemainingTimeChanged(float remaining) => _ui.SetRemainingTime(remaining);
 

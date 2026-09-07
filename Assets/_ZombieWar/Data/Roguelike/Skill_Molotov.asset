@@ -21,12 +21,12 @@ MonoBehaviour:
   _accentColor: {r: 1, g: 0.42, b: 0.16, a: 1}
   _maxStacks: 5
   _draftWeight: 1
-  _baseInterval: 9
+  _baseInterval: 5.5
   _intervalPerStack: 0.85
-  _minInterval: 4
+  _minInterval: 2.5
   _radius: 2.2
   _baseBurnDuration: 4
   _burnDurationPerStack: 1
-  _baseDamagePerTick: 8
+  _baseDamagePerTick: 5.5
   _damagePerStack: 1.15
   _tickInterval: 0.4

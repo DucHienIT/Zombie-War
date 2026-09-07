@@ -27,6 +27,27 @@ Game bắn súng 3D góc nhìn top-down cho mobile, màn hình dọc, làm trên
 2. Mở project bằng **Unity Hub** với editor `2022.3.62f3`.
 3. Để Unity import package và sinh lại thư mục `Library/` ở lần mở đầu.
 
+## Build APK
+
+Cần **Android Build Support** (kèm SDK/NDK/OpenJDK) trong Unity Hub. Build bằng menu, không mở File → Build Settings:
+
+| Menu | Ra file |
+|---|---|
+| `Tools ▸ Zombie War ▸ Build ▸ Android APK (Release)` | `Builds/Android/Release/ZombieWar-<version>-vc<code>.apk` |
+| `Tools ▸ Zombie War ▸ Build ▸ Android APK (Development)` | `Builds/Android/Development/…-dev.apk` (kèm profiler) |
+
+Tool (`Assets/_ZombieWar/Scripts/Editor/AndroidBuilder.cs`) tự áp toàn bộ player settings ảnh hưởng tới bản build — IL2CPP, ARM64, min SDK 25, portrait, APK thay vì AAB — nên không cần tick tay thứ gì. Sửa tay trong Inspector sẽ bị lần build sau ghi đè; muốn đổi thật thì sửa hằng số trong script (bảng đầy đủ ở [CLAUDE.md](CLAUDE.md#build-android-sản-phẩm-apk)).
+
+Texture và audio có luật import riêng cho Android, ép tự động lúc import (`TextureImportRules` / `AudioImportRules`): texture nén ASTC với maxSize theo loại nội dung, audio mono Vorbis. Không phải chỉnh tay khi thêm asset mới; bảng luật xem [CLAUDE.md](CLAUDE.md).
+
+Mặc định APK ký bằng debug keystore của Unity — cài chạy được trên máy thật nhưng Play Store từ chối. Ký thật thì đặt 4 biến môi trường `ZW_ANDROID_KEYSTORE`, `ZW_ANDROID_KEYSTORE_PASS`, `ZW_ANDROID_KEYALIAS`, `ZW_ANDROID_KEYALIAS_PASS` trước khi mở Unity.
+
+Build headless:
+
+```bash
+Unity -batchmode -quit -projectPath . -buildTarget Android -executeMethod ZombieWar.EditorTools.AndroidBuilder.BuildReleaseFromCommandLine -logFile build.log
+```
+
 ## Render: 2D & 3D
 
 Pipeline asset đang dùng `Assets/Settings/UniversalRP.asset` có hai renderer, nên có thể dựng scene 2D và 3D trong cùng project:

@@ -17,15 +17,16 @@ MonoBehaviour:
   _icon: {fileID: 0}
   _description: Autonomous sidearm carried by the sentry drone.
   _animatorWeaponType: 0
-  _damage: 8
-  _fireInterval: 0.35
+  _damage: 5.5
+  _fireInterval: 0.25
   _range: 12
   _projectileSpeed: 32
   _projectileRadius: 0.06
   _pelletCount: 1
   _spreadAngle: 2
   _knockback: 0.4
-  _muzzleVfx: {fileID: 3264251641068707433, guid: ec5285e6d1fcadf4bbfc3a12da447acf, type: 3}
+  _pierce: 0
+  _muzzleVfx: {fileID: 3264251641068707433, guid: 5b8714f4d51662c41befd8b0cc2d2dcc, type: 3}
   _fleshImpactVfx: {fileID: 1348457769765022127, guid: ca75323a3eb2de448a5464d2a4b63cab, type: 3}
   _propImpactVfx: {fileID: 4474901532229616265, guid: 8acb8f58135e1c6498568ff561f221b2, type: 3}
   _shotClip: {fileID: 8300000, guid: 8581f806dddef8046b4942de05b897be, type: 3}

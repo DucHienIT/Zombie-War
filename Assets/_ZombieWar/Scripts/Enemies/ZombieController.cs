@@ -51,6 +51,7 @@ namespace ZombieWar.Enemies
         public Vector3 Position => _transform.position;
         public ZombieState State => _state;
         public bool IsAlive => _hp > 0f;
+        public float HealthNormalized => _definition.MaxHp > 0f ? Mathf.Clamp01(_hp / _definition.MaxHp) : 0f;
         public bool IsTargetable => IsAlive && _state != ZombieState.Spawning;
 
         private void Awake()
@@ -139,6 +140,7 @@ namespace ZombieWar.Enemies
             }
 
             _hp -= info.Amount;
+            _owner.ReportDamage(this, info.Amount);
             _materialFx.FlashHit(_feedback.ZombieHitFlashDuration);
             _owner.PlayVoice(_definition.HitClips, _transform.position);
 

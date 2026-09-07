@@ -18,6 +18,9 @@ namespace ZombieWar.Data
         [SerializeField] private float _duration = 180f;
         [SerializeField] private float _countdownDuration = 3f;
         [SerializeField] private WavePhaseSO[] _phases;
+        // When set, running out of clock is not enough: the run stays in play until the level's
+        // boss is down. The boss itself is a scripted spawn in one of the phases above.
+        [SerializeField] private bool _requiresBossDefeat;
 
         [Header("Spawning")]
         [SerializeField] private float _spawnRingInner = 12f;
@@ -35,6 +38,7 @@ namespace ZombieWar.Data
         public float Duration => _duration;
         public float CountdownDuration => _countdownDuration;
         public WavePhaseSO[] Phases => _phases;
+        public bool RequiresBossDefeat => _requiresBossDefeat;
         public float SpawnRingInner => _spawnRingInner;
         public float SpawnRingOuter => _spawnRingOuter;
         public float MinSpawnDistance => _minSpawnDistance;

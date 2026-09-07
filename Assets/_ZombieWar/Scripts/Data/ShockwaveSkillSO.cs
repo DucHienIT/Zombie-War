@@ -6,36 +6,36 @@ namespace ZombieWar.Data
     [CreateAssetMenu(menuName = "Zombie War/Active Skill/Shockwave", fileName = "Skill_Shockwave")]
     public sealed class ShockwaveSkillSO : ActiveSkillSO
     {
-        [Header("Auto Cast")]
-        [SerializeField] private float _baseInterval = 8f;
-        // Multiplied in once per extra stack.
-        [SerializeField] private float _intervalPerStack = 0.85f;
-        [SerializeField] private float _minInterval = 3.5f;
-
-        [Header("Blast")]
+        [Header("Aura")]
+        // An aura beats on its own rhythm instead of waiting for a crowd to gather, so the
+        // cooldown is that beat: one pulse a second, every second, whatever stands around.
+        [SerializeField] private float _tickInterval = 1f;
         [SerializeField] private float _baseRadius = 3.5f;
         // Added once per extra stack.
         [SerializeField] private float _radiusPerStack = 0.3f;
-        [SerializeField] private float _baseDamage = 30f;
+
+        [Header("Damage")]
+        // A fraction of the old single blast on purpose: the aura earns its damage over time.
+        [SerializeField] private float _baseDamagePerTick = 7f;
         // Multiplied in once per extra stack.
         [SerializeField] private float _damagePerStack = 1.2f;
-        // Above the zombie physics-knockback threshold on purpose: everything in reach is launched.
-        [SerializeField] private float _force = 7f;
-        // The wave waits, cooldown spent, until this many zombies stand inside it. It is a
-        // get-off-me move, not a metronome.
-        [SerializeField] private int _minZombiesToTrigger = 2;
+        // Below the zombie physics-knockback threshold on purpose: a pulse shoves the crowd back
+        // a step, it does not launch it. Launching every second would erase the chase entirely.
+        [SerializeField] private float _knockback = 1.5f;
 
-        public override float CooldownFor(int stacks) => ScaledCooldown(_baseInterval, _intervalPerStack, _minInterval, stacks);
+        // The beat never changes with rank - only the reach and the bite do.
+        public override float CooldownFor(int stacks) => _tickInterval;
 
-        public override bool CanTrigger(in AbilityContext context, int stacks)
-        {
-            return context.Shockwave.CountZombiesWithin(RadiusFor(stacks)) >= _minZombiesToTrigger;
-        }
+        // The aura effect is continuous even though the damage is not, so it is switched on
+        // here (idempotent, re-sized whenever a new rank widens the circle) rather than per beat.
+        public override void OnEquipped(in AbilityContext context, int stacks) => context.Shockwave.SetAura(RadiusFor(stacks));
+
+        public override void OnUnequipped(in AbilityContext context) => context.Shockwave.Deactivate();
 
         public override void Trigger(in AbilityContext context, int stacks)
         {
-            float damage = _baseDamage * Mathf.Pow(_damagePerStack, Mathf.Max(0, stacks - 1));
-            context.Shockwave.Emit(RadiusFor(stacks), damage, _force);
+            float damage = _baseDamagePerTick * Mathf.Pow(_damagePerStack, Mathf.Max(0, stacks - 1));
+            context.Shockwave.Pulse(RadiusFor(stacks), damage, _knockback);
         }
 
         private float RadiusFor(int stacks) => _baseRadius + _radiusPerStack * Mathf.Max(0, stacks - 1);

@@ -21,10 +21,10 @@ MonoBehaviour:
   _accentColor: {r: 0.44, g: 0.83, b: 1, a: 1}
   _maxStacks: 5
   _draftWeight: 1
-  _baseInterval: 5
+  _baseInterval: 3.2
   _intervalPerStack: 0.88
-  _minInterval: 2.5
-  _baseDamage: 40
+  _minInterval: 1.6
+  _baseDamage: 26
   _damageFalloffPerJump: 0.8
   _baseJumps: 3
   _jumpsPerStack: 1

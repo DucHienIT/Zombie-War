@@ -27,4 +27,7 @@ MonoBehaviour:
   - _time: 145
     _definition: {fileID: 11400000, guid: 93b0f7be99747354abe0fdf0337f849f, type: 2}
     _count: 1
+  - _time: 160
+    _definition: {fileID: 11400000, guid: 9ee43a65c7f50fd469272dfcff09f27e, type: 2}
+    _count: 2
   _fireHazardTimes: []
