@@ -19,15 +19,29 @@ namespace ZombieWar.Core
         [SerializeField] private LevelLoader _levelLoader;
         [SerializeField] private ProfileService _profile;
 
+        [Header("Transition")]
+        // Retry, next level and "back to menu" swap runs in place behind the loading panel.
+        // The cover delay is how long the panel gets to become opaque before the swap; the rest
+        // of the duration is the panel holding still so the switch never flashes into view.
+        [SerializeField] private float _transitionDuration = 1.1f;
+        [SerializeField] private float _coverDelay = 0.35f;
+
         private readonly SaveService _save = new SaveService();
         private LevelDefinitionSO _level;
         private LevelTimer _timer;
         private ScoreTracker _score;
         private float _countdownRemaining;
         private int _lastCountdownShown = -1;
+        private LevelDefinitionSO _pendingLevel;
+        private float _transitionElapsed;
+        private bool _runCleared;
 
         public event Action<GameState> OnStateChanged;
         public event Action<LevelDefinitionSO> OnRunStarted;
+        // The run that was on screen is being thrown away: every system drops what it spawned.
+        // Fired while the loading panel covers the screen, so the hitch it costs is never seen.
+        public event Action OnRunCleared;
+        public event Action<float> OnLoadingProgress;
         public event Action<int> OnCountdownChanged;
         public event Action<float> OnRemainingTimeChanged;
         public event Action<int, int> OnScoreChanged;
@@ -71,8 +85,8 @@ namespace ZombieWar.Core
 
         private void Start()
         {
-            // Retry and "next level" reload the scene with the level already chosen; every
-            // other entry into the scene lands on the menu.
+            // The editor cheat window can stamp a level onto the selection asset before entering
+            // play mode; every other entry into the scene lands on the menu.
             if (_levelLoader.ConsumeAutoStart() && _levelLoader.PendingLevel != null)
             {
                 StartRun(_levelLoader.PendingLevel);
@@ -93,31 +107,21 @@ namespace ZombieWar.Core
                 case GameState.Playing:
                     TickPlaying(deltaTime);
                     break;
+                case GameState.Loading:
+                    // Unscaled: the run being left behind may still be frozen by the pause menu.
+                    TickTransition(Time.unscaledDeltaTime);
+                    break;
             }
         }
 
         public void StartRun(LevelDefinitionSO level)
         {
-            if (level == null)
+            if (!PrepareRun(level))
             {
-                Debug.LogError($"{LogPrefix} StartRun called with no level.", this);
                 return;
             }
 
-            _level = level;
-            _levelLoader.Remember(level);
-            _mapLoader.Load(level);
-            _timer = new LevelTimer(level.Duration);
-            _score = new ScoreTracker(_scoringRules.MultiKillWindow, _scoringRules.MultiKillBonus, _scoringRules.HealthBonusPerPercent);
-            _countdownRemaining = level.CountdownDuration;
-            _lastCountdownShown = -1;
-            Time.timeScale = 1f;
-
-            OnRunStarted?.Invoke(level);
-            SetState(GameState.Countdown);
-            OnRemainingTimeChanged?.Invoke(_timer.Remaining);
-            OnScoreChanged?.Invoke(0, 0);
-            PublishCountdown();
+            LaunchPreparedRun();
         }
 
         public void Pause()
@@ -180,19 +184,109 @@ namespace ZombieWar.Core
             EndLevel(won);
         }
 
-        public void Retry() => _levelLoader.RestartWith(_level);
+        public void Retry() => BeginTransition(_level);
 
-        public void GoToMenu() => _levelLoader.ReturnToMenu();
+        public void GoToMenu() => BeginTransition(null);
 
-        public void GoToNextLevel()
+        public void GoToNextLevel() => BeginTransition(_level != null ? _level.NextLevel : null);
+
+        // Drops whatever is running and brings up another level, the same way Retry does.
+        public void LoadLevel(LevelDefinitionSO level) => BeginTransition(level);
+
+        // Leaving a run used to reload the scene through the Loading scene, which is the cheapest
+        // way to be sure pools, physics and the map start clean - but it also meant walking back
+        // to the main menu made the player sit through a full load screen. The swap now happens
+        // in place: the loading panel covers the screen, every system drops what the run left
+        // behind, and the next run (or the menu) is built while none of it is visible.
+        private void BeginTransition(LevelDefinitionSO next)
         {
-            if (_level.NextLevel == null)
+            if (State == GameState.Loading)
             {
-                _levelLoader.ReturnToMenu();
                 return;
             }
 
-            _levelLoader.RestartWith(_level.NextLevel);
+            Time.timeScale = 1f;
+            _pendingLevel = next;
+            _transitionElapsed = 0f;
+            _runCleared = false;
+            SetState(GameState.Loading);
+            OnLoadingProgress?.Invoke(0f);
+        }
+
+        private void TickTransition(float deltaTime)
+        {
+            _transitionElapsed += deltaTime;
+            OnLoadingProgress?.Invoke(_transitionDuration > 0f ? Mathf.Clamp01(_transitionElapsed / _transitionDuration) : 1f);
+            if (_transitionElapsed >= _coverDelay)
+            {
+                SwapRun();
+            }
+
+            if (_transitionElapsed < _transitionDuration)
+            {
+                return;
+            }
+
+            SwapRun();
+            // The next run was built while covered; all that is left is to hand it the clock.
+            if (_level != null)
+            {
+                LaunchPreparedRun();
+                return;
+            }
+
+            SetState(GameState.Menu);
+        }
+
+        // The whole swap sits behind the panel: the old run is dropped and the new one built in
+        // the same frame, so the countdown never starts on a half-built level.
+        private void SwapRun()
+        {
+            if (_runCleared)
+            {
+                return;
+            }
+
+            _runCleared = true;
+            // Everything on the player still exists here; the map loader parks it right after.
+            OnRunCleared?.Invoke();
+            LevelDefinitionSO next = _pendingLevel;
+            _pendingLevel = null;
+            if (next != null && PrepareRun(next))
+            {
+                return;
+            }
+
+            _level = null;
+            _mapLoader.Unload();
+        }
+
+        // Builds the world and the bookkeeping for one run without starting its clock.
+        private bool PrepareRun(LevelDefinitionSO level)
+        {
+            if (level == null)
+            {
+                Debug.LogError($"{LogPrefix} PrepareRun called with no level.", this);
+                return false;
+            }
+
+            _level = level;
+            _mapLoader.Load(level);
+            _timer = new LevelTimer(level.Duration);
+            _score = new ScoreTracker(_scoringRules.MultiKillWindow, _scoringRules.MultiKillBonus, _scoringRules.HealthBonusPerPercent);
+            _countdownRemaining = level.CountdownDuration;
+            _lastCountdownShown = -1;
+            Time.timeScale = 1f;
+            OnRunStarted?.Invoke(level);
+            return true;
+        }
+
+        private void LaunchPreparedRun()
+        {
+            SetState(GameState.Countdown);
+            OnRemainingTimeChanged?.Invoke(_timer.Remaining);
+            OnScoreChanged?.Invoke(0, 0);
+            PublishCountdown();
         }
 
         private void TickCountdown(float deltaTime)

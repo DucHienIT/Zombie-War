@@ -49,6 +49,7 @@ namespace ZombieWar.VFX
         {
             _zombies.OnZombieDamaged += HandleZombieDamaged;
             _flow.OnRunStarted += HandleRunStarted;
+            _flow.OnRunCleared += DespawnAll;
             _flow.OnLevelEnded += HandleLevelEnded;
         }
 
@@ -56,6 +57,7 @@ namespace ZombieWar.VFX
         {
             _zombies.OnZombieDamaged -= HandleZombieDamaged;
             _flow.OnRunStarted -= HandleRunStarted;
+            _flow.OnRunCleared -= DespawnAll;
             _flow.OnLevelEnded -= HandleLevelEnded;
         }
 

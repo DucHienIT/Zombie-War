@@ -62,6 +62,7 @@ namespace ZombieWar.Roguelike
         private void OnEnable()
         {
             _flow.OnRunStarted += HandleRunStarted;
+            _flow.OnRunCleared += HandleRunCleared;
             _flow.OnLevelEnded += HandleLevelEnded;
             _zombies.OnZombieKilled += HandleZombieKilled;
         }
@@ -69,6 +70,7 @@ namespace ZombieWar.Roguelike
         private void OnDisable()
         {
             _flow.OnRunStarted -= HandleRunStarted;
+            _flow.OnRunCleared -= HandleRunCleared;
             _flow.OnLevelEnded -= HandleLevelEnded;
             _zombies.OnZombieKilled -= HandleZombieKilled;
         }
@@ -135,12 +137,7 @@ namespace ZombieWar.Roguelike
 
         private void HandleRunStarted(LevelDefinitionSO level)
         {
-            _xp = NewTracker();
-            _stacks.Clear();
-            _pendingLevelUps = 0;
-            _offerCount = 0;
-            _choiceOpen = false;
-            _firstChoiceDone = false;
+            ClearRun();
             // The bomb is a spec feature, so it is owned from the start rather than drafted.
             // Seeding it here keeps the rebuild loop uniform and the card levels honest.
             if (_settings.StartingAbility != null)
@@ -150,6 +147,25 @@ namespace ZombieWar.Roguelike
 
             RebuildLoadout();
             OnXpChanged?.Invoke(_xp.Normalized, _xp.Level);
+        }
+
+        // The run is being torn down. Rebuilding on an empty loadout is what makes the blades
+        // stop and the drone land - nothing drafted may survive into the menu or the next run.
+        private void HandleRunCleared()
+        {
+            ClearRun();
+            RebuildLoadout();
+            OnXpChanged?.Invoke(_xp.Normalized, _xp.Level);
+        }
+
+        private void ClearRun()
+        {
+            _xp = NewTracker();
+            _stacks.Clear();
+            _pendingLevelUps = 0;
+            _offerCount = 0;
+            _choiceOpen = false;
+            _firstChoiceDone = false;
         }
 
         private void HandleLevelEnded(LevelResult result)

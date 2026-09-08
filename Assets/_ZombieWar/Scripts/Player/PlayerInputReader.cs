@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using ZombieWar.Data;
 
 namespace ZombieWar.Player
 {
@@ -9,15 +8,14 @@ namespace ZombieWar.Player
         private const string LogPrefix = "[Input]";
 
         [SerializeField] private InputActionReference _moveAction;
-        [SerializeField] private PlayerDefinitionSO _definition;
 
         public Vector2 MoveVector { get; private set; }
 
         private void Awake()
         {
-            if (_moveAction == null || _definition == null)
+            if (_moveAction == null)
             {
-                Debug.LogError($"{LogPrefix} Move action or player definition is missing.", this);
+                Debug.LogError($"{LogPrefix} Move action is missing.", this);
             }
         }
 
@@ -32,21 +30,12 @@ namespace ZombieWar.Player
             MoveVector = Vector2.zero;
         }
 
+        // The stick control already carries the Input System's StickDeadzone processor
+        // (<Gamepad>/leftStick, project defaults 0.125-0.925), so the value arrives remapped;
+        // a second radial dead zone here only pushed the first response ~10 px further out.
         private void Update()
         {
-            MoveVector = ApplyRadialDeadZone(_moveAction.action.ReadValue<Vector2>(), _definition.JoystickDeadZone);
-        }
-
-        private static Vector2 ApplyRadialDeadZone(Vector2 raw, float deadZone)
-        {
-            float magnitude = raw.magnitude;
-            if (magnitude <= deadZone)
-            {
-                return Vector2.zero;
-            }
-
-            float remapped = Mathf.Clamp01((magnitude - deadZone) / (1f - deadZone));
-            return raw / magnitude * remapped;
+            MoveVector = _moveAction.action.ReadValue<Vector2>();
         }
     }
 }

@@ -1,18 +1,17 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using ZombieWar.Data;
 
 namespace ZombieWar.Core
 {
-    // Starting a level from the menu happens in place; retry, next level and "back to menu"
-    // go through the Loading scene, which loads a fresh Gameplay scene behind a progress bar.
-    // A fresh scene is the cheapest way to guarantee pools, physics and the map start clean.
+    // The one thing that has to survive the trip from the Loading scene into Gameplay: which
+    // level, if any, the fresh scene should drop straight into instead of showing the menu.
+    // Retry, next level and "back to menu" no longer come through here - GameFlowController
+    // swaps runs in place behind the loading panel - so at runtime this is read-only.
     public sealed class LevelLoader : MonoBehaviour
     {
         private const string LogPrefix = "[Level]";
 
         [SerializeField] private LevelSelectionSO _selection;
-        [SerializeField] private string _loadingSceneName = "Loading";
 
         public LevelDefinitionSO PendingLevel => _selection.Selected;
 
@@ -25,25 +24,5 @@ namespace ZombieWar.Core
         }
 
         public bool ConsumeAutoStart() => _selection.ConsumeAutoStart();
-
-        public void Remember(LevelDefinitionSO level) => _selection.Select(level, false);
-
-        public void RestartWith(LevelDefinitionSO level)
-        {
-            _selection.Select(level, true);
-            Reload();
-        }
-
-        public void ReturnToMenu()
-        {
-            _selection.Select(null, false);
-            Reload();
-        }
-
-        private void Reload()
-        {
-            Time.timeScale = 1f;
-            SceneManager.LoadSceneAsync(_loadingSceneName, LoadSceneMode.Single);
-        }
     }
 }

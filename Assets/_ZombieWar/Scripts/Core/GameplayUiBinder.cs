@@ -48,6 +48,7 @@ namespace ZombieWar.Core
         private void OnEnable()
         {
             _flow.OnStateChanged += HandleStateChanged;
+            _flow.OnLoadingProgress += HandleLoadingProgress;
             _flow.OnCountdownChanged += HandleCountdownChanged;
             _flow.OnRemainingTimeChanged += HandleRemainingTimeChanged;
             _flow.OnScoreChanged += HandleScoreChanged;
@@ -66,6 +67,7 @@ namespace ZombieWar.Core
         private void OnDisable()
         {
             _flow.OnStateChanged -= HandleStateChanged;
+            _flow.OnLoadingProgress -= HandleLoadingProgress;
             _flow.OnCountdownChanged -= HandleCountdownChanged;
             _flow.OnRemainingTimeChanged -= HandleRemainingTimeChanged;
             _flow.OnScoreChanged -= HandleScoreChanged;
@@ -83,6 +85,17 @@ namespace ZombieWar.Core
 
         private void HandleStateChanged(GameState state)
         {
+            // Swapping runs in place: the panel covers everything, so the HUD is left exactly as
+            // the old run left it and whatever comes next turns it on or off when the swap lands.
+            if (state == GameState.Loading)
+            {
+                _ui.ShowLoadingPanel();
+                _ui.SetPauseButtonInteractable(false);
+                return;
+            }
+
+            _ui.HideLoadingPanel();
+
             // MenuUiBinder owns that screen; touching the HUD here would fight it.
             if (state == GameState.Menu)
             {
@@ -108,6 +121,8 @@ namespace ZombieWar.Core
         }
 
         private void HandleCountdownChanged(int seconds) => _ui.SetCountdownSeconds(seconds);
+
+        private void HandleLoadingProgress(float normalized) => _ui.SetLoadingProgress(normalized);
 
         // The bar carries the archetype's display name, so the HUD never holds a ZombieDefinitionSO.
         private void HandleBossSpawned(ZombieController boss) => _ui.ShowBossBar(boss.Definition.DisplayName);

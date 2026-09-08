@@ -17,7 +17,6 @@ MonoBehaviour:
   _acceleration: 24
   _turnSpeedDegrees: 720
   _hitInvulnerability: 0.4
-  _joystickDeadZone: 0.12
   _targetScanInterval: 0.1
   _targetHoldDuration: 0.35
   _anglePenaltyWeight: 0.02

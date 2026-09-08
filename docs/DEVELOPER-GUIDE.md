@@ -135,7 +135,7 @@ Paused/LevelUp đặt timeScale = 0. HitStopController dùng unscaled time cho t
 
 ## 4. Player, input và camera
 
-PlayerInputReader đọc Move qua InputActionReference, enable/disable theo lifecycle, áp dụng radial dead zone. Asset chung là `Assets/InputSystem_Actions.inputactions`; joystick đi qua Input System, không tạo đường Input.GetKey song song.
+PlayerInputReader đọc Move qua InputActionReference, enable/disable theo lifecycle, không áp dead zone riêng (dead zone duy nhất là processor StickDeadzone mặc định của Input System trên `<Gamepad>/leftStick`). Asset chung là `Assets/InputSystem_Actions.inputactions`; joystick ảo là `UI/Hud/FloatingJoystick` (kế thừa `OnScreenControl`, gốc đi theo ngón cái, khoá một pointer) bắn vào `<Gamepad>/leftStick`, không tạo đường đọc touch hay Input.GetKey song song.
 
 PlayerMotor.FixedUpdate đổi input thành velocity X/Z theo trục thế giới vì camera north-up; áp dụng Acceleration và giữ velocity Y cho gravity. Có target thì quay về target, không có thì quay theo hướng chạy. LocalMoveDirection/NormalizedSpeed/WorldMoveDirection cấp cho animation và consumer. Đổi camera sang quay tự do phải xem lại ánh xạ joystick.
 

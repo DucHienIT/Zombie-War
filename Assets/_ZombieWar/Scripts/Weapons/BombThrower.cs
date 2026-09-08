@@ -58,6 +58,27 @@ namespace ZombieWar.Weapons
             _active = new List<Bomb>(_definition.PoolSize);
         }
 
+        private void OnEnable()
+        {
+            _flow.OnRunCleared += DespawnAll;
+        }
+
+        private void OnDisable()
+        {
+            _flow.OnRunCleared -= DespawnAll;
+        }
+
+        // The run is over: a bomb still in the air belongs to it and must never land on the next one.
+        private void DespawnAll()
+        {
+            for (int i = 0; i < _active.Count; i++)
+            {
+                _pool.Release(_active[i]);
+            }
+
+            _active.Clear();
+        }
+
         private void Update()
         {
             float deltaTime = Time.deltaTime;

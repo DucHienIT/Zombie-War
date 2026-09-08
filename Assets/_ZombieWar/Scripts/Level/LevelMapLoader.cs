@@ -36,8 +36,11 @@ namespace ZombieWar.Level
                 return;
             }
 
+            // Destroy is deferred to the end of the frame, so the old map is switched off first:
+            // that is what makes its NavMeshSurface drop its data before the new one adds its own.
             if (Map != null)
             {
+                Map.gameObject.SetActive(false);
                 Destroy(Map.gameObject);
             }
 
@@ -55,6 +58,23 @@ namespace ZombieWar.Level
             // The follow target just teleported across the map; without this the camera
             // would glide in from wherever it idled during the menu.
             _virtualCamera.PreviousStateIsValid = false;
+        }
+
+        // Back to the menu: the world goes away and the player is parked, leaving the scene in
+        // exactly the state it boots into.
+        public void Unload()
+        {
+            if (Map != null)
+            {
+                Map.gameObject.SetActive(false);
+                Destroy(Map.gameObject);
+            }
+
+            Map = null;
+            Level = null;
+            _playerBody.velocity = Vector3.zero;
+            _playerBody.angularVelocity = Vector3.zero;
+            _playerBody.gameObject.SetActive(false);
         }
     }
 }

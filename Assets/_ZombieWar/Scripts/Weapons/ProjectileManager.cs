@@ -15,6 +15,7 @@ namespace ZombieWar.Weapons
         [SerializeField] private Projectile _prefab;
         [SerializeField] private int _prewarmCount = 180;
         [SerializeField] private Transform _poolParent;
+        [SerializeField] private GameFlowController _flow;
         [SerializeField] private ZombieManager _zombies;
         [SerializeField] private VfxService _vfx;
         [SerializeField] private LayerMask _hitMask;
@@ -24,7 +25,7 @@ namespace ZombieWar.Weapons
 
         private void Awake()
         {
-            if (_prefab == null || _zombies == null || _vfx == null)
+            if (_prefab == null || _flow == null || _zombies == null || _vfx == null)
             {
                 Debug.LogError($"{LogPrefix} ProjectileManager has an unassigned reference.", this);
                 return;
@@ -32,6 +33,25 @@ namespace ZombieWar.Weapons
 
             _pool = new ComponentPool<Projectile>(_prefab, _poolParent, _prewarmCount);
             _active = new List<Projectile>(_prewarmCount);
+        }
+
+        private void OnEnable()
+        {
+            _flow.OnRunCleared += DespawnAll;
+        }
+
+        private void OnDisable()
+        {
+            _flow.OnRunCleared -= DespawnAll;
+        }
+
+        // The run is over: a round still in flight would arrive in the next one.
+        private void DespawnAll()
+        {
+            for (int i = _active.Count - 1; i >= 0; i--)
+            {
+                Despawn(i);
+            }
         }
 
         public void Spawn(Vector3 origin, Vector3 direction, GunDefinitionSO definition, in ShotStats shot)

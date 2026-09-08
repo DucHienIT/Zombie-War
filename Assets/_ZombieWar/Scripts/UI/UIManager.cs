@@ -16,6 +16,9 @@ namespace ZombieWar.UI
         [SerializeField] private MenuScreenView _menuScreen;
         [SerializeField] private CountdownView _countdown;
         [SerializeField] private PopupManager _popups;
+        // Covers everything while one run is swapped for another. It is a panel in this prefab
+        // rather than the Loading scene: walking back to the menu must not reload the game.
+        [SerializeField] private LoadingView _loadingPanel;
 
         [Header("HUD")]
         [SerializeField] private HealthBarView _healthBar;
@@ -50,6 +53,7 @@ namespace ZombieWar.UI
         private void Awake()
         {
             bool missing = _hudCanvas == null || _menuScreen == null || _countdown == null || _popups == null
+                           || _loadingPanel == null
                            || _healthBar == null || _timer == null || _score == null || _gunHud == null
                            || _xpBar == null || _activeSkillsHud == null || _bossBar == null || _pauseButton == null || _pausePopup == null
                            || _resultPopup == null || _skillPopup == null || _weaponPopup == null || _weaponSelectPopup == null
@@ -129,6 +133,12 @@ namespace ZombieWar.UI
             PlayTap();
             _onUpgradeWeaponRequested?.Invoke(_openWeapon);
         }
+
+        public void ShowLoadingPanel() => _loadingPanel.Show();
+
+        public void SetLoadingProgress(float normalized) => _loadingPanel.SetProgress(normalized);
+
+        public void HideLoadingPanel() => _loadingPanel.Hide();
 
         public void SetHudVisible(bool visible) => _hudCanvas.enabled = visible;
 

@@ -56,6 +56,7 @@ namespace ZombieWar.Roguelike
         {
             _zombies.OnZombieKilled += HandleZombieKilled;
             _flow.OnRunStarted += HandleRunStarted;
+            _flow.OnRunCleared += DespawnAll;
             _flow.OnLevelEnded += HandleLevelEnded;
         }
 
@@ -63,6 +64,7 @@ namespace ZombieWar.Roguelike
         {
             _zombies.OnZombieKilled -= HandleZombieKilled;
             _flow.OnRunStarted -= HandleRunStarted;
+            _flow.OnRunCleared -= DespawnAll;
             _flow.OnLevelEnded -= HandleLevelEnded;
         }
 

@@ -13,9 +13,6 @@ namespace ZombieWar.Data
         [SerializeField] private float _turnSpeedDegrees = 720f;
         [SerializeField] private float _hitInvulnerability = 0.4f;
 
-        [Header("Input")]
-        [SerializeField] private float _joystickDeadZone = 0.12f;
-
         [Header("Auto Target")]
         [SerializeField] private float _targetScanInterval = 0.1f;
         [SerializeField] private float _targetHoldDuration = 0.35f;
@@ -36,7 +33,6 @@ namespace ZombieWar.Data
         public float Acceleration => _acceleration;
         public float TurnSpeedDegrees => _turnSpeedDegrees;
         public float HitInvulnerability => _hitInvulnerability;
-        public float JoystickDeadZone => _joystickDeadZone;
         public float TargetScanInterval => _targetScanInterval;
         public float TargetHoldDuration => _targetHoldDuration;
         public float AnglePenaltyWeight => _anglePenaltyWeight;

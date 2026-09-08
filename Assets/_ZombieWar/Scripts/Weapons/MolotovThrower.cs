@@ -87,6 +87,33 @@ namespace ZombieWar.Weapons
             _audio.PlayWorld(_definition.ThrowClip, origin);
         }
 
+        private void OnEnable()
+        {
+            _flow.OnRunCleared += DespawnAll;
+        }
+
+        private void OnDisable()
+        {
+            _flow.OnRunCleared -= DespawnAll;
+        }
+
+        // The run is over: bottles in the air and patches still burning belong to it.
+        private void DespawnAll()
+        {
+            for (int i = 0; i < _flights.Count; i++)
+            {
+                _bottlePool.Release(_flights[i].Bottle);
+            }
+
+            for (int i = 0; i < _fires.Count; i++)
+            {
+                _firePool.Release(_fires[i].Zone);
+            }
+
+            _flights.Clear();
+            _fires.Clear();
+        }
+
         // Keeps running through the death slow-motion, like the bombs do, so a bottle already in
         // the air still lands and a lit patch keeps burning instead of freezing mid-frame.
         private void Update()

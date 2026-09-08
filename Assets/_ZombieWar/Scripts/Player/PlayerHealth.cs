@@ -11,6 +11,7 @@ namespace ZombieWar.Player
 
         [SerializeField] private PlayerDefinitionSO _definition;
         [SerializeField] private PlayerStatSheet _stats;
+        [SerializeField] private GameFlowController _flow;
 
         private float _current;
         private float _invulnerabilityTimer;
@@ -19,6 +20,9 @@ namespace ZombieWar.Player
         public event Action<float, float> OnHealthChanged;
         public event Action<DamageInfo> OnDamaged;
         public event Action OnDied;
+        // A run is starting on a soldier who may have died in the last one: whatever a presenter
+        // put on the model when he went down has to be taken back off.
+        public event Action OnRevived;
 
         public float Current => _current;
         public float Max => _definition.MaxHp + _maxHpBonus;
@@ -28,7 +32,7 @@ namespace ZombieWar.Player
 
         private void Awake()
         {
-            if (_definition == null || _stats == null)
+            if (_definition == null || _stats == null || _flow == null)
             {
                 Debug.LogError($"{LogPrefix} PlayerHealth has an unassigned reference.", this);
                 return;
@@ -40,11 +44,24 @@ namespace ZombieWar.Player
         private void OnEnable()
         {
             _stats.OnChanged += HandleStatsChanged;
+            _flow.OnRunStarted += HandleRunStarted;
         }
 
         private void OnDisable()
         {
             _stats.OnChanged -= HandleStatsChanged;
+            _flow.OnRunStarted -= HandleRunStarted;
+        }
+
+        // Runs are swapped in place now, so nothing else puts the soldier back on his feet
+        // between them.
+        private void HandleRunStarted(LevelDefinitionSO level)
+        {
+            _current = Max;
+            _invulnerabilityTimer = 0f;
+            DamageTaken = 0f;
+            OnHealthChanged?.Invoke(_current, Max);
+            OnRevived?.Invoke();
         }
 
         private void Start()

@@ -47,11 +47,24 @@ namespace ZombieWar.Level
         private void OnEnable()
         {
             _director.OnFireHazardRequested += HandleHazardRequested;
+            _flow.OnRunCleared += DespawnAll;
         }
 
         private void OnDisable()
         {
             _director.OnFireHazardRequested -= HandleHazardRequested;
+            _flow.OnRunCleared -= DespawnAll;
+        }
+
+        // The run is over: a patch left burning would still be there when the next map loads.
+        private void DespawnAll()
+        {
+            for (int i = 0; i < _active.Count; i++)
+            {
+                _pool.Release(_active[i]);
+            }
+
+            _active.Clear();
         }
 
         private void Update()

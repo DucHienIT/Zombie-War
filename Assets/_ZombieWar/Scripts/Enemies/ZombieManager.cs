@@ -81,11 +81,22 @@ namespace ZombieWar.Enemies
         private void OnEnable()
         {
             _flow.OnRunStarted += HandleRunStarted;
+            _flow.OnRunCleared += HandleRunCleared;
         }
 
         private void OnDisable()
         {
             _flow.OnRunStarted -= HandleRunStarted;
+            _flow.OnRunCleared -= HandleRunCleared;
+        }
+
+        // The run is being thrown away: every body goes back to the pool before the map that
+        // carries its NavMesh is destroyed. The pools themselves are kept and reused.
+        private void HandleRunCleared()
+        {
+            DespawnAll();
+            _boss = null;
+            _bossDefeated = false;
         }
 
         // Pools are filled once the map exists: a NavMeshAgent that wakes up with no NavMesh
