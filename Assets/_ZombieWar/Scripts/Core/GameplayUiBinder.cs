@@ -42,14 +42,13 @@ namespace ZombieWar.Core
 
             // Cached once: turning a method group into a delegate allocates on every level-up.
             _onSkillPicked = _rogue.ChooseOffer;
-            _ui.BindGameplayCommands(_flow.Pause);
+            _ui.BindGameplayCommands(_flow.Pause, _weapons.RequestSwitch);
         }
 
         private void OnEnable()
         {
             _flow.OnStateChanged += HandleStateChanged;
             _flow.OnLoadingProgress += HandleLoadingProgress;
-            _flow.OnCountdownChanged += HandleCountdownChanged;
             _flow.OnRemainingTimeChanged += HandleRemainingTimeChanged;
             _flow.OnScoreChanged += HandleScoreChanged;
             _flow.OnLevelEnded += HandleLevelEnded;
@@ -68,7 +67,6 @@ namespace ZombieWar.Core
         {
             _flow.OnStateChanged -= HandleStateChanged;
             _flow.OnLoadingProgress -= HandleLoadingProgress;
-            _flow.OnCountdownChanged -= HandleCountdownChanged;
             _flow.OnRemainingTimeChanged -= HandleRemainingTimeChanged;
             _flow.OnScoreChanged -= HandleScoreChanged;
             _flow.OnLevelEnded -= HandleLevelEnded;
@@ -90,6 +88,7 @@ namespace ZombieWar.Core
             if (state == GameState.Loading)
             {
                 _ui.ShowLoadingPanel();
+                _ui.HideIntro();
                 _ui.SetPauseButtonInteractable(false);
                 return;
             }
@@ -102,25 +101,29 @@ namespace ZombieWar.Core
                 return;
             }
 
-            if (state == GameState.Countdown)
+            if (state == GameState.Intro)
             {
                 _ui.ShowGameplayScreen();
-                // A retry reloads the scene, but a fresh run started from the menu reuses this HUD.
+                // Runs are swapped in place, so the bar of the previous run's boss is still up here.
                 _ui.HideBossBar();
+                LevelDefinitionSO level = _flow.Level;
+                _ui.ShowIntro(level.LevelIndex, level.DisplayName, _flow.SkipIntro);
+            }
+            else if (state == GameState.Playing)
+            {
+                _ui.FinishIntro();
             }
 
             _ui.SetPauseButtonInteractable(state == GameState.Playing);
-            _ui.ShowCountdown(state == GameState.Countdown);
-            // The run is over: nothing on the HUD is actionable behind the result panel.
-            _ui.SetHudVisible(state != GameState.Won && state != GameState.Lost);
+            // Hidden during the cinematic and once the run is over: nothing on it is actionable then.
+            bool hudVisible = state != GameState.Intro && state != GameState.Won && state != GameState.Lost;
+            _ui.SetHudVisible(hudVisible);
 
             if (state == GameState.Paused)
             {
                 _ui.ShowPausePopup(_flow.Resume, _flow.Retry, _flow.GoToMenu, _cameraShake.IsEnabled, _cameraShake.SetEnabled);
             }
         }
-
-        private void HandleCountdownChanged(int seconds) => _ui.SetCountdownSeconds(seconds);
 
         private void HandleLoadingProgress(float normalized) => _ui.SetLoadingProgress(normalized);
 
@@ -155,7 +158,7 @@ namespace ZombieWar.Core
         // paused for the level-up popup, which is why this is not folded into Update.
         private void HandleLoadoutChanged() => RefreshActiveSkills();
 
-        // The runner only knows ActiveSkillSO; flattening to icon + stack + cooldown fraction
+        // The runner only knows ActiveSkillSO; flattening to icon + cooldown fraction
         // here is what keeps that asset type out of UIRoot.prefab.
         private void RefreshActiveSkills()
         {
@@ -163,7 +166,7 @@ namespace ZombieWar.Core
             for (int i = 0; i < count; i++)
             {
                 AbilityRunner.EquippedSkill entry = _equippedBuffer[i];
-                _activeSkillsHud[i] = new ActiveSkillHudEntry(entry.Skill.Icon, entry.Stacks, entry.CooldownFraction);
+                _activeSkillsHud[i] = new ActiveSkillHudEntry(entry.Skill.Icon, entry.CooldownFraction);
             }
 
             _ui.SetActiveSkills(_activeSkillsHud, count);

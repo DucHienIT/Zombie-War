@@ -18,7 +18,7 @@ MonoBehaviour:
   _mapPrefab: {fileID: 5028678196323562947, guid: b124a3da1d5126546afeeafafb94c054, type: 3}
   _nextLevel: {fileID: 0}
   _duration: 180
-  _countdownDuration: 3
+  _introDuration: 4.5
   _phases:
   - {fileID: 11400000, guid: 7cdfd5610a3f3024b8f00aae77d29c27, type: 2}
   - {fileID: 11400000, guid: 72c6f5f4ac3b98f40830d394c0e771c0, type: 2}

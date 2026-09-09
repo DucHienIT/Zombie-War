@@ -30,8 +30,8 @@ namespace ZombieWar.Core
         private LevelDefinitionSO _level;
         private LevelTimer _timer;
         private ScoreTracker _score;
-        private float _countdownRemaining;
-        private int _lastCountdownShown = -1;
+        private float _introDuration;
+        private float _introElapsed;
         private LevelDefinitionSO _pendingLevel;
         private float _transitionElapsed;
         private bool _runCleared;
@@ -42,7 +42,8 @@ namespace ZombieWar.Core
         // Fired while the loading panel covers the screen, so the hitch it costs is never seen.
         public event Action OnRunCleared;
         public event Action<float> OnLoadingProgress;
-        public event Action<int> OnCountdownChanged;
+        // Normalized 0..1 through the opening cinematic; presenters drive camera and overlay from it.
+        public event Action<float> OnIntroProgress;
         public event Action<float> OnRemainingTimeChanged;
         public event Action<int, int> OnScoreChanged;
         public event Action<LevelResult> OnLevelEnded;
@@ -101,8 +102,8 @@ namespace ZombieWar.Core
             float deltaTime = Time.deltaTime;
             switch (State)
             {
-                case GameState.Countdown:
-                    TickCountdown(deltaTime);
+                case GameState.Intro:
+                    TickIntro(deltaTime);
                     break;
                 case GameState.Playing:
                     TickPlaying(deltaTime);
@@ -122,6 +123,17 @@ namespace ZombieWar.Core
             }
 
             LaunchPreparedRun();
+        }
+
+        // A tap during the cinematic jumps straight to the fight instead of sitting through it.
+        public void SkipIntro()
+        {
+            if (State != GameState.Intro)
+            {
+                return;
+            }
+
+            _introElapsed = _introDuration;
         }
 
         public void Pause()
@@ -239,7 +251,7 @@ namespace ZombieWar.Core
         }
 
         // The whole swap sits behind the panel: the old run is dropped and the new one built in
-        // the same frame, so the countdown never starts on a half-built level.
+        // the same frame, so the intro never starts on a half-built level.
         private void SwapRun()
         {
             if (_runCleared)
@@ -274,8 +286,8 @@ namespace ZombieWar.Core
             _mapLoader.Load(level);
             _timer = new LevelTimer(level.Duration);
             _score = new ScoreTracker(_scoringRules.MultiKillWindow, _scoringRules.MultiKillBonus, _scoringRules.HealthBonusPerPercent);
-            _countdownRemaining = level.CountdownDuration;
-            _lastCountdownShown = -1;
+            _introDuration = level.IntroDuration;
+            _introElapsed = 0f;
             Time.timeScale = 1f;
             OnRunStarted?.Invoke(level);
             return true;
@@ -283,32 +295,21 @@ namespace ZombieWar.Core
 
         private void LaunchPreparedRun()
         {
-            SetState(GameState.Countdown);
+            SetState(GameState.Intro);
             OnRemainingTimeChanged?.Invoke(_timer.Remaining);
             OnScoreChanged?.Invoke(0, 0);
-            PublishCountdown();
+            OnIntroProgress?.Invoke(0f);
         }
 
-        private void TickCountdown(float deltaTime)
+        private void TickIntro(float deltaTime)
         {
-            _countdownRemaining -= deltaTime;
-            PublishCountdown();
-            if (_countdownRemaining <= 0f)
+            _introElapsed += deltaTime;
+            bool finished = _introElapsed >= _introDuration;
+            OnIntroProgress?.Invoke(finished ? 1f : _introElapsed / _introDuration);
+            if (finished)
             {
                 SetState(GameState.Playing);
             }
-        }
-
-        private void PublishCountdown()
-        {
-            int shown = Mathf.CeilToInt(_countdownRemaining);
-            if (shown == _lastCountdownShown)
-            {
-                return;
-            }
-
-            _lastCountdownShown = shown;
-            OnCountdownChanged?.Invoke(shown);
         }
 
         private void TickPlaying(float deltaTime)

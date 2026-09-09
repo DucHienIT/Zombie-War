@@ -41,7 +41,7 @@ namespace ZombieWar.Core
         }
 
         // The gun a run starts with; chosen on the pre-battle weapon-select screen and kept
-        // for Retry/Next Level, since those skip that screen and jump straight into Countdown.
+        // for Retry/Next Level, since those skip that screen and jump straight into the intro cinematic.
         public GunDefinitionSO EquippedGun
         {
             get

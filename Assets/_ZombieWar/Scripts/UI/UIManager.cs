@@ -14,7 +14,7 @@ namespace ZombieWar.UI
         [Header("Screens")]
         [SerializeField] private Canvas _hudCanvas;
         [SerializeField] private MenuScreenView _menuScreen;
-        [SerializeField] private CountdownView _countdown;
+        [SerializeField] private IntroCinematicView _intro;
         [SerializeField] private PopupManager _popups;
         // Covers everything while one run is swapped for another. It is a panel in this prefab
         // rather than the Loading scene: walking back to the menu must not reload the game.
@@ -41,18 +41,20 @@ namespace ZombieWar.UI
         [Header("Audio")]
         [SerializeField] private AudioSource _audioSource;
         [SerializeField] private AudioClip _tapClip;
+        [SerializeField] private AudioClip _gunSwitchClip;
         [SerializeField] private AudioClip _winClip;
         [SerializeField] private AudioClip _loseClip;
         [SerializeField] private AudioClip _levelUpClip;
 
         private Action _onPauseRequested;
+        private Action _onSwitchGunRequested;
         private Action<int> _onUpgradeWeaponRequested;
         private WeaponEntryData[] _menuWeapons;
         private int _openWeapon = -1;
 
         private void Awake()
         {
-            bool missing = _hudCanvas == null || _menuScreen == null || _countdown == null || _popups == null
+            bool missing = _hudCanvas == null || _menuScreen == null || _intro == null || _popups == null
                            || _loadingPanel == null
                            || _healthBar == null || _timer == null || _score == null || _gunHud == null
                            || _xpBar == null || _activeSkillsHud == null || _bossBar == null || _pauseButton == null || _pausePopup == null
@@ -65,11 +67,13 @@ namespace ZombieWar.UI
             }
 
             _pauseButton.onClick.AddListener(HandlePauseClicked);
+            _gunHud.Init(HandleSwitchGunClicked);
         }
 
-        public void BindGameplayCommands(Action onPause)
+        public void BindGameplayCommands(Action onPause, Action onSwitchGun)
         {
             _onPauseRequested = onPause;
+            _onSwitchGunRequested = onSwitchGun;
         }
 
         public void ShowGameplayScreen()
@@ -85,7 +89,7 @@ namespace ZombieWar.UI
             _onUpgradeWeaponRequested = onUpgradeWeapon;
             _openWeapon = -1;
             _hudCanvas.enabled = false;
-            _countdown.SetVisible(false);
+            _intro.Hide();
             _menuScreen.SetVisible(true);
             _menuScreen.Bind(header, levels, weapons, skills, onLevelSelected, HandleWeaponSelected, Wrap(onUpgradeSkill), Wrap(onSettings), PlayTap);
         }
@@ -162,9 +166,12 @@ namespace ZombieWar.UI
 
         public void HideBossBar() => _bossBar.Hide();
 
-        public void ShowCountdown(bool visible) => _countdown.SetVisible(visible);
+        public void ShowIntro(int chapter, string title, Action onSkip) => _intro.Show(chapter, title, onSkip);
 
-        public void SetCountdownSeconds(int seconds) => _countdown.SetSeconds(seconds);
+        // Plays the start flash on top of whatever the intro left up; a no-op when no intro is showing.
+        public void FinishIntro() => _intro.Finish();
+
+        public void HideIntro() => _intro.Hide();
 
         public void ShowPausePopup(Action onResume, Action onRestart, Action onMenu, bool shakeEnabled, Action<bool> onShakeChanged)
         {
@@ -251,6 +258,12 @@ namespace ZombieWar.UI
         {
             PlayTap();
             _onPauseRequested?.Invoke();
+        }
+
+        private void HandleSwitchGunClicked()
+        {
+            Play(_gunSwitchClip);
+            _onSwitchGunRequested?.Invoke();
         }
 
         private void Play(AudioClip clip)

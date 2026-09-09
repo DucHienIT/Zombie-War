@@ -4,7 +4,8 @@ namespace ZombieWar.Core
     {
         // Idle: the menu overlay is up and no run exists yet.
         Menu,
-        Countdown,
+        // Opening cinematic: the world exists and the soldier stands ready, but nothing moves yet.
+        Intro,
         Playing,
         Paused,
         // Modal upgrade draft: the run is frozen but it is not the pause menu.

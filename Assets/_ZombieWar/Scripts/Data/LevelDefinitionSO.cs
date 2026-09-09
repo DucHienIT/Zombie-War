@@ -16,7 +16,8 @@ namespace ZombieWar.Data
 
         [Header("Session")]
         [SerializeField] private float _duration = 180f;
-        [SerializeField] private float _countdownDuration = 3f;
+        // Length of the opening cinematic before the first zombie spawns; the player can tap to skip it.
+        [SerializeField] private float _introDuration = 4.5f;
         [SerializeField] private WavePhaseSO[] _phases;
         // When set, running out of clock is not enough: the run stays in play until the level's
         // boss is down. The boss itself is a scripted spawn in one of the phases above.
@@ -36,7 +37,7 @@ namespace ZombieWar.Data
         public LevelMap MapPrefab => _mapPrefab;
         public LevelDefinitionSO NextLevel => _nextLevel;
         public float Duration => _duration;
-        public float CountdownDuration => _countdownDuration;
+        public float IntroDuration => _introDuration;
         public WavePhaseSO[] Phases => _phases;
         public bool RequiresBossDefeat => _requiresBossDefeat;
         public float SpawnRingInner => _spawnRingInner;
