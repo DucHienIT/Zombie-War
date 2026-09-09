@@ -62,6 +62,8 @@ namespace ZombieWar.Player
         private Quaternion _leftCalibrationGoal;
         private bool _calibrationRequested;
         private bool _offsetsCached;
+        // Rigs without finger bones (Biped-style) still get the hand IK, just no curl.
+        private bool _hasFingerBones;
 
         private void Awake()
         {
@@ -72,19 +74,23 @@ namespace ZombieWar.Player
             }
 
             // Runs before the first animator update, so these are the authored rest rotations.
-            CacheRest(RightFingerBones, _rightFingerRest);
-            CacheRest(LeftFingerBones, _leftFingerRest);
-            CacheRest(RightThumbBones, _rightThumbRest);
-            CacheRest(LeftThumbBones, _leftThumbRest);
+            _hasFingerBones = CacheRest(RightFingerBones, _rightFingerRest)
+                              & CacheRest(LeftFingerBones, _leftFingerRest)
+                              & CacheRest(RightThumbBones, _rightThumbRest)
+                              & CacheRest(LeftThumbBones, _leftThumbRest);
         }
 
-        private void CacheRest(HumanBodyBones[] bones, Quaternion[] rest)
+        private bool CacheRest(HumanBodyBones[] bones, Quaternion[] rest)
         {
+            bool complete = true;
             for (int i = 0; i < bones.Length; i++)
             {
                 Transform bone = _animator.GetBoneTransform(bones[i]);
+                complete &= bone != null;
                 rest[i] = bone != null ? bone.localRotation : Quaternion.identity;
             }
+
+            return complete;
         }
 
         private void OnAnimatorIK(int layerIndex)
@@ -106,6 +112,11 @@ namespace ZombieWar.Player
 
             Pin(AvatarIKGoal.RightHand, AvatarIKHint.RightElbow, gun.RightHandGrip, _rightElbowHint, _rightGoalOffset);
             Pin(AvatarIKGoal.LeftHand, AvatarIKHint.LeftElbow, gun.LeftHandGrip, _leftElbowHint, _leftGoalOffset);
+            if (!_hasFingerBones)
+            {
+                return;
+            }
+
             Curl(RightFingerBones, _rightFingerRest, _rightFingerCurl);
             Curl(LeftFingerBones, _leftFingerRest, _leftFingerCurl);
             Curl(RightThumbBones, _rightThumbRest, _rightThumbCurl);
