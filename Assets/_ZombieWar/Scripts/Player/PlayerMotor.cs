@@ -71,6 +71,12 @@ namespace ZombieWar.Player
 
             if (facing.sqrMagnitude <= MovingThresholdSqr)
             {
+                // Nothing steers the body now: kill any spin that zombie contacts pushed into the rigidbody,
+                // otherwise an idle soldier keeps turning forever.
+                if (_rigidbody.angularVelocity != Vector3.zero)
+                {
+                    _rigidbody.angularVelocity = Vector3.zero;
+                }
                 return;
             }
 
