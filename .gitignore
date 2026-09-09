@@ -86,6 +86,3 @@ Captures/
 # Only this one file is ignored: the rest of Scripts/Editor/ (build tool + asmdef) is committed.
 /Assets/_ZombieWar/Scripts/Editor/DebugCheatWindow.cs
 /Assets/_ZombieWar/Scripts/Editor/DebugCheatWindow.cs.meta
-
-# Local-only options of the third-party BuildReport editor tool (stores a machine-specific output path)
-/ProjectSettings/BuildReportToolOptions.xml

@@ -3,17 +3,7 @@ guid: 4b11d0901d1e3f04da6b00a4ff5d74dd
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: FatZombie_Mat
-    second: {fileID: 2100000, guid: 9716cbd1410dc004ea62978057f7e59e, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: lambert1
-    second: {fileID: 2100000, guid: 9716cbd1410dc004ea62978057f7e59e, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 0
     materialName: 0
