@@ -24,6 +24,10 @@ namespace ZombieWar.Data
         [Header("Auto Fire")]
         [SerializeField] private float _aimToleranceDegrees = 8f;
 
+        [Header("Gun Switch")]
+        [SerializeField] private float _switchLockDuration = 0.25f;
+        [SerializeField] private float _minCooldownAfterSwitch = 0.15f;
+
         [Header("Feedback")]
         [SerializeField] private PooledVfx _hitVfx;
         [SerializeField] private float _hitCameraImpulse = 0.2f;
@@ -39,6 +43,8 @@ namespace ZombieWar.Data
         public float OcclusionGrace => _occlusionGrace;
         public float TargetSwitchMargin => _targetSwitchMargin;
         public float AimToleranceDegrees => _aimToleranceDegrees;
+        public float SwitchLockDuration => _switchLockDuration;
+        public float MinCooldownAfterSwitch => _minCooldownAfterSwitch;
         public PooledVfx HitVfx => _hitVfx;
         public float HitCameraImpulse => _hitCameraImpulse;
     }

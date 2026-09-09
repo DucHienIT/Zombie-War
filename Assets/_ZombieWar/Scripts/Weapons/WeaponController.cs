@@ -28,6 +28,7 @@ namespace ZombieWar.Weapons
         private Transform _transform;
         private int _currentIndex;
         private float _stateTimer;
+        private float _pendingCooldownAfterSwitch;
 
         public event Action<Gun> OnGunChanged;
         public event Action<Gun> OnShotFired;
@@ -73,22 +74,68 @@ namespace ZombieWar.Weapons
         }
 
         // Upgrades bought in the menu land here, so a run always starts with the saved levels.
-        // The gun itself was chosen on the weapon-select screen (or kept from the previous run,
-        // for Retry/Next Level) and is fixed for the whole run - there is no in-match switching.
+        // The starting gun is the one chosen on the weapon-select screen (or kept from the
+        // previous run, for Retry/Next Level); the HUD switch button cycles from there.
         private void HandleRunStarted(LevelDefinitionSO level)
         {
             ApplyUpgrades();
-            int index = ResolveEquippedIndex();
-            if (index != _currentIndex)
+            _pendingCooldownAfterSwitch = 0f;
+            State = WeaponState.Ready;
+            SelectGun(ResolveEquippedIndex());
+            OnGunChanged?.Invoke(CurrentGun);
+        }
+
+        // Cycles to the next unlocked gun (spec 5: at least two guns and a switch button on the
+        // HUD). The lock-out window keeps a tap from becoming a free reload: whatever cooldown
+        // the old gun still owed carries over to the new one.
+        public void RequestSwitch()
+        {
+            if (State == WeaponState.Switching || _flow.State != GameState.Playing || !_health.IsAlive)
             {
-                _guns[_currentIndex].SetVisible(false);
-                _currentIndex = index;
-                Gun gun = CurrentGun;
-                gun.SetVisible(true);
-                _aim.SetScanRange(gun.Definition.Range);
+                return;
             }
 
+            int next = ResolveNextUnlockedIndex();
+            if (next == _currentIndex)
+            {
+                return;
+            }
+
+            float remainingCooldown = State == WeaponState.Cooldown ? _stateTimer : 0f;
+            SelectGun(next);
+
+            State = WeaponState.Switching;
+            _stateTimer = _playerDefinition.SwitchLockDuration;
+            _pendingCooldownAfterSwitch = Mathf.Max(_playerDefinition.MinCooldownAfterSwitch, remainingCooldown);
             OnGunChanged?.Invoke(CurrentGun);
+        }
+
+        private void SelectGun(int index)
+        {
+            if (index == _currentIndex)
+            {
+                return;
+            }
+
+            _guns[_currentIndex].SetVisible(false);
+            _currentIndex = index;
+            Gun gun = CurrentGun;
+            gun.SetVisible(true);
+            _aim.SetScanRange(gun.Definition.Range);
+        }
+
+        private int ResolveNextUnlockedIndex()
+        {
+            for (int step = 1; step < _guns.Length; step++)
+            {
+                int index = (_currentIndex + step) % _guns.Length;
+                if (_profile.IsGunUnlocked(_guns[index].Definition))
+                {
+                    return index;
+                }
+            }
+
+            return _currentIndex;
         }
 
         private void ApplyUpgrades()
@@ -142,6 +189,9 @@ namespace ZombieWar.Weapons
                     break;
                 case WeaponState.Cooldown:
                     TickCooldown(deltaTime);
+                    break;
+                case WeaponState.Switching:
+                    TickSwitch(deltaTime);
                     break;
             }
         }
@@ -226,6 +276,18 @@ namespace ZombieWar.Weapons
             }
 
             State = WeaponState.Ready;
+        }
+
+        private void TickSwitch(float deltaTime)
+        {
+            _stateTimer -= deltaTime;
+            if (_stateTimer > 0f)
+            {
+                return;
+            }
+
+            State = WeaponState.Cooldown;
+            _stateTimer = _pendingCooldownAfterSwitch;
         }
     }
 }
