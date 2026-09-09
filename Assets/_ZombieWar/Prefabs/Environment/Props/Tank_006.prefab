@@ -668,6 +668,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6502819831603285025}
     m_Modifications:
+    - target: {fileID: 2108511266191337181, guid: f6d4a3f43e9c8e54d98f80cdd032351d, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: 9c215455e2c3b484fb9cdd7137c71c1e, type: 2}
     - target: {fileID: 2424877145718338498, guid: f6d4a3f43e9c8e54d98f80cdd032351d, type: 3}
       propertyPath: m_Name
       value: Tank_tower_006
@@ -1045,6 +1049,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5754084199372789682, guid: 3159fa8f81d2bb2458048d6d46de18ab, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: 5d4d47b37d0655d4e9dbad3edc4e1193, type: 2}
     - target: {fileID: 919132149155446097, guid: 3159fa8f81d2bb2458048d6d46de18ab, type: 3}
       propertyPath: m_Name
       value: Tank_006

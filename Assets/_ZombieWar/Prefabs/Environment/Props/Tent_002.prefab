@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5754084199372789682, guid: 051f528edc7306240bb0f1b6a68333b2, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: 52f585b30f4a73f4d8f27d49a5401804, type: 2}
     - target: {fileID: 919132149155446097, guid: 051f528edc7306240bb0f1b6a68333b2, type: 3}
       propertyPath: m_Name
       value: Tent_002
