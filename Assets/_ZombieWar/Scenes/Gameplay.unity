@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameplayRoot
       objectReference: {fileID: 0}
+    - target: {fileID: 368121464427203797, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 825491425852113598, guid: 94e1958cf77af544994da37060b7156a, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
       value: 25
@@ -198,6 +202,10 @@ PrefabInstance:
       propertyPath: m_AdditionalShaderChannelsFlag
       value: 25
       objectReference: {fileID: 0}
+    - target: {fileID: 2756792178244259132, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 3611338825383138440, guid: 94e1958cf77af544994da37060b7156a, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
       value: 25
@@ -223,6 +231,10 @@ PrefabInstance:
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 6092273841241652954, guid: 94e1958cf77af544994da37060b7156a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6549203998026920113, guid: 94e1958cf77af544994da37060b7156a, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
       value: 25
       objectReference: {fileID: 0}
