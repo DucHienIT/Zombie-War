@@ -6,15 +6,14 @@ using UnityEngine.InputSystem.OnScreen;
 
 namespace ZombieWar.UI
 {
-    // Floating joystick: the stick sets up wherever the thumb lands inside the touch area, and the
-    // base drags along once the thumb slides past the rim, so reversing direction never needs the
-    // thumb to travel back through the origin first.
+    // Floating joystick: the stick sets up wherever the thumb lands inside the touch area and keeps
+    // that origin fixed until release.
     //
     // It drives <Gamepad>/leftStick through the Input System's on-screen device exactly like the
     // package's OnScreenStick, so the Move action and everything downstream stay untouched. It is
     // written in-house because OnScreenStick accepts every pointer (a second finger resting on the
     // lower half re-centres the stick, and lifting either finger zeroes it) and keeps its origin
-    // nailed to the press point with no way to make the base follow.
+    // nailed to the press point with no way to reposition it from outside.
     //
     // Lives on the object the touch area bubbles up to (Handle): uGUI delivers drag and release to
     // whichever object took the press, so the whole gesture lands on this one component.
@@ -32,7 +31,6 @@ namespace ZombieWar.UI
         [Header("Stick")]
         // Thumb travel from the origin, in canvas units, that reads as full deflection.
         [SerializeField] private float _movementRange = 110f;
-        [SerializeField] private bool _baseFollowsThumb = true;
 
         [Header("Placement")]
         // Keeps the ring fully on screen when the thumb lands near an edge.
@@ -47,7 +45,7 @@ namespace ZombieWar.UI
 
         private RectTransform _area;
         private Vector2 _home;
-        // Stick origin in the touch area's local space; slides after the thumb while following.
+        // Stick origin in the touch area's local space, fixed at the press point.
         private Vector2 _origin;
         private int _pointerId = NoPointer;
         private Tween _fadeTween;
@@ -120,15 +118,7 @@ namespace ZombieWar.UI
                 return;
             }
 
-            Vector2 delta = local - _origin;
-            if (_baseFollowsThumb && delta.sqrMagnitude > _movementRange * _movementRange)
-            {
-                _origin = ClampToArea(local - delta.normalized * _movementRange);
-                PlaceRoot();
-                delta = local - _origin;
-            }
-
-            delta = Vector2.ClampMagnitude(delta, _movementRange);
+            Vector2 delta = Vector2.ClampMagnitude(local - _origin, _movementRange);
             _handle.anchoredPosition = delta;
             SendValueToControl(delta / _movementRange);
         }
