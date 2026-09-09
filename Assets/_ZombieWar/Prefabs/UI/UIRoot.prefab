@@ -36578,6 +36578,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2478046494964267636}
+  - component: {fileID: 3257629629173133909}
   m_Layer: 0
   m_Name: Hard
   m_TagString: Untagged
@@ -36606,6 +36607,20 @@ RectTransform:
   m_AnchoredPosition: {x: -8, y: 0}
   m_SizeDelta: {x: 232, y: 80}
   m_Pivot: {x: 1, y: 0.5}
+--- !u!114 &3257629629173133909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5150109093125029859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49b4031778599364aa5b1bd9f9cf0e14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _requiredTaps: 7
+  _maxTapInterval: 1
 --- !u!1 &5239542059103490989
 GameObject:
   m_ObjectHideFlags: 0
@@ -38382,6 +38397,7 @@ MonoBehaviour:
   _prevButton: {fileID: 125206200645270200}
   _nextButton: {fileID: 9219548467580104721}
   _chapterText: {fileID: 6470200633261670976}
+  _hardTapCheat: {fileID: 3257629629173133909}
 --- !u!114 &1079559152891098185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43280,7 +43296,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

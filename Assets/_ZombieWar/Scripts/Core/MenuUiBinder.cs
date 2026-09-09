@@ -17,6 +17,10 @@ namespace ZombieWar.Core
         [SerializeField] private SettingsService _settings;
         // Chapter order on the battle page.
         [SerializeField] private LevelDefinitionSO[] _levels;
+        // When off, PLAY starts the run immediately with the currently equipped gun; the HUD
+        // switch button already lets the player cycle guns mid-run, so the pre-run popup is
+        // redundant. Flip this on to bring the weapon-select popup back without touching code.
+        [SerializeField] private bool _weaponSelectEnabled;
 
         private readonly SaveService _save = new SaveService();
         private LevelCardData[] _cards;
@@ -64,8 +68,8 @@ namespace ZombieWar.Core
             RefreshWeapons();
             RefreshSkills();
             _menuShown = true;
-            _ui.ShowMenuScreen(BuildHeader(), _cards, _weapons, _skills, HandleLevelSelected, HandleUpgradeRequested,
-                HandleSkillUpgradeRequested, HandleSettingsRequested);
+            _ui.ShowMenuScreen(BuildHeader(), _cards, _weapons, _skills, HandleLevelSelected, HandleUnlockCheatRequested,
+                HandleUpgradeRequested, HandleSkillUpgradeRequested, HandleSettingsRequested);
         }
 
         // Rewards land at the end of a run while the menu is hidden; only a live menu redraws.
@@ -235,10 +239,33 @@ namespace ZombieWar.Core
                 return;
             }
 
+            if (!_weaponSelectEnabled)
+            {
+                _flow.StartRun(level);
+                return;
+            }
+
             // The run only actually starts once a gun is picked; Retry/Next Level skip this
             // screen entirely and keep whatever was equipped here.
             _pendingLevel = level;
             _ui.ShowWeaponSelectPopup(_weapons, HandleWeaponPicked);
+        }
+
+        // Debug cheat kept in shipping builds: the battle page fires it after seven quick taps on HARD.
+        // Unlock is a high-water mark, so every chapter before this one opens with it.
+        private void HandleUnlockCheatRequested(int slot)
+        {
+            LevelDefinitionSO level = _levels[slot];
+            if (level == null)
+            {
+                Debug.LogError($"{LogPrefix} Unlock cheat requested for empty level slot {slot}.", this);
+                return;
+            }
+
+            _save.UnlockLevel(level.LevelIndex);
+            Debug.Log($"{LogPrefix} Cheat unlocked chapter {level.LevelIndex}.", this);
+            RefreshCards();
+            _ui.RefreshLevels(_cards);
         }
 
         private void HandleWeaponPicked(int index)

@@ -83,7 +83,8 @@ namespace ZombieWar.UI
         }
 
         public void ShowMenuScreen(in MenuHeaderData header, LevelCardData[] levels, WeaponEntryData[] weapons, SkillNodeData[] skills,
-            Action<int> onLevelSelected, Action<int> onUpgradeWeapon, Action<int> onUpgradeSkill, Action onSettings)
+            Action<int> onLevelSelected, Action<int> onLevelUnlockCheat, Action<int> onUpgradeWeapon, Action<int> onUpgradeSkill,
+            Action onSettings)
         {
             _menuWeapons = weapons;
             _onUpgradeWeaponRequested = onUpgradeWeapon;
@@ -91,7 +92,8 @@ namespace ZombieWar.UI
             _hudCanvas.enabled = false;
             _intro.Hide();
             _menuScreen.SetVisible(true);
-            _menuScreen.Bind(header, levels, weapons, skills, onLevelSelected, HandleWeaponSelected, Wrap(onUpgradeSkill), Wrap(onSettings), PlayTap);
+            _menuScreen.Bind(header, levels, weapons, skills, onLevelSelected, onLevelUnlockCheat, HandleWeaponSelected,
+                Wrap(onUpgradeSkill), Wrap(onSettings), PlayTap);
         }
 
         // Re-pushes header, weapon and skill data while the menu is already up (after an upgrade).
@@ -104,6 +106,9 @@ namespace ZombieWar.UI
                 _weaponPopup.Refresh(weapons[_openWeapon]);
             }
         }
+
+        // Redraws the chapter cards in place after a level got unlocked while the menu is up.
+        public void RefreshLevels(LevelCardData[] levels) => _menuScreen.RefreshLevels(levels);
 
         public void ShowSettingsPopup(in SettingsData data, Action<SettingId, bool> onChanged)
         {

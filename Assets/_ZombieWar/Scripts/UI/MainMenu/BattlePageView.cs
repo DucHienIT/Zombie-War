@@ -19,16 +19,19 @@ namespace ZombieWar.UI
         [SerializeField] private Button _prevButton;
         [SerializeField] private Button _nextButton;
         [SerializeField] private TMP_Text _chapterText;
+        // Seven quick taps on the HARD label unlock the chapter on screen; it ships in the build on purpose.
+        [SerializeField] private SecretTapTrigger _hardTapCheat;
 
         private LevelCardData[] _levels;
         private Action<int> _onLevelSelected;
+        private Action<int> _onUnlockCheat;
         private Action _onTap;
         private Action _playAction;
         private int _index;
 
         private void Awake()
         {
-            if (_card == null || _prevButton == null || _nextButton == null || _chapterText == null)
+            if (_card == null || _prevButton == null || _nextButton == null || _chapterText == null || _hardTapCheat == null)
             {
                 Debug.LogError($"{LogPrefix} BattlePageView has an unassigned reference.", this);
                 return;
@@ -37,6 +40,7 @@ namespace ZombieWar.UI
             _playAction = HandlePlay;
             _prevButton.onClick.AddListener(HandlePrev);
             _nextButton.onClick.AddListener(HandleNext);
+            _hardTapCheat.Init(HandleUnlockCheat);
         }
 
         // The page is switched on by the tab bar, so every visit replays the card coming in.
@@ -48,7 +52,7 @@ namespace ZombieWar.UI
             }
         }
 
-        public void Bind(LevelCardData[] levels, Action<int> onLevelSelected, Action onTap)
+        public void Bind(LevelCardData[] levels, Action<int> onLevelSelected, Action<int> onUnlockCheat, Action onTap)
         {
             if (levels == null || levels.Length == 0)
             {
@@ -58,8 +62,22 @@ namespace ZombieWar.UI
 
             _levels = levels;
             _onLevelSelected = onLevelSelected;
+            _onUnlockCheat = onUnlockCheat;
             _onTap = onTap;
             _index = LastUnlockedIndex();
+            Refresh(NoStep);
+        }
+
+        // Redraws the chapter in view with fresh data (after the unlock cheat) without moving off it.
+        public void Refresh(LevelCardData[] levels)
+        {
+            if (_levels == null || levels == null || levels.Length == 0)
+            {
+                return;
+            }
+
+            _levels = levels;
+            _index = Mathf.Min(_index, _levels.Length - 1);
             Refresh(NoStep);
         }
 
@@ -115,6 +133,17 @@ namespace ZombieWar.UI
         {
             _onTap?.Invoke();
             _onLevelSelected?.Invoke(_index);
+        }
+
+        private void HandleUnlockCheat()
+        {
+            if (_levels == null || _levels[_index].Unlocked)
+            {
+                return;
+            }
+
+            _onTap?.Invoke();
+            _onUnlockCheat?.Invoke(_index);
         }
     }
 }

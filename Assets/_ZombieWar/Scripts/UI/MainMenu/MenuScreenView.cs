@@ -39,12 +39,13 @@ namespace ZombieWar.UI
         public void SetVisible(bool visible) => _canvas.enabled = visible;
 
         public void Bind(in MenuHeaderData header, LevelCardData[] levels, WeaponEntryData[] weapons, SkillNodeData[] skills,
-            Action<int> onLevelSelected, Action<int> onWeaponSelected, Action<int> onSkillUpgrade, Action onSettings, Action onTap)
+            Action<int> onLevelSelected, Action<int> onLevelUnlockCheat, Action<int> onWeaponSelected, Action<int> onSkillUpgrade,
+            Action onSettings, Action onTap)
         {
             _onTap = onTap;
             _onSettings = onSettings;
             _header.Set(header);
-            _battlePage.Bind(levels, onLevelSelected, onTap);
+            _battlePage.Bind(levels, onLevelSelected, onLevelUnlockCheat, onTap);
             _weaponPage.Bind(weapons, onWeaponSelected, onTap);
             _skillTreePage.Bind(skills, onSkillUpgrade, onTap);
             ShowPage(_defaultTab);
@@ -57,6 +58,8 @@ namespace ZombieWar.UI
             _weaponPage.Refresh(weapons);
             _skillTreePage.Refresh(skills);
         }
+
+        public void RefreshLevels(LevelCardData[] levels) => _battlePage.Refresh(levels);
 
         private void HandleTabSelected(int tab)
         {
