@@ -15,7 +15,7 @@ MonoBehaviour:
   _id: brute
   _displayName: Brute
   _prefab: {fileID: 3326704796316143143, guid: 0042dc83634158f408a4d74242cbcb72, type: 3}
-  _poolPrewarm: 22
+  _poolPrewarm: 28
   _maxHp: 84
   _moveSpeed: 1.1
   _scoreReward: 30

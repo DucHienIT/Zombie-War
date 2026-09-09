@@ -15,7 +15,7 @@ MonoBehaviour:
   _id: runner
   _displayName: Runner
   _prefab: {fileID: 2500135637788990654, guid: f32cabb5549901e4b872ee8ef22c45d0, type: 3}
-  _poolPrewarm: 48
+  _poolPrewarm: 60
   _maxHp: 14
   _moveSpeed: 2.3
   _scoreReward: 15

@@ -15,7 +15,7 @@ MonoBehaviour:
   _id: walker
   _displayName: Walker
   _prefab: {fileID: 126188387973491263, guid: f8a480dc0f0cb6b4db7186c2cca81e49, type: 3}
-  _poolPrewarm: 64
+  _poolPrewarm: 80
   _maxHp: 24
   _moveSpeed: 1.5
   _scoreReward: 10

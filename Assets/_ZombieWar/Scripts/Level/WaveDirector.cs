@@ -165,7 +165,7 @@ namespace ZombieWar.Level
             }
 
             _spawnTimer = phase.SpawnInterval * CurrentIntervalStretch();
-            if (_zombies.ActiveCount >= phase.AliveCap)
+            if (_zombies.LivingCount >= phase.AliveCap)
             {
                 // At cap the tick is skipped, never banked: no catch-up burst when the crowd thins.
                 return;

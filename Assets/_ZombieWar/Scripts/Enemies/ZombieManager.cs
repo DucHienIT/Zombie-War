@@ -53,6 +53,7 @@ namespace ZombieWar.Enemies
         private float _lastVoiceTime;
         private float _lastHitVoiceTime;
         private float _lastSpawnVoiceTime;
+        private int _livingCount;
 
         public event Action<ZombieController> OnZombieKilled;
         public event Action<ZombieController, float> OnZombieDamaged;
@@ -61,6 +62,10 @@ namespace ZombieWar.Enemies
         public event Action OnBossDefeated;
 
         public int ActiveCount => _active.Count;
+        // Zombies that can still fight. Dying bodies stay in the active list while their death
+        // pose and dissolve play, so spawn caps read this instead of ActiveCount - otherwise a
+        // longer death lets corpses hold cap slots and quietly slows the wave.
+        public int LivingCount => _livingCount;
         // A level flagged as boss-gated reads this instead of the clock to decide the run is won.
         public bool BossDefeated => _bossDefeated;
 
@@ -134,6 +139,7 @@ namespace ZombieWar.Enemies
 
             ZombieController zombie = pool.Get(position, rotation);
             _active.Add(zombie);
+            _livingCount++;
             PlaySpawnVoice(definition.SpawnClip, position);
             if (definition.IsBoss)
             {
@@ -212,6 +218,7 @@ namespace ZombieWar.Enemies
 
             _active.Clear();
             _despawnQueue.Clear();
+            _livingCount = 0;
         }
 
         private void Update()
@@ -224,10 +231,20 @@ namespace ZombieWar.Enemies
 
             float deltaTime = Time.deltaTime;
             Vector3 playerPosition = _playerTransform.position;
+            // Recounted every tick rather than tracked by event: a zombie recycled off the mesh
+            // zeroes its HP without raising OnDied, and this loop already visits every one.
+            int living = 0;
             for (int i = 0; i < _active.Count; i++)
             {
-                _active[i].Tick(deltaTime, playerPosition);
+                ZombieController zombie = _active[i];
+                zombie.Tick(deltaTime, playerPosition);
+                if (zombie.IsAlive)
+                {
+                    living++;
+                }
             }
+
+            _livingCount = living;
 
             FlushDespawnQueue();
         }
