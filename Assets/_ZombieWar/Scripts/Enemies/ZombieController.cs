@@ -142,7 +142,7 @@ namespace ZombieWar.Enemies
             _hp -= info.Amount;
             _owner.ReportDamage(this, info.Amount);
             _materialFx.FlashHit(_feedback.ZombieHitFlashDuration);
-            _owner.PlayVoice(_definition.HitClips, _transform.position);
+            _owner.PlayHitVoice(_definition.HitClips, _transform.position);
 
             float force = info.Force * _definition.KnockbackForceMultiplier;
             bool physical = force >= _definition.PhysicsKnockbackThreshold;

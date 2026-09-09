@@ -25,8 +25,13 @@ namespace ZombieWar.Enemies
         [SerializeField] private VfxService _vfx;
 
         [Header("Voice Limit")]
-        // Minimum spacing between zombie voice clips so a crowd never becomes a noise wall.
-        [SerializeField] private float _voiceInterval = 0.12f;
+        // Minimum spacing between attack/death voice clips so a crowd never becomes a noise wall.
+        [SerializeField] private float _voiceInterval = 0.25f;
+        // Hit grunts fire on every bullet, so they get a slower gate of their own and never starve attack/death voices.
+        [SerializeField] private float _hitVoiceInterval = 0.4f;
+        // Spawn moans come from the off-screen ring and stack fastest at late phases.
+        [SerializeField] private float _spawnVoiceInterval = 0.7f;
+        [SerializeField, Range(0f, 1f)] private float _voiceVolume = 0.75f;
 
         [Header("Corpse")]
         // Layer a body launched by a lethal blast moves to while it dissolves. Bullets, aim and
@@ -46,6 +51,8 @@ namespace ZombieWar.Enemies
         private bool _bossDefeated;
         private int _corpseLayer;
         private float _lastVoiceTime;
+        private float _lastHitVoiceTime;
+        private float _lastSpawnVoiceTime;
 
         public event Action<ZombieController> OnZombieKilled;
         public event Action<ZombieController, float> OnZombieDamaged;
@@ -127,7 +134,7 @@ namespace ZombieWar.Enemies
 
             ZombieController zombie = pool.Get(position, rotation);
             _active.Add(zombie);
-            _audio.PlayWorld(definition.SpawnClip, position);
+            PlaySpawnVoice(definition.SpawnClip, position);
             if (definition.IsBoss)
             {
                 _boss = zombie;
@@ -156,14 +163,44 @@ namespace ZombieWar.Enemies
 
         public void PlayVoice(AudioClip[] clips, Vector3 position)
         {
-            float now = Time.time;
-            if (now - _lastVoiceTime < _voiceInterval)
+            if (!TryOpenGate(ref _lastVoiceTime, _voiceInterval))
             {
                 return;
             }
 
-            _lastVoiceTime = now;
-            _audio.PlayWorldRandom(clips, position);
+            _audio.PlayWorldRandom(clips, position, _voiceVolume);
+        }
+
+        public void PlayHitVoice(AudioClip[] clips, Vector3 position)
+        {
+            if (!TryOpenGate(ref _lastHitVoiceTime, _hitVoiceInterval))
+            {
+                return;
+            }
+
+            _audio.PlayWorldRandom(clips, position, _voiceVolume);
+        }
+
+        private void PlaySpawnVoice(AudioClip clip, Vector3 position)
+        {
+            if (clip == null || !TryOpenGate(ref _lastSpawnVoiceTime, _spawnVoiceInterval))
+            {
+                return;
+            }
+
+            _audio.PlayWorld(clip, position, _voiceVolume);
+        }
+
+        private static bool TryOpenGate(ref float lastTime, float interval)
+        {
+            float now = Time.time;
+            if (now - lastTime < interval)
+            {
+                return false;
+            }
+
+            lastTime = now;
+            return true;
         }
 
         public void DespawnAll()

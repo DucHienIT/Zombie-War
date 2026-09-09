@@ -14,8 +14,11 @@ namespace ZombieWar.Audio
         [SerializeField] private float _pitchJitter = 0.03f;
         // Identical clips requested inside this window are merged into one voice (shotgun pellets, crowd hits).
         [SerializeField] private float _sameClipMergeWindow = 0.03f;
+        // Copies of one clip allowed to overlap; a crowd hitting the same grunt past this is dropped instead of stacked.
+        [SerializeField] private int _maxVoicesPerClip = 3;
 
         private readonly Dictionary<AudioClip, float> _lastPlayTime = new Dictionary<AudioClip, float>(32);
+        private float[] _voiceStartTime;
         private int _nextVoice;
 
         private void Awake()
@@ -23,7 +26,10 @@ namespace ZombieWar.Audio
             if (_worldVoices == null || _worldVoices.Length == 0)
             {
                 Debug.LogError($"{LogPrefix} No world voices assigned.", this);
+                return;
             }
+
+            _voiceStartTime = new float[_worldVoices.Length];
         }
 
         // Every world sound goes through these voices, so muting them mutes gameplay audio.
@@ -37,25 +43,40 @@ namespace ZombieWar.Audio
 
         public void PlayWorld(AudioClip clip, Vector3 position)
         {
-            if (clip == null || IsMerged(clip))
+            PlayWorld(clip, position, 1f);
+        }
+
+        public void PlayWorld(AudioClip clip, Vector3 position, float volume)
+        {
+            if (clip == null || IsMerged(clip) || IsClipSaturated(clip))
             {
                 return;
             }
 
-            AudioSource voice = AcquireVoice();
+            int index = AcquireVoice();
+            AudioSource voice = _worldVoices[index];
             voice.transform.position = position;
             voice.pitch = 1f + Random.Range(-_pitchJitter, _pitchJitter);
-            voice.PlayOneShot(clip);
+            voice.volume = volume;
+            // Play (not PlayOneShot) so a stolen voice replaces its old sound instead of layering on top of it.
+            voice.clip = clip;
+            voice.Play();
+            _voiceStartTime[index] = Time.unscaledTime;
         }
 
         public void PlayWorldRandom(AudioClip[] clips, Vector3 position)
+        {
+            PlayWorldRandom(clips, position, 1f);
+        }
+
+        public void PlayWorldRandom(AudioClip[] clips, Vector3 position, float volume)
         {
             if (clips == null || clips.Length == 0)
             {
                 return;
             }
 
-            PlayWorld(clips[Random.Range(0, clips.Length)], position);
+            PlayWorld(clips[Random.Range(0, clips.Length)], position, volume);
         }
 
         private bool IsMerged(AudioClip clip)
@@ -70,25 +91,48 @@ namespace ZombieWar.Audio
             return false;
         }
 
-        private AudioSource AcquireVoice()
+        private bool IsClipSaturated(AudioClip clip)
+        {
+            int playing = 0;
+            for (int i = 0; i < _worldVoices.Length; i++)
+            {
+                AudioSource voice = _worldVoices[i];
+                if (voice.clip == clip && voice.isPlaying)
+                {
+                    playing++;
+                }
+            }
+
+            return playing >= _maxVoicesPerClip;
+        }
+
+        private int AcquireVoice()
         {
             int count = _worldVoices.Length;
             for (int i = 0; i < count; i++)
             {
-                AudioSource candidate = _worldVoices[(_nextVoice + i) % count];
-                if (candidate.isPlaying)
+                int index = (_nextVoice + i) % count;
+                if (_worldVoices[index].isPlaying)
                 {
                     continue;
                 }
 
-                _nextVoice = (_nextVoice + i + 1) % count;
-                return candidate;
+                _nextVoice = (index + 1) % count;
+                return index;
             }
 
-            // Every voice is busy: steal the oldest in round-robin order.
-            AudioSource stolen = _worldVoices[_nextVoice];
-            _nextVoice = (_nextVoice + 1) % count;
-            return stolen;
+            // Every voice is busy: steal the one that has been playing the longest.
+            int oldest = 0;
+            for (int i = 1; i < count; i++)
+            {
+                if (_voiceStartTime[i] < _voiceStartTime[oldest])
+                {
+                    oldest = i;
+                }
+            }
+
+            _nextVoice = (oldest + 1) % count;
+            return oldest;
         }
     }
 }
