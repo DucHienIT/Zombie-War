@@ -127,6 +127,7 @@ namespace ZombieWar.EditorTools
             }
 
             ApplyOwnedSettings(development);
+            BumpVersion();
 
             SigningState previousSigning;
             if (!TryApplySigning(development, out previousSigning))
@@ -199,6 +200,40 @@ namespace ZombieWar.EditorTools
             }
 
             return scenes;
+        }
+
+        // Every build ships under a fresh version: the patch component of bundleVersion and
+        // bundleVersionCode both advance by one, so two APKs can never share a name or a version code.
+        // Runs only after every pre-build check has passed, so a cancelled build does not burn a number.
+        private static void BumpVersion()
+        {
+            string previousVersion = PlayerSettings.bundleVersion;
+            int previousCode = PlayerSettings.Android.bundleVersionCode;
+
+            PlayerSettings.bundleVersion = IncrementPatch(previousVersion);
+            PlayerSettings.Android.bundleVersionCode = previousCode + 1;
+            AssetDatabase.SaveAssets();
+
+            Debug.Log($"{LogPrefix} Version {previousVersion} (vc{previousCode}) -> {PlayerSettings.bundleVersion} (vc{PlayerSettings.Android.bundleVersionCode}).");
+        }
+
+        private static string IncrementPatch(string version)
+        {
+            string[] parts = string.IsNullOrEmpty(version) ? new string[0] : version.Split('.');
+            if (parts.Length == 0)
+            {
+                return "1.0.1";
+            }
+
+            int patch;
+            if (!int.TryParse(parts[parts.Length - 1], out patch))
+            {
+                Debug.LogWarning($"{LogPrefix} bundleVersion '{version}' has no numeric patch component; appending '.1'.");
+                return version + ".1";
+            }
+
+            parts[parts.Length - 1] = (patch + 1).ToString();
+            return string.Join(".", parts);
         }
 
         private static void ApplyOwnedSettings(bool development)

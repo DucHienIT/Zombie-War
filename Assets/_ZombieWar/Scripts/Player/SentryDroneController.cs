@@ -266,7 +266,7 @@ namespace ZombieWar.Player
             var shot = new ShotStats(_damage, _gun.Knockback, 0);
             _projectiles.Spawn(origin, direction, _gun, shot);
             _vfx.Play(_gun.MuzzleVfx, _muzzle);
-            _audio.PlayWorld(_gun.ShotClip, origin);
+            _audio.PlayWorld(_gun.ShotClip, origin, _gun.ShotVolume);
             _cooldown = _fireInterval;
         }
     }

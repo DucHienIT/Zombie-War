@@ -16034,7 +16034,6 @@ MonoBehaviour:
   _vfx: {fileID: 2440377868786309692}
   _voiceInterval: 0.4
   _hitVoiceInterval: 0.6
-  _spawnVoiceInterval: 1.2
   _voiceVolume: 0.55
   _corpseLayerName: Corpse
 --- !u!114 &5073273168370420658
@@ -16152,7 +16151,7 @@ MonoBehaviour:
   _flow: {fileID: 4281690564645500983}
   _playerHealth: {fileID: 1926974352833698016}
   _weapons: {fileID: 6468280450332108366}
-  _cameraShake: {fileID: 7999020213214323880}
+  _settings: {fileID: 5626922606752480210}
   _rogue: {fileID: 5561710302172639988}
   _abilities: {fileID: 6866345778990028579}
   _zombies: {fileID: 4514733768100110360}
@@ -16171,13 +16170,13 @@ MonoBehaviour:
   _ui: {fileID: 1399598326377616648}
   _flow: {fileID: 4281690564645500983}
   _profile: {fileID: 277039655086971240}
-  _cameraShake: {fileID: 7999020213214323880}
   _settings: {fileID: 5626922606752480210}
   _levels:
   - {fileID: 11400000, guid: 9f0fa2abeacb92048a5e4278531c8336, type: 2}
   - {fileID: 11400000, guid: ff06822f45f98d445a639299a83e6f75, type: 2}
   - {fileID: 11400000, guid: e14eb9931cb44324c84ac3e695a6ae70, type: 2}
   - {fileID: 11400000, guid: ecaa8b33e9e6c4249b6493c4fa2bf395, type: 2}
+  _weaponSelectEnabled: 0
 --- !u!114 &277039655086971240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16260,6 +16259,7 @@ MonoBehaviour:
   _world: {fileID: 4343982078079130504}
   _music: {fileID: 8766361984037272434}
   _uiVoice: {fileID: 8475027840805174577}
+  _cameraShake: {fileID: 7999020213214323880}
 --- !u!114 &973604570578434903
 MonoBehaviour:
   m_ObjectHideFlags: 0

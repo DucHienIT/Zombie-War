@@ -57,7 +57,6 @@ namespace ZombieWar.Data
         [SerializeField] private AudioClip[] _attackClips;
         [SerializeField] private AudioClip[] _hitClips;
         [SerializeField] private AudioClip[] _deathClips;
-        [SerializeField] private AudioClip _spawnClip;
 
         public string Id => _id;
         public string DisplayName => _displayName;
@@ -90,6 +89,5 @@ namespace ZombieWar.Data
         public AudioClip[] AttackClips => _attackClips;
         public AudioClip[] HitClips => _hitClips;
         public AudioClip[] DeathClips => _deathClips;
-        public AudioClip SpawnClip => _spawnClip;
     }
 }

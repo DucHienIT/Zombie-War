@@ -30,6 +30,7 @@ MonoBehaviour:
   _fleshImpactVfx: {fileID: 1348457769765022127, guid: ca75323a3eb2de448a5464d2a4b63cab, type: 3}
   _propImpactVfx: {fileID: 4474901532229616265, guid: 8acb8f58135e1c6498568ff561f221b2, type: 3}
   _shotClip: {fileID: 8300000, guid: 8581f806dddef8046b4942de05b897be, type: 3}
+  _shotVolume: 0.45
   _cameraImpulse: 0.035
   _unlockedByDefault: 1
   _maxUpgradeLevel: 5

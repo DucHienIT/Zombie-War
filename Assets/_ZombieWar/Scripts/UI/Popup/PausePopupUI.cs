@@ -12,20 +12,18 @@ namespace ZombieWar.UI
         [SerializeField] private Button _resumeButton;
         [SerializeField] private Button _restartButton;
         [SerializeField] private Button _menuButton;
-
-        [Header("Settings")]
-        [SerializeField] private SwitchToggleView _shakeSwitch;
+        [SerializeField] private Button _settingsButton;
 
         private Action _onResume;
         private Action _onRestart;
         private Action _onMenu;
-        private Action<bool> _onShakeChanged;
+        private Action _onSettings;
         private Action _exitAction;
 
         protected override void Awake()
         {
             base.Awake();
-            if (_resumeButton == null || _restartButton == null || _menuButton == null || _shakeSwitch == null)
+            if (_resumeButton == null || _restartButton == null || _menuButton == null || _settingsButton == null)
             {
                 Debug.LogError($"{LogPrefix} PausePopupUI has an unassigned reference.", this);
                 return;
@@ -34,16 +32,15 @@ namespace ZombieWar.UI
             _resumeButton.onClick.AddListener(HandleResumeClicked);
             _restartButton.onClick.AddListener(HandleRestartClicked);
             _menuButton.onClick.AddListener(HandleMenuClicked);
-            _shakeSwitch.OnValueChanged += HandleShakeChanged;
+            _settingsButton.onClick.AddListener(HandleSettingsClicked);
         }
 
-        public void Setup(Action onResume, Action onRestart, Action onMenu, bool shakeEnabled, Action<bool> onShakeChanged)
+        public void Setup(Action onResume, Action onRestart, Action onMenu, Action onSettings)
         {
             _onResume = onResume;
             _onRestart = onRestart;
             _onMenu = onMenu;
-            _onShakeChanged = onShakeChanged;
-            _shakeSwitch.SetOnSilently(shakeEnabled);
+            _onSettings = onSettings;
             // Any close the player did not choose explicitly means "resume the run".
             _exitAction = onResume;
         }
@@ -73,6 +70,7 @@ namespace ZombieWar.UI
             Close();
         }
 
-        private void HandleShakeChanged(bool enabled) => _onShakeChanged?.Invoke(enabled);
+        // The settings sheet stacks on top; the pause popup stays open underneath it.
+        private void HandleSettingsClicked() => _onSettings?.Invoke();
     }
 }

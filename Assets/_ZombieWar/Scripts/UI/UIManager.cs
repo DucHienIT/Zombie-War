@@ -178,9 +178,9 @@ namespace ZombieWar.UI
 
         public void HideIntro() => _intro.Hide();
 
-        public void ShowPausePopup(Action onResume, Action onRestart, Action onMenu, bool shakeEnabled, Action<bool> onShakeChanged)
+        public void ShowPausePopup(Action onResume, Action onRestart, Action onMenu, Action onSettings)
         {
-            _pausePopup.Setup(Wrap(onResume), Wrap(onRestart), Wrap(onMenu), shakeEnabled, Wrap(onShakeChanged));
+            _pausePopup.Setup(Wrap(onResume), Wrap(onRestart), Wrap(onMenu), Wrap(onSettings));
             _popups.Show(_pausePopup);
         }
 
@@ -214,20 +214,6 @@ namespace ZombieWar.UI
             {
                 PlayTap();
                 action();
-            };
-        }
-
-        private Action<bool> Wrap(Action<bool> action)
-        {
-            if (action == null)
-            {
-                return null;
-            }
-
-            return value =>
-            {
-                PlayTap();
-                action(value);
             };
         }
 

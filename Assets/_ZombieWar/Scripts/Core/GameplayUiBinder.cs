@@ -20,20 +20,21 @@ namespace ZombieWar.Core
         [SerializeField] private GameFlowController _flow;
         [SerializeField] private PlayerHealth _playerHealth;
         [SerializeField] private WeaponController _weapons;
-        [SerializeField] private CameraShakeController _cameraShake;
+        [SerializeField] private SettingsService _settings;
         [SerializeField] private RoguelikeDirector _rogue;
         [SerializeField] private AbilityRunner _abilities;
         [SerializeField] private ZombieManager _zombies;
 
         private SkillCardData[] _skillCards;
         private Action<int> _onSkillPicked;
+        private Action _onPauseSettings;
         private readonly AbilityRunner.EquippedSkill[] _equippedBuffer = new AbilityRunner.EquippedSkill[AbilityRunner.MaxEquipped];
         private readonly ActiveSkillHudEntry[] _activeSkillsHud = new ActiveSkillHudEntry[AbilityRunner.MaxEquipped];
 
         private void Awake()
         {
             bool missing = _ui == null || _flow == null || _playerHealth == null || _weapons == null
-                           || _cameraShake == null || _rogue == null || _abilities == null || _zombies == null;
+                           || _settings == null || _rogue == null || _abilities == null || _zombies == null;
             if (missing)
             {
                 Debug.LogError($"{LogPrefix} GameplayUiBinder has an unassigned reference - the HUD would never update.", this);
@@ -42,6 +43,7 @@ namespace ZombieWar.Core
 
             // Cached once: turning a method group into a delegate allocates on every level-up.
             _onSkillPicked = _rogue.ChooseOffer;
+            _onPauseSettings = HandlePauseSettingsRequested;
             _ui.BindGameplayCommands(_flow.Pause, _weapons.RequestSwitch);
         }
 
@@ -121,9 +123,12 @@ namespace ZombieWar.Core
 
             if (state == GameState.Paused)
             {
-                _ui.ShowPausePopup(_flow.Resume, _flow.Retry, _flow.GoToMenu, _cameraShake.IsEnabled, _cameraShake.SetEnabled);
+                _ui.ShowPausePopup(_flow.Resume, _flow.Retry, _flow.GoToMenu, _onPauseSettings);
             }
         }
+
+        // Same sheet the menu opens; it stacks above the pause popup and closes back onto it.
+        private void HandlePauseSettingsRequested() => _ui.ShowSettingsPopup(_settings.Snapshot(), _settings.Apply);
 
         private void HandleLoadingProgress(float normalized) => _ui.SetLoadingProgress(normalized);
 

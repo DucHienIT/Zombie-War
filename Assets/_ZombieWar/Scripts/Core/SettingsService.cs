@@ -1,5 +1,6 @@
 using UnityEngine;
 using ZombieWar.Audio;
+using ZombieWar.UI;
 
 namespace ZombieWar.Core
 {
@@ -13,6 +14,8 @@ namespace ZombieWar.Core
         [SerializeField] private AudioSource _music;
         // The UI plays its taps through its own source inside the UI prefab.
         [SerializeField] private AudioSource _uiVoice;
+        // Shake keeps its own switch; this only routes the sheet's row to it.
+        [SerializeField] private CameraShakeController _cameraShake;
 
         private readonly SaveService _save = new SaveService();
 
@@ -23,7 +26,7 @@ namespace ZombieWar.Core
 
         private void Awake()
         {
-            if (_world == null || _music == null || _uiVoice == null)
+            if (_world == null || _music == null || _uiVoice == null || _cameraShake == null)
             {
                 Debug.LogError($"{LogPrefix} SettingsService has an unassigned reference.", this);
                 return;
@@ -32,6 +35,29 @@ namespace ZombieWar.Core
             ApplySound(_save.SoundEnabled);
             ApplyMusic(_save.MusicEnabled);
             HapticsEnabled = _save.HapticsEnabled;
+        }
+
+        public SettingsData Snapshot() =>
+            new SettingsData(SoundEnabled, MusicEnabled, HapticsEnabled, _cameraShake.IsEnabled);
+
+        // The sheet only says which row moved; which switch owns that row is decided here.
+        public void Apply(SettingId id, bool enabled)
+        {
+            switch (id)
+            {
+                case SettingId.Sound:
+                    SetSoundEnabled(enabled);
+                    break;
+                case SettingId.Music:
+                    SetMusicEnabled(enabled);
+                    break;
+                case SettingId.Haptics:
+                    SetHapticsEnabled(enabled);
+                    break;
+                case SettingId.CameraShake:
+                    _cameraShake.SetEnabled(enabled);
+                    break;
+            }
         }
 
         public void SetSoundEnabled(bool enabled)
