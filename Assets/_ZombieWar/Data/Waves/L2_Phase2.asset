@@ -23,5 +23,11 @@ MonoBehaviour:
     _weight: 25
   - _definition: {fileID: 11400000, guid: c02e777ce552f0f4cb8f9035ee21905e, type: 2}
     _weight: 5
-  _scriptedSpawns: []
+  _scriptedSpawns:
+  - _time: 30
+    _definition: {fileID: 11400000, guid: 93b0f7be99747354abe0fdf0337f849f, type: 2}
+    _count: 1
+  - _time: 60
+    _definition: {fileID: 11400000, guid: 93b0f7be99747354abe0fdf0337f849f, type: 2}
+    _count: 1
   _fireHazardTimes: []

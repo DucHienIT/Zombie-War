@@ -15,7 +15,7 @@ MonoBehaviour:
   _id: giant
   _displayName: Giant
   _prefab: {fileID: 610786250769294143, guid: db7860cff9d5e2a4a8ac88dd68b15f7e, type: 3}
-  _poolPrewarm: 1
+  _poolPrewarm: 2
   _maxHp: 720
   _moveSpeed: 1
   _scoreReward: 300
