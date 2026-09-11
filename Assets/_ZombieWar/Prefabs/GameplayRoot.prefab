@@ -15914,7 +15914,7 @@ MonoBehaviour:
   - {fileID: 70887345015374480}
   _pitchJitter: 0.03
   _sameClipMergeWindow: 0.03
-  _maxVoicesPerClip: 3
+  _maxVoicesPerClip: 2
 --- !u!1 &8840087316811622482
 GameObject:
   m_ObjectHideFlags: 0
@@ -16032,10 +16032,10 @@ MonoBehaviour:
   _feedback: {fileID: 11400000, guid: 64488bbe0fa51fb49a8bc6286063d744, type: 2}
   _audio: {fileID: 4343982078079130504}
   _vfx: {fileID: 2440377868786309692}
-  _voiceInterval: 0.25
-  _hitVoiceInterval: 0.4
-  _spawnVoiceInterval: 0.7
-  _voiceVolume: 0.75
+  _voiceInterval: 0.4
+  _hitVoiceInterval: 0.6
+  _spawnVoiceInterval: 1.2
+  _voiceVolume: 0.55
   _corpseLayerName: Corpse
 --- !u!114 &5073273168370420658
 MonoBehaviour:
