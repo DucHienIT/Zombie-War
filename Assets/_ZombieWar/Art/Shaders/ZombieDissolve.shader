@@ -3,7 +3,7 @@ Shader "ZombieWar/ZombieDissolve"
     Properties
     {
         _BaseMap("Base Map", 2D) = "white" {}
-        _BaseColor("Base Color", Color) = (1, 1, 1, 1)
+        [HDR] _BaseColor("Base Color", Color) = (1, 1, 1, 1)
         _Smoothness("Smoothness", Range(0, 1)) = 0.2
         _NoiseMap("Dissolve Noise", 2D) = "white" {}
         _DissolveAmount("Dissolve Amount", Range(0, 1)) = 0

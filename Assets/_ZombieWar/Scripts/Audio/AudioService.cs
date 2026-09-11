@@ -14,7 +14,9 @@ namespace ZombieWar.Audio
         [SerializeField] private float _pitchJitter = 0.03f;
         // Identical clips requested inside this window are merged into one voice (shotgun pellets, crowd hits).
         [SerializeField] private float _sameClipMergeWindow = 0.03f;
-        // Copies of one clip allowed to overlap; a crowd hitting the same grunt past this is dropped instead of stacked.
+        // Copies of one clip allowed to overlap. Past this the oldest copy of that clip is restarted rather
+        // than the request dropped: an automatic gun still gets a transient per shot, but its tails never stack
+        // beyond the cap, so the crowd-noise ceiling holds.
         [SerializeField] private int _maxVoicesPerClip = 3;
 
         private readonly Dictionary<AudioClip, float> _lastPlayTime = new Dictionary<AudioClip, float>(32);
@@ -48,12 +50,17 @@ namespace ZombieWar.Audio
 
         public void PlayWorld(AudioClip clip, Vector3 position, float volume)
         {
-            if (clip == null || IsMerged(clip) || IsClipSaturated(clip))
+            if (clip == null || IsMerged(clip))
             {
                 return;
             }
 
-            int index = AcquireVoice();
+            int index = FindOldestVoiceIfSaturated(clip);
+            if (index < 0)
+            {
+                index = AcquireVoice();
+            }
+
             AudioSource voice = _worldVoices[index];
             voice.transform.position = position;
             voice.pitch = 1f + Random.Range(-_pitchJitter, _pitchJitter);
@@ -91,19 +98,27 @@ namespace ZombieWar.Audio
             return false;
         }
 
-        private bool IsClipSaturated(AudioClip clip)
+        // Returns the longest-playing voice of this clip when the clip already fills its overlap budget, -1 otherwise.
+        private int FindOldestVoiceIfSaturated(AudioClip clip)
         {
             int playing = 0;
+            int oldest = -1;
             for (int i = 0; i < _worldVoices.Length; i++)
             {
                 AudioSource voice = _worldVoices[i];
-                if (voice.clip == clip && voice.isPlaying)
+                if (voice.clip != clip || !voice.isPlaying)
                 {
-                    playing++;
+                    continue;
+                }
+
+                playing++;
+                if (oldest < 0 || _voiceStartTime[i] < _voiceStartTime[oldest])
+                {
+                    oldest = i;
                 }
             }
 
-            return playing >= _maxVoicesPerClip;
+            return playing >= _maxVoicesPerClip ? oldest : -1;
         }
 
         private int AcquireVoice()
