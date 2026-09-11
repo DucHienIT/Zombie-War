@@ -49,4 +49,3 @@ MonoBehaviour:
   _deathClips:
   - {fileID: 8300000, guid: 9df77b70cadc8384ca073a95aebc666f, type: 3}
   - {fileID: 8300000, guid: 1d92c5ac0e056b045b4461b147f95be5, type: 3}
-  _spawnClip: {fileID: 8300000, guid: f1ff3e33006a291449618f6fc613e928, type: 3}

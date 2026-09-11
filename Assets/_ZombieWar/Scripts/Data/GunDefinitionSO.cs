@@ -33,6 +33,8 @@ namespace ZombieWar.Data
         [SerializeField] private PooledVfx _fleshImpactVfx;
         [SerializeField] private PooledVfx _propImpactVfx;
         [SerializeField] private AudioClip _shotClip;
+        // Automatic guns fire several times a second, so their shot sits well under the zombie voices.
+        [SerializeField, Range(0f, 1f)] private float _shotVolume = 0.5f;
         [SerializeField] private float _cameraImpulse = 0.08f;
 
         [Header("Upgrade")]
@@ -63,6 +65,7 @@ namespace ZombieWar.Data
         public PooledVfx FleshImpactVfx => _fleshImpactVfx;
         public PooledVfx PropImpactVfx => _propImpactVfx;
         public AudioClip ShotClip => _shotClip;
+        public float ShotVolume => _shotVolume;
         public float CameraImpulse => _cameraImpulse;
         public bool UnlockedByDefault => _unlockedByDefault;
         public int MaxUpgradeLevel => _maxUpgradeLevel;

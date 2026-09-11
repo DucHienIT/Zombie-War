@@ -244,7 +244,7 @@ namespace ZombieWar.Weapons
             SpawnPellets(definition, origin, forward, shot);
             // Attached, not dropped at a world position: the flash rides the muzzle while the soldier runs.
             _vfx.Play(definition.MuzzleVfx, muzzle);
-            _audio.PlayWorld(definition.ShotClip, origin);
+            _audio.PlayWorld(definition.ShotClip, origin, definition.ShotVolume);
             _impulseSource.GenerateImpulseWithForce(definition.CameraImpulse);
             gun.Kick();
             OnShotFired?.Invoke(gun);
