@@ -102,6 +102,8 @@ namespace ZombieWar.UI
             _chapterText.SetText("{0} / {1}", _index + 1, _levels.Length);
             _prevButton.interactable = _index > 0;
             _nextButton.interactable = _index < _levels.Length - 1;
+            _prevButton.gameObject.SetActive(_prevButton.interactable);
+            _nextButton.gameObject.SetActive(_nextButton.interactable);
             _card.PlayEnter(step);
         }
 
